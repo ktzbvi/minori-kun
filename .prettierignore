@@ -1,0 +1,4 @@
+apps/api/vendor
+apps/api/storage
+apps/api/openapi.json
+pnpm-lock.yaml

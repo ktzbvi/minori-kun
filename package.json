@@ -1,0 +1,36 @@
+{
+  "name": "minorikun-marketplace",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.17.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm --filter './packages/*' build && pnpm --parallel --filter './apps/*' build",
+    "lint": "eslint .",
+    "typecheck": "pnpm --parallel --filter './apps/*' typecheck && pnpm --parallel --filter './packages/*' typecheck",
+    "test": "pnpm --parallel --filter './apps/*' test",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "api:types": "openapi-typescript apps/api/openapi.json -o packages/api-client/src/generated/schema.d.ts",
+    "api:types:check": "openapi-typescript apps/api/openapi.json -o node_modules/.cache/minori-schema.d.ts && cmp -s node_modules/.cache/minori-schema.d.ts packages/api-client/src/generated/schema.d.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.4.0",
+    "openapi-typescript": "^7.9.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.42.0",
+    "vue-eslint-parser": "^10.2.0"
+  }
+}
