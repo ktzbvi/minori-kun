@@ -71,6 +71,7 @@
 ## Change Boundaries
 
 - Do not mutate Figma, Figwright, Penpot, external services, or payment systems unless the user explicitly requests that mutation.
+- When replacing a Figma design, never place the replacement on top of the superseded frame. Edit the original in place, or build the replacement beside it; after visual verification, delete the exact superseded node before moving the replacement into its final position, then verify that no overlapping duplicate frames remain.
 - Do not generate or edit the Excel requirement workbook while the Markdown requirement is being established unless the user explicitly starts the Excel phase.
 - Treat only `docs/みのりくん_EC画面要件定義書.xlsx` as the current manager workbook; archived workbooks are historical evidence only.
 - Preserve unrelated user files and existing artifacts. Never delete or replace them merely because they are outdated.

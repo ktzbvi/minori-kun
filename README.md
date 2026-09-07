@@ -1,46 +1,116 @@
 # Minori-kun Marketplace
 
-Minori-kun is a Japanese agricultural marketplace implemented as one Laravel API and three independent Vue applications in a pnpm monorepo.
+Minori-kun is a Japanese agricultural marketplace implemented as a Laravel modular-monolith API with three independent Vue applications in one pnpm monorepo.
 
-## Repository layout
+Local development runs directly on the host. Docker is not used for development.
 
-- `apps/api` — Laravel JSON API and domain implementation.
-- `apps/buyer-web` — Buyer-facing Vue application.
-- `apps/producer-web` — Producer Portal Vue application.
-- `apps/admin-web` — Admin Portal Vue application.
-- `packages/ui` — shared UI primitives and design tokens.
-- `packages/api-client` — Axios client and generated API contract types.
-- `packages/config` — shared frontend tooling configuration.
-- `docs` — requirements, manager workbook, architecture decisions, and project context.
+## Project structure
 
-## Prerequisite
+```text
+apps/
+├── api/             Laravel JSON API
+├── buyer-web/       Buyer Vue SPA
+├── producer-web/    Producer Vue SPA
+└── admin-web/       Admin Vue SPA
+packages/
+├── ui/              Shared UI primitives and design tokens
+├── api-client/      Axios client and generated API types
+└── config/          Shared frontend tooling configuration
+docs/                Requirements, workbook, and project context
+scripts/             Cross-platform project verification scripts
+```
 
-Install and start Docker Desktop. Host PHP, Node.js, pnpm, MySQL, and Mailpit installations are not required. PowerShell 5.1 or newer is the supported command shell.
+The files under `docker/` are production image definitions only. They are not part of setup or daily local development.
+
+## Local prerequisites
+
+Install these tools on the host and make them available on `PATH`:
+
+- PHP 8.4 with `bcmath`, `curl`, `fileinfo`, `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, and `zip` extensions.
+- Composer 2.8 or newer.
+- Node.js 22.12 or newer.
+- pnpm 10. Enable it with `corepack enable` and `corepack prepare pnpm@10.17.1 --activate` if Corepack is available.
+- MySQL 8.4 with a local database named `minori`.
+- Mailpit for browser-based local email inspection, or use Laravel's `log` mailer instead.
+- PowerShell 5.1 or newer.
+
+Verify the main tools:
+
+```powershell
+php --version
+composer --version
+node --version
+pnpm --version
+mysql --version
+```
+
+## Database preparation
+
+Create a UTF-8 local database and a development-only MySQL user. The default application settings expect:
+
+```text
+Host:     127.0.0.1
+Port:     3306
+Database: minori
+User:     minori
+Password: minori_local
+```
+
+You may use different local credentials. Put them only in `apps/api/.env`; never commit that file.
 
 ## First setup
 
-From any PowerShell directory, run the script by path:
+From the repository root:
 
 ```powershell
-C:\EC\m.ps1 bootstrap
+.\m.ps1 bootstrap
 ```
 
-`bootstrap` builds the images, installs locked Composer and pnpm dependencies, initializes Laravel, runs additive migrations, loads repeatable local fixtures, starts the services, and waits for health checks. It is safe to run again when recovering the development environment; it does not recreate the database.
+The command performs the following work in order:
+
+1. Validates the PHP, Composer, Node.js, and pnpm toolchain.
+2. Installs Composer dependencies from `composer.lock`.
+3. Creates `apps/api/.env` from `.env.example` when it does not exist.
+4. Generates the Laravel application key and storage link.
+5. Installs pnpm dependencies from `pnpm-lock.yaml`.
+6. Runs pending migrations against the configured MySQL database.
+7. Loads repeatable local fixtures without duplicating them.
+
+`bootstrap` does not start long-running development servers.
 
 ## Daily development
 
+Start local MySQL first. Then use separate terminals so logs remain understandable.
+
+Terminal 1 — Laravel API:
+
 ```powershell
-.\m.ps1 up
-.\m.ps1 status
-.\m.ps1 logs
-.\m.ps1 stop
+cd apps/api
+php artisan serve
 ```
 
-`up` starts the existing environment only. It never installs dependencies, runs migrations, seeds fixtures, or resets data.
+Terminal 2 — all three Vue applications with hot reload:
+
+```powershell
+.\m.ps1 web
+```
+
+Terminal 3 — local email inbox, when needed:
+
+```powershell
+mailpit
+```
+
+Terminal 4 — database queue worker, only when developing an asynchronous feature:
+
+```powershell
+cd apps/api
+php artisan queue:work
+```
 
 Local URLs:
 
-| Service | URL |
+| Application | URL |
 |---|---|
 | API | http://localhost:8000 |
 | Buyer | http://localhost:5173 |
@@ -48,100 +118,136 @@ Local URLs:
 | Admin | http://localhost:5175 |
 | Mailpit | http://localhost:8025 |
 
-Vite hot reload runs for all three SPAs from one frontend container. Source code stays on the Windows filesystem at `C:\EC`; deleting or recreating containers does not delete source code.
+Stop a foreground server or worker with `Ctrl+C`.
 
-## Common commands
+## Project commands
 
 ```powershell
-.\m.ps1 restart
-.\m.ps1 logs api
-.\m.ps1 shell
-.\m.ps1 artisan route:list
-.\m.ps1 migrate
-.\m.ps1 seed
-.\m.ps1 worker
+.\m.ps1 bootstrap
+.\m.ps1 web
 .\m.ps1 test
 .\m.ps1 check
 .\m.ps1 api-sync
 .\m.ps1 help
 ```
 
-- `seed` refreshes deterministic local fixtures without duplicating them.
-- `worker` runs the database queue worker in the foreground; press `Ctrl+C` to stop it. The daily stack does not run a worker automatically.
+- `bootstrap` coordinates both Composer and pnpm setup, then initializes the application.
+- `web` runs the Buyer, Producer, and Admin Vite servers together.
 - `test` runs Pest and frontend unit tests.
-- `check` runs non-mutating formatting checks, PHPStan/Larastan, Pest, ESLint, Prettier, TypeScript, Vitest, production frontend builds, and generated-contract freshness checks.
-- `api-sync` regenerates `apps/api/openapi.json` and the committed TypeScript declarations after an intentional API contract change.
+- `check` runs Pint check, PHPStan/Larastan, Pest, ESLint, Prettier check, TypeScript checks, Vitest, frontend production builds, and non-mutating API contract freshness checks.
+- `api-sync` intentionally regenerates `apps/api/openapi.json` and the committed TypeScript API declarations.
 
-## Local email
+Normal Laravel operations use normal Artisan commands from `apps/api`:
 
-Laravel sends local SMTP mail to Mailpit. Open http://localhost:8025 to inspect messages. Mailpit is a development tool and is not a production email provider.
+```powershell
+cd apps/api
+php artisan route:list
+php artisan migrate
+php artisan db:seed
+php artisan queue:work
+php artisan migrate:fresh --seed
+```
 
-## Authentication and runtime storage
+`migrate:fresh --seed` is destructive and must only be used when all local database data may be deleted.
 
-Sanctum uses first-party encrypted session cookies. Local sessions, cache entries, and queued jobs are stored in MySQL. No authentication token belongs in browser storage. Redis and Horizon are not part of this local stack.
+## pnpm workspace and package installation
 
-Database timestamps remain UTC. Business dates and UI display use `BUSINESS_TIMEZONE=Asia/Tokyo`.
+The root and application-level `node_modules` directories are normal in a pnpm workspace. They are dependency links/views created by pnpm, not three unrelated full installations. Do not edit or delete individual package files inside them, and never commit them.
+
+Run package commands from the repository root. To install a runtime dependency for Buyer only:
+
+```powershell
+pnpm --filter @minorikun/buyer-web add <package-name>
+```
+
+To install a Buyer-only development dependency:
+
+```powershell
+pnpm --filter @minorikun/buyer-web add -D <package-name>
+```
+
+Other workspace targets follow the same pattern:
+
+```powershell
+pnpm --filter @minorikun/producer-web add <package-name>
+pnpm --filter @minorikun/admin-web add <package-name>
+pnpm --filter @minorikun/ui add <package-name>
+pnpm --filter @minorikun/api-client add <package-name>
+```
+
+Install repository-wide tooling at the workspace root only when every application needs it:
+
+```powershell
+pnpm add -Dw <package-name>
+```
+
+These commands update the selected package's `package.json` and the single root `pnpm-lock.yaml`. Do not use `npm install` inside an individual application.
+
+## Local runtime behavior
+
+- Sanctum uses encrypted first-party session cookies; no JWT or browser-stored secret is used.
+- Sessions, cache entries, and queued jobs are stored in MySQL.
+- The queue worker is opt-in during development.
+- Database and application timestamps remain UTC.
+- Marketplace business dates and UI display use `BUSINESS_TIMEZONE=Asia/Tokyo`.
+- Mailpit is a local inspection tool, not a production email provider.
+
+If Mailpit is not installed, set this in `apps/api/.env` and inspect `apps/api/storage/logs/laravel.log`:
+
+```dotenv
+MAIL_MAILER=log
+```
 
 ## Local demo accounts
 
-The repeatable local seeder creates:
+The local seeder creates:
 
 | Portal | Email | Password |
 |---|---|---|
 | Buyer | `buyer@example.test` | `password` |
 | Producer | `producer@example.test` | `password` |
 
-No default Admin credential is seeded. Create or rotate Admin access through the protected Artisan command when that workflow is implemented.
-
-## Migrations and data safety
-
-Run pending additive migrations with:
-
-```powershell
-.\m.ps1 migrate
-```
-
-Normal `stop`, `up`, and container rebuilds preserve MySQL data and Laravel uploads. To intentionally erase and recreate the local database:
-
-```powershell
-.\m.ps1 db-reset
-```
-
-The reset requires typing the exact confirmation phrase shown by the script. Do not use `docker compose down -v` unless all Compose-managed database and upload volumes are intentionally disposable.
+No default Admin credential is seeded.
 
 ## API contract workflow
 
-Laravel Form Requests and Resources generate OpenAPI through Scramble. `openapi-typescript` generates the shared declarations used by all Vue applications.
+Laravel and Scramble generate OpenAPI. `openapi-typescript` converts the committed contract into shared frontend declarations.
 
-1. Intentionally change the API contract.
+1. Change the Laravel API contract intentionally.
 2. Run `.\m.ps1 api-sync`.
-3. Review both generated files.
+3. Review `apps/api/openapi.json` and `packages/api-client/src/generated/schema.d.ts`.
 4. Run `.\m.ps1 check`.
 
-Pages call endpoint functions from `packages/api-client`; they do not call raw Axios directly.
+The freshness check generates temporary comparison files outside the repository and does not rewrite tracked files.
 
 ## Development guidelines
 
-- Read the relevant `FR-*`, `SCR-*`, business/data/integration/security rules, and acceptance-test IDs in `docs/REQUIREMENTS.md` before implementing a feature.
-- Keep Laravel controllers thin. Use Form Requests for validation, Policies for authorization, domain actions/services for behavior, and API Resources for responses.
-- Protect every API endpoint server-side by role and resource ownership. Frontend route guards and hidden buttons are UX controls, not authorization.
-- Keep payment, refund, screening, fulfillment, and payout states separate. Financial and inventory writes spanning multiple records require database transactions and idempotency.
-- Dispatch queued side effects only after the authoritative database transaction commits.
-- Keep role-specific pages and workflows inside their SPA. `packages/ui` contains only shared primitives/tokens, and `packages/api-client` owns HTTP endpoint functions and generated types.
-- Use Vue Query for server state and Pinia only for client/presentation state. Never store session secrets in Pinia, `localStorage`, or `sessionStorage`.
-- Store JPY amounts as integers and percentages as basis points. Producer-funded option discounts and the Company's fixed 10% commission are separate values.
-- Add focused backend authorization/invalid-state tests and frontend type/component tests with every implementation batch.
-- Never commit credentials, real card/bank data, `vendor`, `node_modules`, build output, screenshots, logs, or machine-specific MCP configuration.
+- Read the relevant requirement and acceptance-test IDs in `docs/REQUIREMENTS.md` before implementation.
+- Keep Laravel controllers thin. Use Form Requests, Policies, domain actions/services, and API Resources.
+- Enforce portal role and resource ownership on the server. Frontend route guards are UX only.
+- Wrap multi-record financial and inventory changes in database transactions.
+- Keep payment, refund, screening, fulfillment, and payout states independent and idempotent.
+- Dispatch queued side effects only after the authoritative transaction commits.
+- Keep role-specific pages inside their SPA. `packages/ui` contains shared primitives only.
+- Pages use endpoint functions from `packages/api-client`; they do not call raw Axios directly.
+- Use Vue Query for server state and Pinia for client/presentation state only.
+- Store JPY as integers and percentages as basis points.
+- Keep Producer-funded discounts separate from the Company's fixed 10% commission.
+- Never commit credentials, real personal/payment/bank data, `vendor`, `node_modules`, logs, screenshots, or build output.
 
 See `AGENTS.md` for the complete repository rules and required handoff format.
 
 ## Troubleshooting
 
-- **Docker unavailable:** start Docker Desktop and wait until its engine is running, then retry.
-- **Port already in use:** change the matching port in the root `.env.example` values copied to your local root `.env`, then restart.
-- **Service not healthy:** run `.\m.ps1 status`, followed by `.\m.ps1 logs <service>`.
-- **Dependencies or generated files are stale:** run `.\m.ps1 bootstrap`; use `.\m.ps1 api-sync` only for intentional API contract changes.
-- **Pending database schema:** run `.\m.ps1 migrate`. Daily `up` intentionally does not migrate automatically.
+- **PowerShell blocks `m.ps1`:** use `powershell -NoProfile -ExecutionPolicy Bypass -File .\m.ps1 help` for a one-off run, or apply your organization's approved script policy.
+- **`php` version check fails:** install PHP 8.4 and ensure it appears before older PHP versions on `PATH`.
+- **Composer cannot reach GitHub:** verify the host network/proxy and GitHub access, then rerun `bootstrap`. Composer no longer runs inside a container.
+- **`pnpm install` reports `EACCES` inside a workspace `node_modules`:** rerun `bootstrap`. It detects and removes generated Linux-style dependency links left by the former Docker development environment, then recreates them for native Windows development.
+- **Laravel reports that `public/storage` already exists:** `bootstrap` keeps a working native link and replaces only an inaccessible link left by the former Docker environment. It stops instead of deleting the path when `public/storage` is a real directory.
+- **MySQL connection fails:** start MySQL and verify `DB_HOST`, `DB_PORT`, database, username, and password in `apps/api/.env`.
+- **A port is busy:** stop the conflicting host process or change the relevant Laravel/Vite port configuration.
+- **Schema is behind:** run `php artisan migrate` from `apps/api`.
+- **Generated API files are stale:** run `.\m.ps1 api-sync`, review the changes, and rerun `.\m.ps1 check`.
 
 ## Sources of truth
 

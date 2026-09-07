@@ -7,20 +7,19 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter './apps/*' dev",
-    "build": "pnpm --filter './packages/*' build && pnpm --parallel --filter './apps/*' build",
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm --filter \"./packages/*\" build && pnpm --parallel --filter \"./apps/*\" build",
     "lint": "eslint .",
-    "typecheck": "pnpm --parallel --filter './apps/*' typecheck && pnpm --parallel --filter './packages/*' typecheck",
-    "test": "pnpm --parallel --filter './apps/*' test",
-    "test:e2e": "playwright test",
+    "typecheck": "pnpm --parallel --filter \"./apps/*\" typecheck && pnpm --parallel --filter \"./packages/*\" typecheck",
+    "test": "pnpm --parallel --filter \"./apps/*\" test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "api:types": "openapi-typescript apps/api/openapi.json -o packages/api-client/src/generated/schema.d.ts",
-    "api:types:check": "openapi-typescript apps/api/openapi.json -o node_modules/.cache/minori-schema.d.ts && cmp -s node_modules/.cache/minori-schema.d.ts packages/api-client/src/generated/schema.d.ts"
+    "api:types:check": "node scripts/check-api-contract.mjs --types-only",
+    "api:contract:check": "node scripts/check-api-contract.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
-    "@playwright/test": "^1.55.0",
     "@types/node": "^22.18.1",
     "@typescript-eslint/eslint-plugin": "^8.42.0",
     "@typescript-eslint/parser": "^8.42.0",

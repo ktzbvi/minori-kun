@@ -1,21 +1,11 @@
 <?php
 
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
-
-final class DatabaseQueueProbe implements ShouldQueue
-{
-    public function __construct(public string $cacheKey) {}
-
-    public function handle(): void
-    {
-        Cache::store('database')->put($this->cacheKey, 'processed', 60);
-    }
-}
+use Tests\Support\DatabaseQueueProbe;
 
 it('provides the database-backed Laravel runtime tables', function (): void {
     foreach (['sessions', 'cache', 'cache_locks', 'jobs', 'job_batches', 'failed_jobs'] as $table) {

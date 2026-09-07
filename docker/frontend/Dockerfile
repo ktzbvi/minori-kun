@@ -1,9 +1,3 @@
-FROM node:22.20.0-bookworm-slim AS development
-RUN corepack enable && corepack prepare pnpm@10.17.1 --activate
-WORKDIR /workspace
-USER node
-CMD ["pnpm", "dev"]
-
 FROM node:22.20.0-bookworm-slim AS build
 ARG APP_PATH
 RUN corepack enable && corepack prepare pnpm@10.17.1 --activate

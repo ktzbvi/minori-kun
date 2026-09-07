@@ -1,10 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [string] $Command = 'help',
-
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]] $Arguments = @()
+    [string] $Command = 'help'
 )
 
 Set-StrictMode -Version 2.0
@@ -12,54 +9,152 @@ $ErrorActionPreference = 'Stop'
 
 function Show-Help {
     @'
-Minori-kun development commands
+Minori-kun native development commands
 
-  .\m.ps1 bootstrap       First-time/recoverable setup and start
-  .\m.ps1 up              Start the daily development stack
-  .\m.ps1 stop            Stop containers without deleting data
-  .\m.ps1 restart         Restart application containers
-  .\m.ps1 status          Show container and health status
-  .\m.ps1 logs [service]  Follow logs (core services by default)
-  .\m.ps1 shell           Open a shell in the API container
-  .\m.ps1 artisan ...     Run a Laravel Artisan command
-  .\m.ps1 migrate         Run pending database migrations
-  .\m.ps1 seed            Refresh safe local fixtures
-  .\m.ps1 worker          Run the database queue worker in foreground
+  .\m.ps1 bootstrap       Install locked dependencies and initialize the app
+  .\m.ps1 web             Run all three Vue development servers
   .\m.ps1 test            Run backend and frontend unit tests
   .\m.ps1 check           Run the complete non-mutating quality gate
   .\m.ps1 api-sync        Regenerate OpenAPI and TypeScript API types
-  .\m.ps1 db-reset        Destructively rebuild the local database
   .\m.ps1 help            Show this help
+
+Use normal php artisan, Composer, pnpm filter, and Mailpit commands for individual tasks.
 '@ | Write-Host
 }
 
-function Assert-Docker {
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        throw 'Docker was not found. Install or start Docker Desktop, then retry.'
-    }
+function Assert-Command {
+    param(
+        [Parameter(Mandatory = $true)][string] $Name,
+        [Parameter(Mandatory = $true)][string] $InstallHint
+    )
 
-    & docker compose version *> $null
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Docker Compose is unavailable. Start Docker Desktop, then retry.'
-    }
-}
-
-function Invoke-Compose {
-    param([Parameter(Mandatory = $true)][string[]] $ComposeArguments)
-
-    & docker compose @ComposeArguments
-    if ($LASTEXITCODE -ne 0) {
-        throw "Docker Compose command failed with exit code $LASTEXITCODE."
+    if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
+        throw "$Name was not found. $InstallHint"
     }
 }
 
-function Show-Urls {
-    Write-Host ''
-    Write-Host 'API:      http://localhost:8000'
-    Write-Host 'Buyer:    http://localhost:5173'
-    Write-Host 'Producer: http://localhost:5174'
-    Write-Host 'Admin:    http://localhost:5175'
-    Write-Host 'Mailpit:  http://localhost:8025'
+function Invoke-Checked {
+    param(
+        [Parameter(Mandatory = $true)][string] $Executable,
+        [string[]] $CommandArguments = @()
+    )
+
+    & $Executable @CommandArguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Executable failed with exit code $LASTEXITCODE."
+    }
+}
+
+function Assert-Toolchain {
+    Assert-Command 'php' 'Install PHP 8.4 with the extensions listed in README.md.'
+    Assert-Command 'composer' 'Install Composer 2.8 or newer.'
+    Assert-Command 'node' 'Install Node.js 22 LTS or newer.'
+    Assert-Command 'pnpm' 'Enable Corepack and activate pnpm 10.'
+
+    Invoke-Checked 'php' @('-r', "exit(version_compare(PHP_VERSION, '8.4.0', '>=') ? 0 : 1);")
+    Invoke-Checked 'node' @('-e', "const [major, minor] = process.versions.node.split('.').map(Number); process.exit(major > 22 || (major === 22 && minor >= 12) ? 0 : 1)")
+}
+
+function Invoke-ApiCommand {
+    param(
+        [Parameter(Mandatory = $true)][string] $Executable,
+        [string[]] $CommandArguments = @()
+    )
+
+    Push-Location (Join-Path $PSScriptRoot 'apps/api')
+    try {
+        Invoke-Checked $Executable $CommandArguments
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Test-DirectoryAccessible {
+    param(
+        [Parameter(Mandatory = $true)][string] $Path
+    )
+
+    try {
+        [System.IO.Directory]::GetFileSystemEntries($Path) | Out-Null
+        return $true
+    }
+    catch {
+        return $false
+    }
+}
+
+function Remove-GeneratedNodeModules {
+    $workspaceRoot = [System.IO.Path]::GetFullPath($PSScriptRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+    $nodeModulesDirectories = @(
+        'node_modules',
+        'apps/buyer-web/node_modules',
+        'apps/producer-web/node_modules',
+        'apps/admin-web/node_modules',
+        'packages/api-client/node_modules',
+        'packages/ui/node_modules'
+    )
+
+    foreach ($relativePath in $nodeModulesDirectories) {
+        $fullPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot $relativePath))
+        $expectedPrefix = $workspaceRoot + [System.IO.Path]::DirectorySeparatorChar
+
+        if (-not $fullPath.StartsWith($expectedPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+            [System.IO.Path]::GetFileName($fullPath) -ne 'node_modules') {
+            throw "Refusing to remove unexpected dependency path: $fullPath"
+        }
+
+        if (Test-Path -LiteralPath $fullPath) {
+            Remove-Item -LiteralPath $fullPath -Recurse -Force
+        }
+    }
+}
+
+function Repair-LegacyDockerWorkspaceLinks {
+    $workspaceLink = Join-Path $PSScriptRoot 'packages/api-client/node_modules/@minorikun/config'
+
+    if ((Test-Path -LiteralPath $workspaceLink) -and -not (Test-DirectoryAccessible $workspaceLink)) {
+        Write-Host 'Removing generated node_modules links left by the former Docker development environment...'
+        Remove-GeneratedNodeModules
+    }
+}
+
+function Ensure-ApiStorageLink {
+    $publicStorage = Join-Path $PSScriptRoot 'apps/api/public/storage'
+
+    if (Test-Path -LiteralPath $publicStorage) {
+        $item = Get-Item -LiteralPath $publicStorage -Force
+        $isLink = ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
+
+        if (-not $isLink) {
+            throw "The path $publicStorage exists but is not a storage link. Move it manually before running bootstrap."
+        }
+
+        if (Test-DirectoryAccessible $publicStorage) {
+            return
+        }
+
+        Write-Host 'Replacing the storage link left by the former Docker development environment...'
+        Remove-Item -LiteralPath $publicStorage -Force
+    }
+
+    Invoke-ApiCommand 'php' @('artisan', 'storage:link')
+}
+
+function Assert-LocalDatabaseConfiguration {
+    $apiEnvironment = Join-Path $PSScriptRoot 'apps/api/.env'
+    $databaseConnection = Select-String -LiteralPath $apiEnvironment -Pattern '^DB_CONNECTION=(.*)$' | Select-Object -Last 1
+
+    if ($null -eq $databaseConnection -or $databaseConnection.Matches[0].Groups[1].Value -ne 'mysql') {
+        return
+    }
+
+    foreach ($name in @('DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD')) {
+        $setting = Select-String -LiteralPath $apiEnvironment -Pattern "^$name=(.+)$" | Select-Object -Last 1
+        if ($null -eq $setting) {
+            throw "$name is missing or empty in apps/api/.env. Configure the local MySQL connection before running bootstrap. The documented default password is minori_local."
+        }
+    }
 }
 
 $normalizedCommand = $Command.ToLowerInvariant()
@@ -71,79 +166,53 @@ if ($normalizedCommand -in @('help', '-h', '--help')) {
 
 Push-Location $PSScriptRoot
 try {
-    Assert-Docker
-
     switch ($normalizedCommand) {
         'bootstrap' {
-            Invoke-Compose @('run', '--rm', '--build', 'setup')
-            Invoke-Compose @('up', '-d', '--build', '--wait')
-            Show-Urls
-        }
-        'up' {
-            Invoke-Compose @('up', '-d', '--wait')
-            Show-Urls
-        }
-        'stop' {
-            Invoke-Compose @('stop')
-        }
-        'restart' {
-            Invoke-Compose @('restart', 'api', 'api-nginx', 'frontend', 'mailpit')
-            Invoke-Compose @('ps')
-        }
-        'status' {
-            Invoke-Compose @('ps')
-        }
-        'logs' {
-            $services = if ($Arguments.Count -gt 0) { $Arguments } else { @('api', 'api-nginx', 'frontend', 'mailpit') }
-            Invoke-Compose (@('logs', '--follow', '--tail', '100') + $services)
-        }
-        'shell' {
-            Invoke-Compose @('exec', 'api', 'bash')
-        }
-        'artisan' {
-            if ($Arguments.Count -eq 0) {
-                throw 'Provide an Artisan command, for example: .\m.ps1 artisan route:list'
+            Assert-Toolchain
+            Invoke-ApiCommand 'composer' @('install', '--no-interaction', '--prefer-dist')
+
+            $apiEnvironment = Join-Path $PSScriptRoot 'apps/api/.env'
+            if (-not (Test-Path -LiteralPath $apiEnvironment)) {
+                Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'apps/api/.env.example') -Destination $apiEnvironment
             }
-            Invoke-Compose (@('exec', '-T', 'api', 'php', 'artisan') + $Arguments)
+
+            if (-not (Select-String -LiteralPath $apiEnvironment -Pattern '^APP_KEY=base64:.+' -Quiet)) {
+                Invoke-ApiCommand 'php' @('artisan', 'key:generate', '--force')
+            }
+            Ensure-ApiStorageLink
+            Repair-LegacyDockerWorkspaceLinks
+            Invoke-Checked 'pnpm' @('install', '--frozen-lockfile')
+            Assert-LocalDatabaseConfiguration
+            Invoke-ApiCommand 'php' @('artisan', 'migrate', '--force')
+            Invoke-ApiCommand 'php' @('artisan', 'db:seed', '--force')
+            Write-Host 'Bootstrap complete. See README.md for the normal Laravel and workspace development commands.'
         }
-        'migrate' {
-            Invoke-Compose @('exec', '-T', 'api', 'php', 'artisan', 'migrate', '--force')
-        }
-        'seed' {
-            Invoke-Compose @('exec', '-T', 'api', 'php', 'artisan', 'db:seed', '--force')
-        }
-        'worker' {
-            Write-Host 'Queue worker is running in the foreground. Press Ctrl+C to stop it.'
-            Invoke-Compose @('exec', 'api', 'php', 'artisan', 'queue:work', '--sleep=1', '--tries=3', '--timeout=90')
+        'web' {
+            Assert-Command 'node' 'Install Node.js 22 LTS or newer.'
+            Assert-Command 'pnpm' 'Enable Corepack and activate pnpm 10.'
+            Invoke-Checked 'pnpm' @('dev')
         }
         'test' {
-            Invoke-Compose @('exec', '-T', 'api', 'composer', 'test')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'test')
+            Assert-Toolchain
+            Invoke-ApiCommand 'composer' @('test')
+            Invoke-Checked 'pnpm' @('test')
         }
         'check' {
-            Invoke-Compose @('exec', '-T', 'api', 'composer', 'format:check')
-            Invoke-Compose @('exec', '-T', 'api', 'composer', 'analyse')
-            Invoke-Compose @('exec', '-T', 'api', 'composer', 'test')
-            Invoke-Compose @('exec', '-T', 'api', 'sh', '-lc', 'php artisan scramble:export --path=storage/framework/cache/openapi-check.json >/dev/null && cmp -s storage/framework/cache/openapi-check.json openapi.json')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'lint')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'format:check')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'typecheck')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'test')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'build')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'api:types:check')
+            Assert-Toolchain
+            Invoke-ApiCommand 'composer' @('format:check')
+            Invoke-ApiCommand 'composer' @('analyse')
+            Invoke-ApiCommand 'composer' @('test')
+            Invoke-Checked 'pnpm' @('lint')
+            Invoke-Checked 'pnpm' @('format:check')
+            Invoke-Checked 'pnpm' @('typecheck')
+            Invoke-Checked 'pnpm' @('test')
+            Invoke-Checked 'pnpm' @('build')
+            Invoke-Checked 'pnpm' @('api:contract:check')
         }
         'api-sync' {
-            Invoke-Compose @('exec', '-T', 'api', 'composer', 'openapi')
-            Invoke-Compose @('exec', '-T', 'frontend', 'pnpm', 'api:types')
-        }
-        'db-reset' {
-            Write-Warning 'This deletes every table and all local MySQL data for Minori-kun.'
-            $confirmation = Read-Host 'Type RESET MINORI LOCAL DATABASE to continue'
-            if ($confirmation -cne 'RESET MINORI LOCAL DATABASE') {
-                Write-Host 'Database reset cancelled. No data was changed.'
-                exit 1
-            }
-            Invoke-Compose @('exec', '-T', 'api', 'php', 'artisan', 'migrate:fresh', '--seed', '--force')
+            Assert-Toolchain
+            Invoke-ApiCommand 'composer' @('openapi')
+            Invoke-Checked 'pnpm' @('api:types')
         }
         default {
             Show-Help

@@ -1,6 +1,6 @@
 # Minori-kun Marketplace — Current Project Context
 
-Last updated: 2026-09-03 (Asia/Tokyo)
+Last updated: 2026-09-04 (Asia/Tokyo)
 
 ## Product and design
 
@@ -26,14 +26,15 @@ Last updated: 2026-09-03 (Asia/Tokyo)
 - The intended frontend stack is Vue 3, TypeScript, Vite, Vue Router, Pinia, Tailwind CSS, and shadcn-vue.
 - Shared frontend code is limited to UI primitives, design tokens, API client/types, and tooling configuration; role-specific pages and workflows remain in their applications.
 - The backend is a Laravel 13 modular monolith and the three portals are Vue 3 applications managed by one pnpm workspace.
-- Local development remains at `C:\EC` and runs through Docker Desktop. The supported public command interface is the root `m.ps1` script; developers do not need host PHP, Node.js, pnpm, or MySQL installations.
-- The local stack contains Laravel PHP-FPM, Nginx, one shared Vite frontend container, MySQL, and Mailpit.
+- Local development runs directly on the host and does not use Docker. Developers install PHP 8.4, Composer, Node.js, pnpm, MySQL, and optionally Mailpit locally.
+- The root `m.ps1` script is limited to cross-workspace coordination: bootstrap, all-frontend development, combined tests/checks, and API contract synchronization. Normal Laravel, Composer, pnpm filter, MySQL, and Mailpit operations use their native commands.
 - Sessions, application cache, and queued jobs use MySQL. Redis and Laravel Horizon were removed to keep local and initial hosting costs proportionate to the confirmed workload.
-- A queue worker is intentionally opt-in through `.\m.ps1 worker`; it is not started by the daily `.\m.ps1 up` command.
-- There is no scheduler container. Laravel scheduling remains available and must be attached to a production cron or hosting scheduler only when a scheduled feature is implemented.
+- A queue worker is intentionally opt-in through Laravel's native `php artisan queue:work` command.
+- Laravel scheduling remains available and must be attached to a production cron or hosting scheduler only when a scheduled feature is implemented.
 - Database timestamps and Laravel's application timezone remain UTC. `BUSINESS_TIMEZONE=Asia/Tokyo` is the explicit boundary for marketplace business dates and customer-facing display.
 - Mailpit is local-only email capture and is not a production mail provider.
-- Runtime storage uses persistent Docker volumes for MySQL, Laravel uploads, Composer dependencies, and pnpm dependencies. Normal stop/start and rebuild operations preserve business data and source code.
+- Local MySQL data and Laravel uploads live on the host. Composer `vendor` and pnpm `node_modules` remain untracked development dependencies.
+- Files under `docker/` define production images only and are not part of local setup or daily development.
 
 ## Continuation rule
 
