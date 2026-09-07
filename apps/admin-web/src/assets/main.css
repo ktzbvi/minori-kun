@@ -1,5 +1,2 @@
 @import 'tailwindcss';
 @import '@minorikun/ui/src/styles/tokens.css';
-
-body { margin: 0; color: var(--color-text); background: var(--color-background); }
-* { box-sizing: border-box; }
