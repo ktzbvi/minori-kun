@@ -12,10 +12,8 @@ const errorMessage = ref('')
 const isSubmitting = ref(false)
 const route = useRoute()
 const router = useRouter()
-const canSubmit = computed(
-  () => email.value.trim().length > 0 && password.value.length > 0 && !isSubmitting.value,
-)
 
+const requiredFieldsError = 'メールアドレスとパスワードを入力してください。'
 const authenticationError = 'メールアドレスまたはパスワードを確認してください。'
 const rateLimitError = '試行回数が多すぎます。しばらくしてからもう一度お試しください。'
 const serviceError =
@@ -23,10 +21,10 @@ const serviceError =
 
 async function submit() {
   errorMessage.value = ''
-  if (!canSubmit.value) {
-    errorMessage.value = 'メールアドレスとパスワードを入力してください。'
-    return
-  }
+  if (email.value.trim().length === 0 || password.value.length === 0) {
+  errorMessage.value = requiredFieldsError
+  return
+}
 
   isSubmitting.value = true
   try {
@@ -130,7 +128,7 @@ async function submit() {
         <UiButton
           class="mt-0.5 w-full disabled:cursor-not-allowed disabled:border-[#9db7a7] disabled:bg-[#9db7a7]"
           type="submit"
-          :disabled="!canSubmit"
+          :disabled="isSubmitting"
           >{{ isSubmitting ? 'ログイン中…' : 'ログインする' }}</UiButton
         >
       </form>
