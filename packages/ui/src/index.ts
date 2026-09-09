@@ -1,4 +1,6 @@
 export { default as UiButton } from './components/Button.vue'
 export { default as UiCard } from './components/Card.vue'
+export { default as UiToaster } from './components/Sonner.vue'
+export { toast } from 'vue-sonner'
 export { cn } from './lib/utils'
 import './styles/tokens.css'

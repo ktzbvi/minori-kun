@@ -1,56 +1,84 @@
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod'
 import axios from 'axios'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { UiButton } from '@minorikun/ui'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { toast, UiButton } from '@minorikun/ui'
 import { authApi } from '@/lib/api'
 import { queryClient } from '@/lib/query'
 
-const email = ref('')
-const password = ref('')
 const errorMessage = ref('')
-const isSubmitting = ref(false)
 const route = useRoute()
 const router = useRouter()
-const canSubmit = computed(
-  () => email.value.trim().length > 0 && password.value.length > 0 && !isSubmitting.value,
-)
 
 const authenticationError = 'メールアドレスまたはパスワードを確認してください。'
 const rateLimitError = '試行回数が多すぎます。しばらくしてからもう一度お試しください。'
 const serviceError =
   '現在ログインできません。通信環境を確認し、しばらくしてからもう一度お試しください。'
 
-async function submit() {
-  errorMessage.value = ''
-  if (!canSubmit.value) {
-    errorMessage.value = 'メールアドレスとパスワードを入力してください。'
-    return
-  }
+const loginSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, 'メールアドレスを入力してください。')
+      .email('正しいメールアドレスを入力してください。')
+      .max(255, 'メールアドレスは255文字以内で入力してください。'),
+    password: z
+      .string()
+      .min(1, 'パスワードを入力してください。')
+      .max(4096, 'パスワードは4096文字以内で入力してください。'),
+  }),
+)
 
-  isSubmitting.value = true
-  try {
-    await authApi.csrf()
-    await authApi.login(email.value.trim(), password.value)
-    await queryClient.invalidateQueries({ queryKey: ['current-session'] })
-    const redirect =
-      typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
-        ? route.query.redirect
-        : '/'
-    await router.replace(redirect)
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response?.status === 422) {
-      errorMessage.value = authenticationError
-    } else if (axios.isAxiosError(error) && error.response?.status === 429) {
-      errorMessage.value = rateLimitError
-    } else {
-      errorMessage.value = serviceError
+const { defineField, errors, handleSubmit, isSubmitting, setFieldValue } = useForm({
+  validationSchema: loginSchema,
+  initialValues: { email: '', password: '' },
+})
+
+const [email, emailAttrs] = defineField('email', (state) => ({
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnInput: false,
+  validateOnModelUpdate: state.errors.length > 0,
+}))
+const [password, passwordAttrs] = defineField('password', (state) => ({
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnInput: false,
+  validateOnModelUpdate: state.errors.length > 0,
+}))
+
+const submit = handleSubmit(
+  async (values) => {
+    errorMessage.value = ''
+    try {
+      await authApi.csrf()
+      await authApi.login(values.email, values.password)
+      await queryClient.invalidateQueries({ queryKey: ['current-session'] })
+      const redirect =
+        typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+          ? route.query.redirect
+          : '/'
+      await router.replace(redirect)
+      toast.success('成功')
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 422) {
+        errorMessage.value = authenticationError
+      } else if (axios.isAxiosError(error) && error.response?.status === 429) {
+        errorMessage.value = rateLimitError
+      } else {
+        errorMessage.value = serviceError
+      }
+      setFieldValue('password', '', false)
     }
-    password.value = ''
-  } finally {
-    isSubmitting.value = false
-  }
-}
+  },
+  () => {
+    errorMessage.value = ''
+  },
+)
 </script>
 
 <template>
@@ -100,13 +128,23 @@ async function submit() {
           <input
             id="admin-email"
             v-model="email"
+            v-bind="emailAttrs"
             class="min-h-12 w-full rounded-[9px] border border-[#cad8ce] bg-white px-3.5 text-[15px] outline-none placeholder:text-[#98a69d] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[#237f4b]/15"
             type="email"
             autocomplete="username"
             inputmode="email"
-            required
             placeholder="メールアドレスを入力"
+            :aria-invalid="Boolean(errors.email)"
+            :aria-describedby="errors.email ? 'admin-email-error' : undefined"
           />
+          <p
+            v-if="errors.email"
+            id="admin-email-error"
+            class="m-0 text-[12px] font-medium text-[#b33a2b]"
+            role="alert"
+          >
+            {{ errors.email }}
+          </p>
         </div>
 
         <div class="grid gap-2">
@@ -116,12 +154,22 @@ async function submit() {
           <input
             id="admin-password"
             v-model="password"
+            v-bind="passwordAttrs"
             class="min-h-12 w-full rounded-[9px] border border-[#cad8ce] bg-white px-3.5 text-[15px] outline-none placeholder:text-[#98a69d] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[#237f4b]/15"
             type="password"
             autocomplete="current-password"
-            required
             placeholder="パスワードを入力"
+            :aria-invalid="Boolean(errors.password)"
+            :aria-describedby="errors.password ? 'admin-password-error' : undefined"
           />
+          <p
+            v-if="errors.password"
+            id="admin-password-error"
+            class="m-0 text-[12px] font-medium text-[#b33a2b]"
+            role="alert"
+          >
+            {{ errors.password }}
+          </p>
         </div>
 
         <p v-if="errorMessage" class="-mt-1 mb-0 text-[13px] font-bold text-[#b33a2b]" role="alert">
@@ -130,7 +178,7 @@ async function submit() {
         <UiButton
           class="mt-0.5 w-full disabled:cursor-not-allowed disabled:border-[#9db7a7] disabled:bg-[#9db7a7]"
           type="submit"
-          :disabled="!canSubmit"
+          :disabled="isSubmitting"
           >{{ isSubmitting ? 'ログイン中…' : 'ログインする' }}</UiButton
         >
       </form>
