@@ -1,55 +1,85 @@
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod'
 import axios from 'axios'
 import { ChevronLeft, Leaf } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { UiButton, UiCard } from '@minorikun/ui'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { toast, UiButton, UiCard } from '@minorikun/ui'
 import { authApi } from '@/lib/api'
 import { queryClient } from '@/lib/query'
 
-const email = ref('')
-const password = ref('')
 const errorMessage = ref('')
-const isSubmitting = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const requiredFieldsError = 'メールアドレスとパスワードを入力してください。'
 const authenticationError = 'メールアドレスまたはパスワードを確認してください。'
 const rateLimitError = '試行回数が多すぎます。しばらくしてからもう一度お試しください。'
 const serviceError = '現在ログインできません。時間をおいてからもう一度お試しください。'
 
-async function submit() {
-  errorMessage.value = ''
-  if (email.value.trim().length === 0 || password.value.length === 0) {
-    errorMessage.value = requiredFieldsError
-    return
-  }
+const loginSchema = toTypedSchema(
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, 'メールアドレスを入力してください。')
+      .email('正しいメールアドレスを入力してください。')
+      .max(255, 'メールアドレスは255文字以内で入力してください。'),
+    password: z
+      .string()
+      .min(1, 'パスワードを入力してください。')
+      .max(4096, 'パスワードは4096文字以内で入力してください。'),
+  }),
+)
 
-  isSubmitting.value = true
-  try {
-    await authApi.csrf()
-    await authApi.login(email.value.trim(), password.value)
-    await queryClient.invalidateQueries({ queryKey: ['current-session'] })
+const { defineField, errors, handleSubmit, isSubmitting, setFieldValue } = useForm({
+  validationSchema: loginSchema,
+  initialValues: { email: '', password: '' },
+})
 
-    const redirect =
-      typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
-        ? route.query.redirect
-        : '/'
-    await router.replace(redirect)
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response?.status === 429) {
-      errorMessage.value = rateLimitError
-    } else if (axios.isAxiosError(error) && error.response?.status !== 422) {
-      errorMessage.value = serviceError
-    } else {
-      errorMessage.value = authenticationError
+const [email, emailAttrs] = defineField('email', (state) => ({
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnInput: false,
+  validateOnModelUpdate: state.errors.length > 0,
+}))
+const [password, passwordAttrs] = defineField('password', (state) => ({
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnInput: false,
+  validateOnModelUpdate: state.errors.length > 0,
+}))
+
+const submit = handleSubmit(
+  async (values) => {
+    errorMessage.value = ''
+    try {
+      await authApi.csrf()
+      await authApi.login(values.email, values.password)
+      await queryClient.invalidateQueries({ queryKey: ['current-session'] })
+
+      const redirect =
+        typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+          ? route.query.redirect
+          : '/'
+      await router.replace(redirect)
+      toast.success('成功')
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 429) {
+        errorMessage.value = rateLimitError
+      } else if (axios.isAxiosError(error) && error.response?.status !== 422) {
+        errorMessage.value = serviceError
+      } else {
+        errorMessage.value = authenticationError
+      }
+      setFieldValue('password', '', false)
     }
-    password.value = ''
-  } finally {
-    isSubmitting.value = false
-  }
-}
+  },
+  () => {
+    errorMessage.value = ''
+  },
+)
 
 function goBack() {
   router.back()
@@ -94,13 +124,23 @@ function goBack() {
               <input
                 id="buyer-email"
                 v-model="email"
+                v-bind="emailAttrs"
                 class="min-h-[39px] rounded-[6px] border border-[#dce5dc] bg-white px-2.5 text-[13px] outline-none placeholder:text-[#a7b0aa] focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15"
                 type="email"
                 autocomplete="username"
                 inputmode="email"
                 placeholder="example@farm-ec.jp"
-                required
+                :aria-invalid="Boolean(errors.email)"
+                :aria-describedby="errors.email ? 'buyer-email-error' : undefined"
               />
+              <p
+                v-if="errors.email"
+                id="buyer-email-error"
+                class="m-0 text-xs font-medium text-[#b33a2b]"
+                role="alert"
+              >
+                {{ errors.email }}
+              </p>
             </div>
 
             <div class="grid gap-1.5">
@@ -111,12 +151,22 @@ function goBack() {
               <input
                 id="buyer-password"
                 v-model="password"
+                v-bind="passwordAttrs"
                 class="min-h-[39px] rounded-[6px] border border-[#dce5dc] bg-white px-2.5 text-[13px] outline-none placeholder:text-[#a7b0aa] focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15"
                 type="password"
                 autocomplete="current-password"
                 placeholder="半角英数字8文字以上"
-                required
+                :aria-invalid="Boolean(errors.password)"
+                :aria-describedby="errors.password ? 'buyer-password-error' : undefined"
               />
+              <p
+                v-if="errors.password"
+                id="buyer-password-error"
+                class="m-0 text-xs font-medium text-[#b33a2b]"
+                role="alert"
+              >
+                {{ errors.password }}
+              </p>
             </div>
 
             <p v-if="errorMessage" class="m-0 text-xs font-medium text-[#b33a2b]" role="alert">
