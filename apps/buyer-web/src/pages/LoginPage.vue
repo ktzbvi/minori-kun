@@ -74,16 +74,22 @@ function goBack() {
       <div class="px-[33px] pt-[75px] pb-12">
         <UiCard class="!rounded-[11px] !border-[#dbe5dc] !bg-white !p-4.5 !shadow-none">
           <div class="mb-6 flex items-center justify-center gap-2.5">
-            <span class="grid size-9 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]" aria-hidden="true">
+            <span
+              class="grid size-9 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
+              aria-hidden="true"
+            >
               <Leaf :size="22" :stroke-width="2.5" />
             </span>
-            <p class="m-0 text-[20px] font-extrabold tracking-[0.06em] text-[#217848]">みのりくん</p>
+            <p class="m-0 text-[20px] font-extrabold tracking-[0.06em] text-[#217848]">
+              みのりくん
+            </p>
           </div>
 
           <form class="grid gap-4" novalidate @submit.prevent="submit">
             <div class="grid gap-1.5">
               <label class="text-[13px] font-bold text-[#24372b]" for="buyer-email">
-                メールアドレス <span class="rounded bg-[#d84444] px-1 py-px text-[10px] text-white">必須</span>
+                メールアドレス
+                <span class="rounded bg-[#d84444] px-1 py-px text-[10px] text-white">必須</span>
               </label>
               <input
                 id="buyer-email"
@@ -99,7 +105,8 @@ function goBack() {
 
             <div class="grid gap-1.5">
               <label class="text-[13px] font-bold text-[#24372b]" for="buyer-password">
-                パスワード <span class="rounded bg-[#d84444] px-1 py-px text-[10px] text-white">必須</span>
+                パスワード
+                <span class="rounded bg-[#d84444] px-1 py-px text-[10px] text-white">必須</span>
               </label>
               <input
                 id="buyer-password"
@@ -129,11 +136,17 @@ function goBack() {
         <nav class="mt-7 grid justify-items-center gap-4 text-[12px]" aria-label="ログイン支援">
           <div class="grid justify-items-center gap-1">
             <span class="text-[#78867d]">アカウントをお持ちでない方</span>
-            <RouterLink class="font-bold text-[#237f4b] underline underline-offset-2" to="/register">
+            <RouterLink
+              class="font-bold text-[#237f4b] underline underline-offset-2"
+              to="/register"
+            >
               新規会員登録
             </RouterLink>
           </div>
-          <RouterLink class="font-medium text-[#6e7e74] underline underline-offset-2" to="/password-reset">
+          <RouterLink
+            class="font-medium text-[#6e7e74] underline underline-offset-2"
+            to="/password-reset"
+          >
             パスワードをお忘れですか？
           </RouterLink>
         </nav>
