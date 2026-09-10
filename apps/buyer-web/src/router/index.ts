@@ -1,13 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { currentSessionQuery, queryClient } from '@/lib/query'
 import HomePage from '@/pages/HomePage.vue'
+import CategoryPage from '@/pages/CategoryPage.vue'
+import CategoryProductListPage from '@/pages/CategoryProductListPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import ProductDetailPage from '@/pages/ProductDetailPage.vue'
+import SearchPage from '@/pages/SearchPage.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
-    { path: '/', name: 'home', component: HomePage },
+    { path: '/', name: 'home', component: HomePage, meta: { public: true } },
+    { path: '/categories', name: 'categories', component: CategoryPage, meta: { public: true } },
+    {
+      path: '/categories/:categoryId',
+      name: 'category-products',
+      component: CategoryProductListPage,
+      meta: { public: true },
+    },
+    {
+      path: '/products/:productId',
+      name: 'product-detail',
+      component: ProductDetailPage,
+      meta: { public: true },
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: SearchPage,
+      meta: { public: true },
+    },
   ],
 })
 

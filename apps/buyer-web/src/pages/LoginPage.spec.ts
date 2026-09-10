@@ -54,8 +54,8 @@ describe('Buyer Login', () => {
     expect(mocks.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['current-session'] })
     expect(mocks.replace).toHaveBeenCalledWith('/')
     expect(mocks.toastSuccess).toHaveBeenCalledWith('成功')
-    expect(mocks.replace.mock.invocationCallOrder[0]).toBeLessThan(
-      mocks.toastSuccess.mock.invocationCallOrder[0],
+    expect(mocks.replace.mock.invocationCallOrder[0]!).toBeLessThan(
+      mocks.toastSuccess.mock.invocationCallOrder[0]!,
     )
   })
 
