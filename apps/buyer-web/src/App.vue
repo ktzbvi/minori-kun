@@ -4,5 +4,5 @@ import { UiToaster } from '@minorikun/ui'
 
 <template>
   <RouterView />
-  <UiToaster />
+  <UiToaster position="top-center" rich-colors mobile />
 </template>

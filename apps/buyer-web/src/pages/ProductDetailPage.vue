@@ -40,11 +40,11 @@ function addToCart() {
 function openSearch() {
   void router.push({ name: 'search' })
 }
-function showCartUnavailable() {
-  toast.info('\u30ab\u30fc\u30c8\u753b\u9762\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+function openCart() {
+  void router.push({ name: 'cart' })
 }
 function showCheckoutUnavailable() {
-  toast.info('\u8cfc\u5165\u624b\u7d9a\u304d\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+  toast.warning('\u8cfc\u5165\u624b\u7d9a\u304d\u306f\u6e96\u5099\u4e2d\u3067\u3059')
 }
 function formatYen(amount: number) {
   return `\u7a0e\u8fbc ${amount.toLocaleString('ja-JP')}\u5186`
@@ -82,7 +82,7 @@ function formatYen(amount: number) {
             class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
             type="button"
             aria-label="Cart"
-            @click="showCartUnavailable"
+            @click="openCart"
           >
             <ShoppingBag :size="21" /><span
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"

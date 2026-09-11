@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
   back: vi.fn(),
   success: vi.fn(),
-  info: vi.fn(),
+  warning: vi.fn(),
   route: {
     params: {} as Record<string, string>,
     query: {} as Record<string, string>,
@@ -25,7 +25,7 @@ vi.mock('vue-router', () => ({
 vi.mock('@minorikun/ui', () => ({
   toast: {
     success: mocks.success,
-    info: mocks.info,
+    warning: mocks.warning,
   },
 }))
 
@@ -150,12 +150,13 @@ describe('Buyer catalogue flows', () => {
     expect(mocks.push).toHaveBeenNthCalledWith(2, { name: 'categories' })
   })
 
-  it('gives feedback for Cart and My Page until their routes exist', async () => {
+  it('routes to Cart and gives feedback for the unfinished My Page', async () => {
     const wrapper = mount(BuyerBottomNavigation)
 
     await buttonWithText(wrapper, '\u30ab\u30fc\u30c8').trigger('click')
     await buttonWithText(wrapper, '\u30de\u30a4\u30da\u30fc\u30b8').trigger('click')
 
-    expect(mocks.info).toHaveBeenCalledTimes(2)
+    expect(mocks.push).toHaveBeenCalledWith({ name: 'cart' })
+    expect(mocks.warning).toHaveBeenCalledOnce()
   })
 })

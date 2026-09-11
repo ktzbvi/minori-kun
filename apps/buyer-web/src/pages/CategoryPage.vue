@@ -10,7 +10,6 @@ import {
   Wheat,
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
-import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import { categories, type Category } from '@/lib/catalog'
 import { useCart } from '@/lib/cart'
@@ -45,8 +44,8 @@ function openCategory(categoryId: Category) {
 function openSearch() {
   void router.push({ name: 'search' })
 }
-function showCartUnavailable() {
-  toast.info('\u30ab\u30fc\u30c8\u753b\u9762\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+function openCart() {
+  void router.push({ name: 'cart' })
 }
 </script>
 
@@ -80,7 +79,7 @@ function showCartUnavailable() {
             class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
             type="button"
             aria-label="Cart"
-            @click="showCartUnavailable"
+            @click="openCart"
           >
             <ShoppingBag :size="21" />
             <span

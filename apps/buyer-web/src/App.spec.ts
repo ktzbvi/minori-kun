@@ -9,7 +9,8 @@ describe('App', () => {
     })
 
     const toaster = wrapper.get('[data-sonner-toaster]')
-    expect(toaster.attributes('data-y-position')).toBe('bottom')
-    expect(toaster.attributes('data-x-position')).toBe('right')
+    expect(toaster.attributes('data-y-position')).toBe('top')
+    expect(toaster.attributes('data-x-position')).toBe('center')
+    expect(toaster.classes()).toContain('ui-toaster--mobile')
   })
 })

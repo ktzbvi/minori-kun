@@ -25,8 +25,12 @@ function navigate(item: BuyerNavigationItem) {
     void router.push({ name: 'categories' })
     return
   }
+  if (item === 'cart') {
+    void router.push({ name: 'cart' })
+    return
+  }
 
-  toast.info('\u3053\u306e\u753b\u9762\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+  toast.warning('\u3053\u306e\u753b\u9762\u306f\u6e96\u5099\u4e2d\u3067\u3059')
 }
 </script>
 
@@ -60,12 +64,16 @@ function navigate(item: BuyerNavigationItem) {
       >
     </button>
     <button
-      class="grid place-items-center gap-0.5 border-0 bg-transparent text-[#68786e]"
+      class="grid place-items-center gap-0.5 border-0 bg-transparent"
+      :class="active === 'cart' ? 'text-[#237f4b]' : 'text-[#68786e]'"
       type="button"
+      :aria-current="active === 'cart' ? 'page' : undefined"
       @click="navigate('cart')"
     >
       <ShoppingBag :size="18" />
-      <span class="text-[10px]">&#x30AB;&#x30FC;&#x30C8;</span>
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'cart' }"
+        >&#x30AB;&#x30FC;&#x30C8;</span
+      >
     </button>
     <button
       class="grid place-items-center gap-0.5 border-0 bg-transparent text-[#68786e]"
