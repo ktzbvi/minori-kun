@@ -1,12 +1,21 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health/live', [HealthController::class, 'live']);
 Route::get('/health/ready', [HealthController::class, 'ready']);
+
+Route::prefix('/api/v1/buyer/registration')->group(function (): void {
+    Route::post('/start', [BuyerRegistrationController::class, 'start']);
+    Route::get('/status', [BuyerRegistrationController::class, 'status']);
+    Route::post('/resend-otp', [BuyerRegistrationController::class, 'resend']);
+    Route::post('/verify-otp', [BuyerRegistrationController::class, 'verify']);
+    Route::post('/complete', [BuyerRegistrationController::class, 'complete']);
+});
 
 foreach (UserRole::cases() as $role) {
     Route::prefix("api/v1/{$role->value}")->group(function () use ($role): void {

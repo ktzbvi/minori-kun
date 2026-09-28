@@ -1,7 +1,7 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Laravel",
+        "title": "Minori-kun API",
         "version": "0.0.1"
     },
     "servers": [
@@ -10,9 +10,339 @@
         }
     ],
     "paths": {
+        "/v1/buyer/registration/start": {
+            "post": {
+                "operationId": "buyerRegistration.start",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartBuyerRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "const": "verify-otp"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "next",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "A registration code was already sent."
+                                        },
+                                        "code": {
+                                            "type": "string",
+                                            "const": "OTP_RESEND_NOT_AVAILABLE"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "code",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/status": {
+            "get": {
+                "operationId": "buyerRegistration.status",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "verified": {
+                                                    "type": "boolean"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "verified",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/resend-otp": {
+            "post": {
+                "operationId": "buyerRegistration.resend",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "A registration code was already sent."
+                                        },
+                                        "code": {
+                                            "type": "string",
+                                            "const": "OTP_RESEND_NOT_AVAILABLE"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "code",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/verify-otp": {
+            "post": {
+                "operationId": "buyerRegistration.verify",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyBuyerRegistrationOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "next": {
+                                                    "type": "string",
+                                                    "const": "registration-details"
+                                                }
+                                            },
+                                            "required": [
+                                                "next"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/complete": {
+            "post": {
+                "operationId": "buyerRegistration.complete",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteBuyerRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "redirect": {
+                                                    "type": "string",
+                                                    "const": "/"
+                                                }
+                                            },
+                                            "required": [
+                                                "redirect"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/buyer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_0",
+                "operationId": "portalAuth.login_5",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -53,7 +383,7 @@
         },
         "/v1/buyer/me": {
             "get": {
-                "operationId": "portalAuth.me_1",
+                "operationId": "portalAuth.me_6",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -84,7 +414,7 @@
         },
         "/v1/buyer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_2",
+                "operationId": "portalAuth.logout_7",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -123,7 +453,7 @@
         },
         "/v1/producer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_3",
+                "operationId": "portalAuth.login_8",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -164,7 +494,7 @@
         },
         "/v1/producer/me": {
             "get": {
-                "operationId": "portalAuth.me_4",
+                "operationId": "portalAuth.me_9",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -195,7 +525,7 @@
         },
         "/v1/producer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_5",
+                "operationId": "portalAuth.logout_10",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -234,7 +564,7 @@
         },
         "/v1/admin/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_6",
+                "operationId": "portalAuth.login_11",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -275,7 +605,7 @@
         },
         "/v1/admin/me": {
             "get": {
-                "operationId": "portalAuth.me_7",
+                "operationId": "portalAuth.me_12",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -306,7 +636,7 @@
         },
         "/v1/admin/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_8",
+                "operationId": "portalAuth.logout_13",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -346,6 +676,76 @@
     },
     "components": {
         "schemas": {
+            "CompleteBuyerRegistrationRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name_phonetic": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "maxLength": 16
+                    },
+                    "prefecture": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line1": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line2": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "terms_accepted": {
+                        "enum": [
+                            "yes",
+                            "on",
+                            "1",
+                            1,
+                            "true",
+                            true
+                        ]
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "phone",
+                    "postal_code",
+                    "prefecture",
+                    "city",
+                    "address_line1",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "CompleteBuyerRegistrationRequest"
+            },
             "CurrentSessionResource": {
                 "type": "object",
                 "properties": {
@@ -417,6 +817,32 @@
                     "password"
                 ],
                 "title": "PortalLoginRequest"
+            },
+            "StartBuyerRegistrationRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "StartBuyerRegistrationRequest"
+            },
+            "VerifyBuyerRegistrationOtpRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "title": "VerifyBuyerRegistrationOtpRequest"
             }
         },
         "responses": {
