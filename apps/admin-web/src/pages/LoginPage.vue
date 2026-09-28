@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
-import axios from 'axios'
 import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { Eye, EyeOff } from 'lucide-vue-next'
 import {
-  toast,
   UiButton,
   UiFormControl,
   UiFormItem,
@@ -15,19 +12,10 @@ import {
   UiFormMessage,
   UiInput,
 } from '@minorikun/ui'
-import { authApi } from '@/lib/api'
-import { queryClient } from '@/lib/query'
+import { useAdminLogin } from '@/composables/useAdminLogin'
 
-const errorMessage = ref('')
 const assistanceMessage = ref(false)
 const passwordVisible = ref(false)
-const route = useRoute()
-const router = useRouter()
-
-const authenticationError = 'メールアドレスまたはパスワードを確認してください。'
-const rateLimitError = '試行回数が多すぎます。しばらくしてからもう一度お試しください。'
-const serviceError =
-  '現在ログインできません。通信環境を確認し、しばらくしてからもう一度お試しください。'
 
 const loginSchema = toTypedSchema(
   z.object({
@@ -44,10 +32,11 @@ const loginSchema = toTypedSchema(
   }),
 )
 
-const { defineField, errors, handleSubmit, isSubmitting, setFieldValue } = useForm({
+const { defineField, errors, handleSubmit, setFieldValue } = useForm({
   validationSchema: loginSchema,
   initialValues: { email: '', password: '' },
 })
+const { isLoggingIn, login } = useAdminLogin(() => setFieldValue('password', '', false))
 
 const [email, emailAttrs] = defineField('email', (state) => ({
   validateOnBlur: false,
@@ -62,34 +51,7 @@ const [password, passwordAttrs] = defineField('password', (state) => ({
   validateOnModelUpdate: state.errors.length > 0,
 }))
 
-const submit = handleSubmit(
-  async (values) => {
-    errorMessage.value = ''
-    try {
-      await authApi.csrf()
-      await authApi.login(values.email, values.password)
-      await queryClient.invalidateQueries({ queryKey: ['current-session'] })
-      const redirect =
-        typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
-          ? route.query.redirect
-          : '/'
-      await router.replace(redirect)
-      toast.success('成功')
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.status === 422) {
-        errorMessage.value = authenticationError
-      } else if (axios.isAxiosError(error) && error.response?.status === 429) {
-        errorMessage.value = rateLimitError
-      } else {
-        errorMessage.value = serviceError
-      }
-      setFieldValue('password', '', false)
-    }
-  },
-  () => {
-    errorMessage.value = ''
-  },
-)
+const submit = handleSubmit((values) => login(values.email, values.password))
 
 function showAccountAssistance() {
   assistanceMessage.value = true
@@ -207,9 +169,6 @@ function showAccountAssistance() {
           パスワードをお忘れですか？
         </button>
 
-        <p v-if="errorMessage" class="mt-4 mb-0 text-[13px] font-bold text-[#b33a2b]" role="alert">
-          {{ errorMessage }}
-        </p>
         <p
           v-if="assistanceMessage"
           class="mt-4 mb-0 text-[13px] leading-5 text-[var(--color-muted)]"
@@ -220,8 +179,8 @@ function showAccountAssistance() {
         <UiButton
           class="mt-6 min-h-14 w-full rounded-[10px] text-base disabled:cursor-not-allowed disabled:border-[#9db7a7] disabled:bg-[#9db7a7]"
           type="submit"
-          :disabled="isSubmitting"
-          >{{ isSubmitting ? 'ログイン中…' : 'ログインする' }}</UiButton
+          :disabled="isLoggingIn"
+          >{{ isLoggingIn ? 'ログイン中…' : 'ログインする' }}</UiButton
         >
 
         <p

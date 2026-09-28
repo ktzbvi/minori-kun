@@ -2,12 +2,14 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { CurrentSession } from '@minorikun/api-client'
-import { authApi } from '@/lib/api'
-import { currentSessionQuery, queryClient } from '@/lib/query'
+import { useAdminLogoutMutation } from '@/services/auth/auth.mutation'
+import { currentSessionQuery } from '@/services/auth/auth.query'
+import { queryClient } from '@/lib/query'
 
 const router = useRouter()
 const isMenuOpen = ref(false)
-const isLoggingOut = ref(false)
+const logoutMutation = useAdminLogoutMutation()
+const isLoggingOut = logoutMutation.isPending
 const session = computed(() =>
   queryClient.getQueryData<CurrentSession>(currentSessionQuery.queryKey),
 )
@@ -28,11 +30,9 @@ const menuItems = [
 
 async function logout() {
   if (isLoggingOut.value) return
-  isLoggingOut.value = true
   try {
-    await authApi.logout()
+    await logoutMutation.mutateAsync()
   } finally {
-    queryClient.removeQueries({ queryKey: currentSessionQuery.queryKey })
     await router.replace('/login')
   }
 }

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { currentSessionQuery, queryClient } from '@/lib/query'
+import { currentSessionQuery } from '@/services/auth/auth.query'
+import { queryClient } from '@/lib/query'
 import HomePage from '@/pages/HomePage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 
