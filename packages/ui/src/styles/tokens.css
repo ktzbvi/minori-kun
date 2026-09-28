@@ -11,17 +11,3 @@
   --color-muted: #687a70;
   font-family: 'Noto Sans JP', system-ui, sans-serif;
 }
-
-.ui-button {
-  min-height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--color-primary);
-  padding: 0 18px;
-  font-weight: 700;
-  background: var(--color-primary);
-  color: white;
-}
-
-.ui-button[data-variant='outline'] { background: white; color: var(--color-primary); }
-.ui-button[data-variant='ghost'] { background: transparent; color: var(--color-primary); border-color: transparent; }
-.ui-card { border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface); padding: 24px; }
