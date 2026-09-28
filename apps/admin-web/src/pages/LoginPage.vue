@@ -5,11 +5,20 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
-import { toast, UiButton } from '@minorikun/ui'
+import {
+  toast,
+  UiButton,
+  UiFormControl,
+  UiFormItem,
+  UiFormLabel,
+  UiFormMessage,
+  UiInput,
+} from '@minorikun/ui'
 import { authApi } from '@/lib/api'
 import { queryClient } from '@/lib/query'
 
 const errorMessage = ref('')
+const assistanceMessage = ref(false)
 const route = useRoute()
 const router = useRouter()
 
@@ -79,108 +88,140 @@ const submit = handleSubmit(
     errorMessage.value = ''
   },
 )
+
+function showAccountAssistance() {
+  assistanceMessage.value = true
+}
 </script>
 
 <template>
   <main
-    class="grid min-h-screen min-w-80 bg-[#f6f8f6] text-[var(--color-text)] md:grid-cols-[minmax(360px,44%)_1fr]"
+    class="grid min-h-screen min-w-80 bg-[#f5f7f5] text-[var(--color-text)] md:grid-cols-[46.25%_1fr]"
   >
     <section
-      class="relative flex min-h-[220px] items-center overflow-hidden bg-[#123c2b] px-7 py-10 text-white md:min-h-screen md:px-[clamp(40px,7vw,104px)] md:py-16"
+      class="flex min-h-[240px] items-center bg-[#123c2b] px-7 py-12 text-white md:min-h-screen md:px-[clamp(48px,5vw,96px)] md:py-16"
       aria-label="みのりくん管理ポータル"
     >
-      <span
-        class="pointer-events-none absolute -right-45 -bottom-[90px] size-[360px] rounded-full border border-white/10"
-        aria-hidden="true"
-      />
-      <span
-        class="pointer-events-none absolute right-[-80px] bottom-0 size-45 rounded-full border border-white/10"
-        aria-hidden="true"
-      />
-      <div class="relative z-10">
-        <p class="m-0 text-[32px] font-extrabold tracking-[0.04em] md:text-[clamp(34px,4vw,50px)]">
+      <div class="max-w-[430px]">
+        <p
+          class="m-0 text-[32px] leading-tight font-extrabold tracking-[0.04em] text-[#eff6df] md:text-[38px]"
+        >
           みのりくん
         </p>
-        <p class="mt-[18px] mb-0 text-lg font-bold text-white/80">管理ポータル</p>
-        <span class="mt-7 block h-[3px] w-12 rounded-sm bg-[#7dc69a]" aria-hidden="true" />
-        <p class="mt-[18px] mb-0 text-sm text-white/60">運営管理者専用</p>
+        <p class="mt-6 mb-0 text-lg font-bold text-white/70 md:text-xl">管理者向けログイン</p>
+        <p class="mt-5 mb-0 text-sm leading-7 text-white/60 md:text-base">
+          登録済みの管理者アカウントでログインしてください。
+        </p>
       </div>
     </section>
 
-    <section class="grid place-items-center px-6 py-10 md:px-6 md:py-12">
-      <form class="grid w-full max-w-[440px] gap-[22px]" novalidate @submit.prevent="submit">
-        <header class="mb-2.5">
-          <p class="mb-3 text-[11px] font-extrabold tracking-[0.16em] text-[var(--color-primary)]">
-            MINORI-KUN ADMIN
-          </p>
-          <h1 class="m-0 text-3xl leading-[1.35] font-bold text-[var(--color-text)]">
+    <section class="grid place-items-center px-6 py-12 md:px-12 md:py-16">
+      <form
+        class="w-full max-w-[520px] md:w-[min(78%,720px)] md:max-w-none"
+        novalidate
+        @submit.prevent="submit"
+      >
+        <header class="mb-7">
+          <h1 class="m-0 text-[30px] leading-tight font-bold text-[var(--color-text)] md:text-[32px]">
             管理者ログイン
           </h1>
-          <p class="mt-2.5 mb-0 text-sm text-[var(--color-muted)]">
-            管理者アカウントでログインしてください。
+          <p class="mt-4 mb-0 text-sm leading-6 text-[var(--color-muted)] md:text-base">
+            メールアドレスとパスワードを入力してください。
           </p>
         </header>
 
-        <div class="grid gap-2">
-          <label class="text-[13px] font-bold text-[#35483d]" for="admin-email">
-            管理者メールアドレス
-          </label>
-          <input
-            id="admin-email"
-            v-model="email"
-            v-bind="emailAttrs"
-            class="min-h-12 w-full rounded-[9px] border border-[#cad8ce] bg-white px-3.5 text-[15px] outline-none placeholder:text-[#98a69d] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[#237f4b]/15"
-            type="email"
-            autocomplete="username"
-            inputmode="email"
-            placeholder="メールアドレスを入力"
-            :aria-invalid="Boolean(errors.email)"
-            :aria-describedby="errors.email ? 'admin-email-error' : undefined"
-          />
-          <p
+        <UiFormItem class="mb-5 gap-2.5">
+          <UiFormLabel class="text-[15px] font-medium text-[#66776e]" for="admin-email">
+            メールアドレス
+          </UiFormLabel>
+          <UiFormControl>
+            <UiInput
+              id="admin-email"
+              v-model="email"
+              v-bind="emailAttrs"
+              class="h-14 rounded-[10px] px-4 text-base shadow-none md:text-base"
+              type="email"
+              autocomplete="username"
+              inputmode="email"
+              placeholder="admin@example.jp"
+              :aria-invalid="Boolean(errors.email)"
+              :aria-describedby="errors.email ? 'admin-email-error' : undefined"
+            />
+          </UiFormControl>
+          <UiFormMessage
             v-if="errors.email"
             id="admin-email-error"
-            class="m-0 text-[12px] font-medium text-[#b33a2b]"
+            class="m-0 text-[12px]"
             role="alert"
           >
             {{ errors.email }}
-          </p>
-        </div>
+          </UiFormMessage>
+        </UiFormItem>
 
-        <div class="grid gap-2">
-          <label class="text-[13px] font-bold text-[#35483d]" for="admin-password">
+        <UiFormItem class="gap-2.5">
+          <UiFormLabel class="text-[15px] font-medium text-[#66776e]" for="admin-password">
             パスワード
-          </label>
-          <input
-            id="admin-password"
-            v-model="password"
-            v-bind="passwordAttrs"
-            class="min-h-12 w-full rounded-[9px] border border-[#cad8ce] bg-white px-3.5 text-[15px] outline-none placeholder:text-[#98a69d] focus:border-[var(--color-primary)] focus:ring-3 focus:ring-[#237f4b]/15"
-            type="password"
-            autocomplete="current-password"
-            placeholder="パスワードを入力"
-            :aria-invalid="Boolean(errors.password)"
-            :aria-describedby="errors.password ? 'admin-password-error' : undefined"
-          />
-          <p
+          </UiFormLabel>
+          <UiFormControl>
+            <UiInput
+              id="admin-password"
+              v-model="password"
+              v-bind="passwordAttrs"
+              class="h-14 rounded-[10px] px-4 text-base shadow-none md:text-base"
+              type="password"
+              autocomplete="current-password"
+              placeholder="パスワードを入力"
+              :aria-invalid="Boolean(errors.password)"
+              :aria-describedby="errors.password ? 'admin-password-error' : undefined"
+            />
+          </UiFormControl>
+          <UiFormMessage
             v-if="errors.password"
             id="admin-password-error"
-            class="m-0 text-[12px] font-medium text-[#b33a2b]"
+            class="m-0 text-[12px]"
             role="alert"
           >
             {{ errors.password }}
-          </p>
-        </div>
+          </UiFormMessage>
+        </UiFormItem>
 
-        <p v-if="errorMessage" class="-mt-1 mb-0 text-[13px] font-bold text-[#b33a2b]" role="alert">
+        <button
+          class="mt-5 block border-0 bg-transparent p-0 text-left text-[15px] font-medium text-[var(--color-primary)] underline-offset-4 hover:underline"
+          type="button"
+          @click="showAccountAssistance"
+        >
+          パスワードをお忘れですか？
+        </button>
+
+        <p v-if="errorMessage" class="mt-4 mb-0 text-[13px] font-bold text-[#b33a2b]" role="alert">
           {{ errorMessage }}
         </p>
+        <p
+          v-if="assistanceMessage"
+          class="mt-4 mb-0 text-[13px] leading-5 text-[var(--color-muted)]"
+          role="status"
+        >
+          管理者アカウントの発行・パスワード再設定については、システム管理担当者にお問い合わせください。
+        </p>
         <UiButton
-          class="mt-0.5 w-full disabled:cursor-not-allowed disabled:border-[#9db7a7] disabled:bg-[#9db7a7]"
+          class="mt-6 min-h-14 w-full rounded-[10px] text-base disabled:cursor-not-allowed disabled:border-[#9db7a7] disabled:bg-[#9db7a7]"
           type="submit"
           :disabled="isSubmitting"
           >{{ isSubmitting ? 'ログイン中…' : 'ログインする' }}</UiButton
         >
+
+        <p
+          class="mt-5 mb-0 flex flex-wrap items-center gap-x-4 gap-y-2 text-[15px] text-[#728078]"
+        >
+          <span>アカウントをお持ちでない方</span>
+          <button
+            class="border-0 bg-transparent p-0 font-medium text-[var(--color-primary)] underline underline-offset-2"
+            type="button"
+            @click="showAccountAssistance"
+          >
+            管理者登録
+          </button>
+        </p>
       </form>
     </section>
   </main>

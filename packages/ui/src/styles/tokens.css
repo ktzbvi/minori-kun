@@ -1,3 +1,5 @@
+@source "../components";
+
 :root {
   color-scheme: light;
   --color-primary: #237f4b;
