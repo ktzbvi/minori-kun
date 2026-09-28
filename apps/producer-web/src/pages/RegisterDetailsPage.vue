@@ -105,23 +105,23 @@ onBeforeUnmount(() => {
 <template>
   <RegistrationShell compact-mobile>
     <div class="w-full max-w-[724px] min-[761px]:max-w-[640px] min-[761px]:py-2">
-      <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-5 min-[761px]:px-0" />
+      <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-4 min-[761px]:px-0" />
 
       <div class="rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none">
         <RegistrationBrand />
-        <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-4xl">アカウントを作成</h1>
+        <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-2xl">アカウントを作成</h1>
 
-        <form class="mt-7 grid gap-5" novalidate @submit.prevent="submit">
+        <form class="mt-7 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4" novalidate @submit.prevent="submit">
         <section class="grid gap-4" aria-labelledby="producer-information-title">
           <h2
             id="producer-information-title"
-            class="text-xl font-bold text-[#25332b] min-[761px]:text-2xl"
+            class="text-xl font-bold text-[#25332b]"
           >
             生産者情報
           </h2>
 
           <div class="grid gap-2">
-            <UiFormLabel class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+            <UiFormLabel class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
               ショッププロフィール写真
               <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
               <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -159,7 +159,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="grid gap-2">
-            <UiFormLabel for="verified-email" class="text-[16px] font-medium text-[#687b70] min-[761px]:text-lg">
+            <UiFormLabel for="verified-email" class="text-[16px] font-medium text-[#687b70] min-[761px]:text-sm">
               メールアドレス
             </UiFormLabel>
             <div class="relative">
@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="grid gap-2">
-            <UiFormLabel for="shop-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+            <UiFormLabel for="shop-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
               ショップ名・農園名
               <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
               <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
 
           <div class="grid gap-4 min-[761px]:grid-cols-2">
             <div class="grid gap-2">
-              <UiFormLabel for="contact-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              <UiFormLabel for="contact-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 担当者名
                 <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
                 <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -208,7 +208,7 @@ onBeforeUnmount(() => {
               <UiFormMessage v-if="errors.contactName" role="alert">{{ errors.contactName }}</UiFormMessage>
             </div>
             <div class="grid gap-2">
-              <UiFormLabel for="phone" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              <UiFormLabel for="phone" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 電話番号
                 <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
                 <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -228,7 +228,7 @@ onBeforeUnmount(() => {
 
         <section class="mt-1 grid gap-4" aria-labelledby="password-title">
           <div>
-            <h2 id="password-title" class="text-xl font-bold text-[#25332b] min-[761px]:text-2xl">
+            <h2 id="password-title" class="text-xl font-bold text-[#25332b]">
               パスワード設定
             </h2>
             <p class="mt-1.5 text-xs leading-relaxed text-[#87968d]">
@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
 
           <div class="grid gap-4 min-[761px]:grid-cols-2">
             <div class="grid gap-2">
-              <UiFormLabel for="password" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              <UiFormLabel for="password" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 パスワード
                 <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
                 <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="grid gap-2">
-              <UiFormLabel for="password-confirmation" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              <UiFormLabel for="password-confirmation" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 パスワード（確認）
                 <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
                 <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -300,7 +300,7 @@ onBeforeUnmount(() => {
         <div class="grid gap-2">
           <div class="flex items-center gap-3">
             <UiCheckbox id="producer-terms" v-model="acceptedTerms" />
-            <label for="producer-terms" class="text-sm text-[#258451] min-[761px]:text-base">
+            <label for="producer-terms" class="text-sm text-[#258451]">
               <a href="/producer-terms" class="underline underline-offset-4">生産者利用規約に同意する</a>
               <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
               <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -311,14 +311,14 @@ onBeforeUnmount(() => {
 
           <UiButton
           type="submit"
-          class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:text-xl"
+          class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base"
           :disabled="isSubmitting || registration.submitted"
         >
           {{ registration.submitted ? '入力内容を確認しました' : isSubmitting ? '作成中…' : 'アカウントを作成する' }}
         </UiButton>
           <RouterLink
           to="/login"
-          class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:text-base"
+          class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4"
         >
           ログイン
           </RouterLink>

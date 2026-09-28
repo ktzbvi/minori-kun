@@ -12,7 +12,7 @@ const steps = [
 
 <template>
   <nav aria-label="登録の進行状況">
-    <ol class="flex items-center gap-2 text-[13px] font-medium min-[761px]:gap-4 min-[761px]:text-lg">
+    <ol class="flex items-center gap-2 text-[13px] font-medium min-[761px]:gap-3 min-[761px]:text-sm">
       <template v-for="(step, index) in steps" :key="step.number">
         <li
           class="flex items-center gap-1 whitespace-nowrap"

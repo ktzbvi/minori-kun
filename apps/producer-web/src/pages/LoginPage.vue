@@ -40,23 +40,23 @@ function submit() {
 <template>
   <main class="min-h-svh bg-[#f2f6f3] min-[761px]:grid min-[761px]:grid-cols-[46.3%_minmax(0,1fr)]">
     <aside
-      class="hidden items-center bg-[#123729] px-[clamp(40px,3.8vw,96px)] py-12 text-[#eaf0dd] min-[761px]:flex"
+      class="hidden items-center bg-[#123729] px-[clamp(40px,3.8vw,64px)] py-10 text-[#eaf0dd] min-[761px]:flex"
     >
       <div class="w-full max-w-[700px]">
-        <p class="mb-[22px] text-[clamp(36px,3vw,52px)] font-extrabold tracking-[.04em] italic">
+        <p class="mb-3 text-[28px] font-extrabold tracking-[.04em] italic">
           みのりくん
         </p>
-        <h2 class="mb-[22px] text-[clamp(22px,1.7vw,30px)] font-semibold text-[#a8c2ae]">
+        <h2 class="mb-3 text-lg font-semibold text-[#a8c2ae]">
           生産者向けログイン
         </h2>
-        <p class="text-[clamp(16px,1.2vw,21px)] leading-[1.7] text-[#9bb5a5]">
+        <p class="text-sm leading-[1.7] text-[#9bb5a5]">
           登録済みの生産者アカウントでログインしてください。
         </p>
       </div>
     </aside>
 
     <section
-      class="relative isolate grid min-h-svh min-w-0 place-items-center overflow-hidden bg-linear-[145deg,#e5f3ed_0%,#f4f8ef_68%,#f4f7ec_100%] px-4 pt-7 pb-[175px] min-[761px]:bg-[#f2f6f3] min-[761px]:bg-none min-[761px]:px-[clamp(48px,7.6vw,160px)] min-[761px]:py-12"
+      class="relative isolate grid min-h-svh min-w-0 place-items-center overflow-hidden bg-linear-[145deg,#e5f3ed_0%,#f4f8ef_68%,#f4f7ec_100%] px-4 pt-7 pb-[175px] min-[761px]:bg-[#f2f6f3] min-[761px]:bg-none min-[761px]:px-[clamp(32px,4vw,64px)] min-[761px]:py-10"
     >
       <div
         class="absolute right-[12%] bottom-[14%] -z-10 size-[120px] rounded-full bg-[#eee6b7] opacity-50 min-[761px]:hidden"
@@ -93,7 +93,7 @@ function submit() {
         </g>
       </svg>
       <UiCard
-        class="w-full max-w-[724px] rounded-[30px] border-0 bg-white px-6 pt-[34px] pb-8 shadow-[0_25px_60px_rgb(33_75_54/11%)] max-[360px]:px-4.5 min-[761px]:max-w-[772px] min-[761px]:-translate-y-[9vh] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none"
+        class="w-full max-w-[724px] rounded-[30px] border-0 bg-white px-6 pt-[34px] pb-8 shadow-[0_25px_60px_rgb(33_75_54/11%)] max-[360px]:px-4.5 min-[761px]:max-w-[496px] min-[761px]:-translate-y-[4vh] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none"
       >
         <header class="flex items-center gap-3.5 min-[761px]:hidden">
           <span
@@ -104,14 +104,14 @@ function submit() {
           </span>
           <span class="text-[29px] font-extrabold tracking-[.08em] text-[#20794d]">みのりくん</span>
         </header>
-        <section class="mt-7 min-[761px]:mt-0 min-[761px]:mb-6">
+        <section class="mt-7 min-[761px]:mt-0 min-[761px]:mb-5">
           <h1
-            class="text-[22px] leading-[1.4] font-bold text-[#183c2c] min-[761px]:text-[clamp(28px,2vw,36px)] min-[761px]:text-[#1e2923]"
+            class="text-[22px] leading-[1.4] font-bold text-[#183c2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]"
           >
             <span class="hidden min-[761px]:inline">生産者ログイン</span>
             <span class="min-[761px]:hidden">生産者ポータル</span>
           </h1>
-          <p class="mt-4 hidden text-[clamp(16px,1.2vw,20px)] text-[#87968d] min-[761px]:block">
+          <p class="mt-2.5 hidden text-base text-[#87968d] min-[761px]:block">
             メールアドレスとパスワードを入力してください。
           </p>
           <p class="mt-[7px] text-[15px] text-[#687b70] min-[761px]:hidden">
@@ -120,15 +120,15 @@ function submit() {
         </section>
 
         <form
-          class="mt-[34px] grid gap-5 min-[761px]:mt-0 min-[761px]:gap-[22px]"
+          class="mt-[34px] grid gap-5 min-[761px]:mt-0 min-[761px]:gap-4"
           novalidate
           :aria-busy="isLoggingIn"
           @submit.prevent="submit"
         >
-          <div class="grid gap-[9px] min-[761px]:gap-3">
+          <div class="grid gap-[9px] min-[761px]:gap-2">
             <UiFormLabel
               for="producer-email"
-              class="text-base font-bold text-[#1e3f30] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#87968d]"
+              class="text-base font-bold text-[#1e3f30] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#87968d]"
             >
               メールアドレス
             </UiFormLabel>
@@ -146,7 +146,7 @@ function submit() {
                 inputmode="email"
                 placeholder="メールアドレスを入力"
                 required
-                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-4 pl-12 text-base min-[761px]:h-[76px] min-[761px]:rounded-xl min-[761px]:border-[#d5e2da] min-[761px]:px-6 min-[761px]:text-xl"
+                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-4 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:px-4 min-[761px]:text-base"
                 :disabled="isLoggingIn"
                 :aria-invalid="Boolean(errors.email)"
                 :aria-describedby="errors.email ? 'producer-email-error' : undefined"
@@ -156,10 +156,10 @@ function submit() {
               {{ errors.email }}
             </UiFormMessage>
           </div>
-          <div class="grid gap-[9px] min-[761px]:gap-3">
+          <div class="grid gap-[9px] min-[761px]:gap-2">
             <UiFormLabel
               for="producer-password"
-              class="text-base font-bold text-[#1e3f30] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#87968d]"
+              class="text-base font-bold text-[#1e3f30] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#87968d]"
             >
               パスワード
             </UiFormLabel>
@@ -176,7 +176,7 @@ function submit() {
                 autocomplete="current-password"
                 placeholder="パスワードを入力"
                 required
-                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-14 pl-12 text-base min-[761px]:h-[76px] min-[761px]:rounded-xl min-[761px]:border-[#d5e2da] min-[761px]:pl-6 min-[761px]:text-xl"
+                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-14 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:pr-11 min-[761px]:pl-4 min-[761px]:text-base"
                 :disabled="isLoggingIn"
                 :aria-invalid="Boolean(errors.password)"
                 :aria-describedby="errors.password ? 'producer-password-error' : undefined"
@@ -190,10 +190,10 @@ function submit() {
               >
                 <Eye
                   v-if="passwordVisible"
-                  class="size-[21px] min-[761px]:size-[25px]"
+                  class="size-[21px] min-[761px]:size-5"
                   aria-hidden="true"
                 />
-                <EyeOff v-else class="size-[21px] min-[761px]:size-[25px]" aria-hidden="true" />
+                <EyeOff v-else class="size-[21px] min-[761px]:size-5" aria-hidden="true" />
               </UiButton>
             </div>
             <UiFormMessage v-if="errors.password" id="producer-password-error" role="alert">
@@ -203,7 +203,7 @@ function submit() {
           <div class="flex justify-end min-[761px]:justify-start">
             <a
               href="/password-reset"
-              class="text-sm font-medium text-[#368357] focus-visible:outline-2 focus-visible:outline-offset-4 min-[761px]:text-lg"
+              class="text-sm font-medium text-[#368357] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               パスワードをお忘れですか？
             </a>
@@ -211,13 +211,13 @@ function submit() {
           <UiButton
             type="submit"
             :disabled="isLoggingIn"
-            class="mt-0.5 min-h-[62px] w-full rounded-2xl border-0 bg-linear-to-r from-[#2b9257] to-[#17643e] text-lg shadow-[0_12px_22px_rgb(29_98_59/22%)] min-[761px]:min-h-[68px] min-[761px]:rounded-xl min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-[21px] min-[761px]:shadow-none"
+            class="mt-0.5 min-h-[62px] w-full rounded-2xl border-0 bg-linear-to-r from-[#2b9257] to-[#17643e] text-lg shadow-[0_12px_22px_rgb(29_98_59/22%)] min-[761px]:min-h-12 min-[761px]:rounded-lg min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none"
           >
             {{ isLoggingIn ? 'ログイン中…' : 'ログインする' }}
           </UiButton>
         </form>
         <footer
-          class="mt-[30px] flex flex-wrap justify-center gap-x-3 gap-y-[5px] text-center text-sm text-[#87968d] min-[761px]:justify-start min-[761px]:gap-x-5 min-[761px]:text-lg"
+          class="mt-[30px] flex flex-wrap justify-center gap-x-3 gap-y-[5px] text-center text-sm text-[#87968d] min-[761px]:mt-5 min-[761px]:justify-start min-[761px]:gap-x-4"
         >
           <span>アカウントをお持ちでない方</span>
           <RouterLink

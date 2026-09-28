@@ -6,8 +6,8 @@ withDefaults(defineProps<{ compactMobile?: boolean }>(), { compactMobile: false 
   <main class="relative isolate min-h-svh overflow-hidden bg-linear-[145deg,#e4f3ed_0%,#f8f8ed_68%,#f4f7ec_100%] min-[761px]:grid min-[761px]:grid-cols-[35%_minmax(0,1fr)] min-[761px]:overflow-visible min-[761px]:bg-[#f3f7f4] min-[761px]:bg-none">
     <aside class="hidden items-center bg-[#14382a] px-[clamp(32px,3.8vw,96px)] py-12 text-[#eaf0dd] min-[761px]:flex min-[761px]:min-h-svh" aria-label="生産者ポータル">
       <div class="w-full">
-        <p class="mb-1 text-[32px] font-extrabold tracking-[.04em] italic min-[761px]:mb-5 min-[761px]:text-[clamp(36px,3vw,52px)]">みのりくん</p>
-        <p class="text-[17px] font-semibold text-[#a8c2ae] min-[761px]:text-[clamp(20px,1.55vw,28px)]">生産者ポータル</p>
+        <p class="mb-1 text-[32px] font-extrabold tracking-[.04em] italic min-[761px]:mb-3 min-[761px]:text-[28px]">みのりくん</p>
+        <p class="text-[17px] font-semibold text-[#a8c2ae] min-[761px]:text-base">生産者ポータル</p>
       </div>
     </aside>
 
@@ -24,7 +24,7 @@ withDefaults(defineProps<{ compactMobile?: boolean }>(), { compactMobile: false 
     </svg>
 
     <section
-      class="relative z-10 grid min-w-0 justify-items-center px-7 pb-[270px] min-[761px]:min-h-svh min-[761px]:place-items-center min-[761px]:px-[clamp(40px,7.6vw,160px)] min-[761px]:py-12"
+      class="relative z-10 grid min-w-0 justify-items-center px-7 pb-[270px] min-[761px]:min-h-svh min-[761px]:place-items-center min-[761px]:px-[clamp(32px,4vw,64px)] min-[761px]:py-10"
       :class="compactMobile ? 'pt-12' : 'pt-[clamp(150px,19vh,320px)]'"
     >
       <slot />
