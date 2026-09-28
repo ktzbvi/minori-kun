@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { Camera, CircleCheck, Eye, EyeOff, Image as ImageIcon } from 'lucide-vue-next'
 import { z } from 'zod'
 import { UiButton, UiCheckbox, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
+import RegistrationBrand from '@/components/registration/RegistrationBrand.vue'
 import RegistrationProgress from '@/components/registration/RegistrationProgress.vue'
 import RegistrationShell from '@/components/registration/RegistrationShell.vue'
 import { useProducerRegistrationStore } from '@/stores/producerRegistration'
@@ -102,12 +103,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RegistrationShell>
-    <div class="w-full max-w-[640px] py-2">
-      <RegistrationProgress :current-step="3" class="mb-5" />
-      <h1 class="text-[30px] font-bold text-[#1e2923] min-[761px]:text-4xl">アカウントを作成</h1>
+  <RegistrationShell compact-mobile>
+    <div class="w-full max-w-[724px] min-[761px]:max-w-[640px] min-[761px]:py-2">
+      <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-5 min-[761px]:px-0" />
 
-      <form class="mt-7 grid gap-5" novalidate @submit.prevent="submit">
+      <div class="rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none">
+        <RegistrationBrand />
+        <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-4xl">アカウントを作成</h1>
+
+        <form class="mt-7 grid gap-5" novalidate @submit.prevent="submit">
         <section class="grid gap-4" aria-labelledby="producer-information-title">
           <h2
             id="producer-information-title"
@@ -117,8 +121,10 @@ onBeforeUnmount(() => {
           </h2>
 
           <div class="grid gap-2">
-            <UiFormLabel class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-              ショッププロフィール写真 <span class="text-[#b74646]">*</span>
+            <UiFormLabel class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              ショッププロフィール写真
+              <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+              <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
             </UiFormLabel>
             <button
               type="button"
@@ -153,16 +159,15 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="grid gap-2">
-            <UiFormLabel for="verified-email" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
+            <UiFormLabel for="verified-email" class="text-[16px] font-medium text-[#687b70] min-[761px]:text-lg">
               メールアドレス
             </UiFormLabel>
             <div class="relative">
               <UiInput
                 id="verified-email"
                 :model-value="verifiedEmail"
-                class="h-12 pr-28 text-base shadow-none"
+                class="h-14 pr-28 text-base shadow-none min-[761px]:h-12"
                 readonly
-                disabled
               />
               <span
                 class="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-1 text-sm font-semibold text-[#258451]"
@@ -173,13 +178,15 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="grid gap-2">
-            <UiFormLabel for="shop-name" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-              ショップ名・農園名 <span class="text-[#b74646]">*</span>
+            <UiFormLabel for="shop-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              ショップ名・農園名
+              <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+              <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
             </UiFormLabel>
             <UiInput
               id="shop-name"
               v-model="shopName"
-              class="h-12 text-base shadow-none"
+              class="h-14 text-base shadow-none min-[761px]:h-12"
               :aria-invalid="Boolean(errors.shopName)"
             />
             <UiFormMessage v-if="errors.shopName" role="alert">{{ errors.shopName }}</UiFormMessage>
@@ -187,27 +194,31 @@ onBeforeUnmount(() => {
 
           <div class="grid gap-4 min-[761px]:grid-cols-2">
             <div class="grid gap-2">
-              <UiFormLabel for="contact-name" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-                担当者名 <span class="text-[#b74646]">*</span>
+              <UiFormLabel for="contact-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+                担当者名
+                <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+                <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
               </UiFormLabel>
               <UiInput
                 id="contact-name"
                 v-model="contactName"
-                class="h-12 text-base shadow-none"
+                class="h-14 text-base shadow-none min-[761px]:h-12"
                 :aria-invalid="Boolean(errors.contactName)"
               />
               <UiFormMessage v-if="errors.contactName" role="alert">{{ errors.contactName }}</UiFormMessage>
             </div>
             <div class="grid gap-2">
-              <UiFormLabel for="phone" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-                電話番号 <span class="text-[#b74646]">*</span>
+              <UiFormLabel for="phone" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+                電話番号
+                <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+                <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
               </UiFormLabel>
               <UiInput
                 id="phone"
                 v-model="phone"
                 type="tel"
                 autocomplete="tel"
-                class="h-12 text-base shadow-none"
+                class="h-14 text-base shadow-none min-[761px]:h-12"
                 :aria-invalid="Boolean(errors.phone)"
               />
               <UiFormMessage v-if="errors.phone" role="alert">{{ errors.phone }}</UiFormMessage>
@@ -227,8 +238,10 @@ onBeforeUnmount(() => {
 
           <div class="grid gap-4 min-[761px]:grid-cols-2">
             <div class="grid gap-2">
-              <UiFormLabel for="password" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-                パスワード <span class="text-[#b74646]">*</span>
+              <UiFormLabel for="password" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+                パスワード
+                <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+                <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
               </UiFormLabel>
               <div class="relative">
                 <UiInput
@@ -236,7 +249,7 @@ onBeforeUnmount(() => {
                   v-model="password"
                   :type="passwordVisible ? 'text' : 'password'"
                   autocomplete="new-password"
-                  class="h-12 pr-12 text-base shadow-none"
+                  class="h-14 pr-12 text-base shadow-none min-[761px]:h-12"
                   :aria-invalid="Boolean(errors.password)"
                 />
                 <UiButton
@@ -253,8 +266,10 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="grid gap-2">
-              <UiFormLabel for="password-confirmation" class="text-[15px] text-[#687b70] min-[761px]:text-lg">
-                パスワード（確認） <span class="text-[#b74646]">*</span>
+              <UiFormLabel for="password-confirmation" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+                パスワード（確認）
+                <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+                <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
               </UiFormLabel>
               <div class="relative">
                 <UiInput
@@ -262,7 +277,7 @@ onBeforeUnmount(() => {
                   v-model="passwordConfirmation"
                   :type="confirmationVisible ? 'text' : 'password'"
                   autocomplete="new-password"
-                  class="h-12 pr-12 text-base shadow-none"
+                  class="h-14 pr-12 text-base shadow-none min-[761px]:h-12"
                   :aria-invalid="Boolean(errors.passwordConfirmation)"
                 />
                 <UiButton
@@ -287,26 +302,28 @@ onBeforeUnmount(() => {
             <UiCheckbox id="producer-terms" v-model="acceptedTerms" />
             <label for="producer-terms" class="text-sm text-[#258451] min-[761px]:text-base">
               <a href="/producer-terms" class="underline underline-offset-4">生産者利用規約に同意する</a>
-              <span class="text-[#b74646]"> *</span>
+              <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+              <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
             </label>
           </div>
           <UiFormMessage v-if="errors.acceptedTerms" role="alert">{{ errors.acceptedTerms }}</UiFormMessage>
         </div>
 
-        <UiButton
+          <UiButton
           type="submit"
           class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:text-xl"
           :disabled="isSubmitting || registration.submitted"
         >
           {{ registration.submitted ? '入力内容を確認しました' : isSubmitting ? '作成中…' : 'アカウントを作成する' }}
         </UiButton>
-        <RouterLink
+          <RouterLink
           to="/login"
           class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:text-base"
         >
           ログイン
-        </RouterLink>
-      </form>
+          </RouterLink>
+        </form>
+      </div>
     </div>
   </RegistrationShell>
 </template>

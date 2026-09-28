@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { Mail } from 'lucide-vue-next'
 import { z } from 'zod'
 import { UiButton, UiCard, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
+import RegistrationBrand from '@/components/registration/RegistrationBrand.vue'
 import RegistrationProgress from '@/components/registration/RegistrationProgress.vue'
 import RegistrationShell from '@/components/registration/RegistrationShell.vue'
 import { useProducerRegistrationStore } from '@/stores/producerRegistration'
@@ -50,22 +51,31 @@ async function changeEmail() {
 
 <template>
   <RegistrationShell>
-    <div class="w-full max-w-[620px]">
-      <RegistrationProgress :current-step="2" class="mb-7" />
+    <div class="w-full max-w-[724px] min-[761px]:max-w-[620px]">
+      <RegistrationProgress :current-step="2" class="mb-10 px-1 min-[761px]:mb-7 min-[761px]:px-0" />
 
-      <UiCard class="rounded-2xl border-[#cfdfd5] bg-white p-7 shadow-none min-[761px]:p-12">
-        <div class="grid size-[70px] place-items-center rounded-full bg-[#e5f1d8] text-[#247d4c]">
+      <UiCard class="rounded-[28px] border-0 bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-2xl min-[761px]:border min-[761px]:border-[#cfdfd5] min-[761px]:p-12 min-[761px]:shadow-none">
+        <RegistrationBrand />
+
+        <div class="mt-7 hidden size-[70px] place-items-center rounded-full bg-[#e5f1d8] text-[#247d4c] min-[761px]:grid">
           <Mail class="size-9" :stroke-width="2" aria-hidden="true" />
         </div>
-        <h1 class="mt-6 text-[28px] font-bold text-[#1e2923] min-[761px]:text-4xl">確認コードを入力</h1>
-        <p class="mt-5 text-[15px] leading-[1.65] text-[#303a34] min-[761px]:text-lg">
-          <strong class="font-bold">{{ destinationEmail }}</strong> に確認コードを送信しました。<br />
-          メールに記載された6桁のコードを入力してください。
+        <h1 class="mt-8 text-[24px] font-bold text-[#173b2c] min-[761px]:mt-6 min-[761px]:text-4xl min-[761px]:text-[#1e2923]">
+          <span class="min-[761px]:hidden">メール確認</span>
+          <span class="hidden min-[761px]:inline">確認コードを入力</span>
+        </h1>
+        <p class="mt-2 text-[16px] leading-[1.65] text-[#687b70] min-[761px]:mt-5 min-[761px]:text-lg min-[761px]:text-[#303a34]">
+          <strong class="font-bold min-[761px]:text-[#303a34]">{{ destinationEmail }}</strong>
+          に確認コードを送信しました。<br class="hidden min-[761px]:block" />
+          <span class="hidden min-[761px]:inline">メールに記載された6桁のコードを入力してください。</span>
         </p>
 
-        <form class="mt-6 grid gap-5" novalidate @submit.prevent="submit">
+        <form class="mt-10 grid gap-5 min-[761px]:mt-6" novalidate @submit.prevent="submit">
           <div class="grid gap-2">
-            <UiFormLabel for="verification-code" class="text-[15px] text-[#687b70] min-[761px]:text-lg">確認コード（6桁）</UiFormLabel>
+            <UiFormLabel for="verification-code" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-lg min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              確認コード（6桁）
+              <span class="ml-1 rounded bg-[#d33d3d] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
+            </UiFormLabel>
             <UiInput
               id="verification-code"
               v-model="code"
@@ -75,7 +85,7 @@ async function changeEmail() {
               autocomplete="one-time-code"
               maxlength="6"
               placeholder="6桁の数字"
-              class="h-[58px] rounded-xl px-5 text-lg shadow-none min-[761px]:h-[72px] min-[761px]:text-xl"
+              class="h-[58px] rounded-xl px-4 text-base shadow-none min-[761px]:h-[72px] min-[761px]:px-5 min-[761px]:text-xl"
               :disabled="isSubmitting"
               :aria-invalid="Boolean(codeError)"
               :aria-describedby="codeError ? 'verification-code-error' : undefined"
@@ -83,7 +93,7 @@ async function changeEmail() {
             <UiFormMessage v-if="codeError" id="verification-code-error" role="alert">{{ codeError }}</UiFormMessage>
           </div>
 
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-[68px] min-[761px]:text-xl" :disabled="isSubmitting">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-[68px] min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-xl min-[761px]:shadow-none" :disabled="isSubmitting">
             {{ isSubmitting ? '確認中…' : '確認して次へ進む' }}
           </UiButton>
         </form>
@@ -91,7 +101,9 @@ async function changeEmail() {
         <p class="mt-6 text-sm leading-relaxed text-[#87968d] min-[761px]:text-base">メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>
         <UiButton variant="outline" class="mt-5 min-h-[56px] w-full rounded-xl text-base min-[761px]:text-lg" @click="resend">確認コードを再送する</UiButton>
         <p v-if="feedback" class="mt-3 text-sm font-medium text-[#247d4c]" role="status">{{ feedback }}</p>
-        <button type="button" class="mt-5 text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:text-base" @click="changeEmail">メールアドレスを変更する</button>
+        <div class="text-center min-[761px]:text-left">
+          <button type="button" class="mt-7 text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:mt-5 min-[761px]:text-base" @click="changeEmail">メールアドレスを変更する</button>
+        </div>
       </UiCard>
     </div>
   </RegistrationShell>
