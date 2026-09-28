@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { Eye, EyeOff } from 'lucide-vue-next'
 import {
   toast,
   UiButton,
@@ -19,6 +20,7 @@ import { queryClient } from '@/lib/query'
 
 const errorMessage = ref('')
 const assistanceMessage = ref(false)
+const passwordVisible = ref(false)
 const route = useRoute()
 const router = useRouter()
 
@@ -163,17 +165,29 @@ function showAccountAssistance() {
             パスワード
           </UiFormLabel>
           <UiFormControl>
-            <UiInput
-              id="admin-password"
-              v-model="password"
-              v-bind="passwordAttrs"
-              class="h-14 rounded-[10px] px-4 text-base shadow-none md:text-base"
-              type="password"
-              autocomplete="current-password"
-              placeholder="パスワードを入力"
-              :aria-invalid="Boolean(errors.password)"
-              :aria-describedby="errors.password ? 'admin-password-error' : undefined"
-            />
+            <div class="relative">
+              <UiInput
+                id="admin-password"
+                v-model="password"
+                v-bind="passwordAttrs"
+                class="h-14 rounded-[10px] py-3 pr-12 pl-4 text-base shadow-none md:text-base"
+                :type="passwordVisible ? 'text' : 'password'"
+                autocomplete="current-password"
+                placeholder="パスワードを入力"
+                :aria-invalid="Boolean(errors.password)"
+                :aria-describedby="errors.password ? 'admin-password-error' : undefined"
+              />
+              <button
+                class="absolute inset-y-0 right-0 grid w-12 place-items-center border-0 bg-transparent text-[#66776e] hover:text-[var(--color-primary)] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[var(--color-primary)]"
+                type="button"
+                :aria-label="passwordVisible ? 'パスワードを隠す' : 'パスワードを表示'"
+                :aria-pressed="passwordVisible"
+                @click="passwordVisible = !passwordVisible"
+              >
+                <EyeOff v-if="passwordVisible" aria-hidden="true" class="h-5 w-5" />
+                <Eye v-else aria-hidden="true" class="h-5 w-5" />
+              </button>
+            </div>
           </UiFormControl>
           <UiFormMessage
             v-if="errors.password"
