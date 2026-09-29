@@ -169,9 +169,9 @@ importers:
 
   apps/producer-web:
     dependencies:
-      '@minorikun/api-client':
+      '@minorikun/api-contracts':
         specifier: workspace:*
-        version: link:../../packages/api-client
+        version: link:../../packages/api-contracts
       '@minorikun/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -222,11 +222,7 @@ importers:
         specifier: ^3.0.6
         version: 3.3.11(typescript@5.9.3)
 
-  packages/api-client:
-    dependencies:
-      axios:
-        specifier: ^1.11.0
-        version: 1.20.0
+  packages/api-contracts:
     devDependencies:
       '@minorikun/config':
         specifier: workspace:*

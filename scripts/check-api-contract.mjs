@@ -36,7 +36,7 @@ try {
 
   const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
   run(pnpm, ['exec', 'openapi-typescript', 'apps/api/openapi.json', '-o', generatedTypes])
-  assertSame(generatedTypes, join(root, 'packages/api-client/src/generated/schema.d.ts'), 'Generated API types')
+  assertSame(generatedTypes, join(root, 'packages/api-contracts/src/generated/schema.d.ts'), 'Generated API types')
 } catch (error) {
   console.error(error.message)
   process.exitCode = 1

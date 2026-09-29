@@ -1,21 +1,10 @@
-import { createApiClient, createAuthApi } from '@minorikun/api-client'
+import axios from 'axios'
 
-export const apiClient = createApiClient({
+const api = axios.create({
   baseURL: window.__MINORI_CONFIG__?.apiOrigin ?? import.meta.env.VITE_API_ORIGIN ?? 'http://localhost:8000',
+  headers: { Accept: 'application/json' },
+  withCredentials: true,
+  withXSRFToken: true,
 })
 
-export const producerAuthApi = createAuthApi(apiClient, 'producer')
-
-export function getApiErrorMessage(error: unknown): string | undefined {
-  if (typeof error !== 'object' || error === null || !('response' in error)) {
-    return error instanceof Error ? error.message : undefined
-  }
-
-  const response = error.response
-  if (typeof response !== 'object' || response === null || !('data' in response)) return undefined
-
-  const data = response.data
-  if (typeof data !== 'object' || data === null || !('message' in data)) return undefined
-
-  return typeof data.message === 'string' ? data.message : undefined
-}
+export default api

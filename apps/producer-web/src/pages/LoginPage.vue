@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { Eye, EyeOff, Leaf, LockKeyhole, Mail } from 'lucide-vue-next'
 import { z } from 'zod'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
@@ -8,10 +8,22 @@ import { useProducerLogin } from '@/composables/useProducerLogin'
 
 const email = ref('')
 const password = ref('')
+const route = useRoute()
 const passwordVisible = ref(false)
 const errors = ref<{ email?: string; password?: string }>({})
 const { isLoggingIn, login } = useProducerLogin(() => {
   password.value = ''
+})
+
+const recoveryNotice = computed(() => {
+  if (route.query.recovery === 'registration') return '登録結果を確認できませんでした。登録時のメールアドレスとパスワードでログインしてください。'
+  if (route.query.recovery === 'registration-complete') return '登録は完了しています。設定したメールアドレスとパスワードでログインしてください。'
+  if (route.query.recovery === 'session-unavailable') return 'アカウント状態を確認できませんでした。通信状態を確認して、もう一度お試しください。'
+  return ''
+})
+const retryTarget = computed(() => {
+  const redirect = route.query.redirect
+  return typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/register'
 })
 
 // SCR-P-001 / P01-01: login must not enforce new-account password rules.
@@ -117,6 +129,12 @@ function submit() {
           <p class="mt-[7px] text-[15px] text-[#687b70] min-[761px]:hidden">
             生産者アカウントでログインしてください。
           </p>
+          <div v-if="recoveryNotice" class="mt-4 rounded-lg bg-[#fff8e8] px-4 py-3 text-sm leading-relaxed text-[#614c22]" role="status">
+            {{ recoveryNotice }}
+            <RouterLink v-if="route.query.recovery === 'session-unavailable'" :to="retryTarget" class="mt-2 block w-fit font-medium text-[#237b4d] underline underline-offset-4">
+              状態を再確認する
+            </RouterLink>
+          </div>
         </section>
 
         <form

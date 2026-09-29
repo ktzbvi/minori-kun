@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\EnsurePortalRole;
 use App\Http\Middleware\EnsureProducerEligible;
+use App\Domain\ProducerRegistration\ProducerRegistrationException;
+use App\Http\Support\ProducerRegistrationCookie;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -24,6 +26,31 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->dontFlash(['code']);
+        $exceptions->dontReport([ProducerRegistrationException::class]);
+        $exceptions->render(function (ProducerRegistrationException $exception, Request $request) {
+            if ($exception->cookieToken !== null) {
+                ProducerRegistrationCookie::queue(
+                    $exception->cookieToken,
+                    $exception->context['registration_state']['session_expires_at'],
+                    $request,
+                );
+            }
+
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'code' => $exception->errorCode,
+                'errors' => $exception->errors ?: new stdClass,
+                ...$exception->context,
+            ], $exception->status)->header('Cache-Control', 'no-store, private');
+        });
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response) {
+            if (request()->is('api/v1/producer/registration*', 'api/v1/producer/terms', 'api/v1/producer/onboarding')) {
+                $response->headers->set('Cache-Control', 'no-store, private');
+            }
+
+            return $response;
+        });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
