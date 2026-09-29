@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { CurrentSession } from '@/types/auth'
-import api, { ensureCsrfCookie } from '../api'
+import api from '../api'
 import { producerAuthKeys } from './auth.key'
 
 export type ProducerLoginCredentials = { email: string; password: string }
@@ -11,7 +11,6 @@ export function useProducerLoginMutation() {
   return useMutation({
     gcTime: 0,
     mutationFn: async ({ email, password }: ProducerLoginCredentials): Promise<CurrentSession> => {
-      await ensureCsrfCookie()
       const response = await api.post<{ data: CurrentSession }>('/api/v1/producer/auth/login', {
         email,
         password,
