@@ -10,9 +10,439 @@
         }
     ],
     "paths": {
+        "/v1/buyer/password-reset/start": {
+            "post": {
+                "operationId": "buyerPasswordReset.start",
+                "tags": [
+                    "BuyerPasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartBuyerPasswordResetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "const": "\u30d1\u30b9\u30ef\u30fc\u30c9\u518d\u8a2d\u5b9a\u7528\u30e1\u30fc\u30eb\u3092\u9001\u4fe1\u3057\u307e\u3057\u305f\u3002"
+                                                }
+                                            },
+                                            "required": [
+                                                "message"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/password-reset/complete": {
+            "post": {
+                "operationId": "buyerPasswordReset.complete",
+                "tags": [
+                    "BuyerPasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteBuyerPasswordResetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "redirect": {
+                                                    "type": "string",
+                                                    "const": "/login"
+                                                }
+                                            },
+                                            "required": [
+                                                "redirect"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/start": {
+            "post": {
+                "operationId": "buyerRegistration.start",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartBuyerRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "const": "verify-otp"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "next",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "A registration code was already sent."
+                                        },
+                                        "code": {
+                                            "type": "string",
+                                            "const": "OTP_RESEND_NOT_AVAILABLE"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "code",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/status": {
+            "get": {
+                "operationId": "buyerRegistration.status",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "verified": {
+                                                    "type": "boolean"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "verified",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/resend-otp": {
+            "post": {
+                "operationId": "buyerRegistration.resend",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "otp_expires_at": {
+                                                    "type": "string"
+                                                },
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "email",
+                                                "otp_expires_at",
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "A registration code was already sent."
+                                        },
+                                        "code": {
+                                            "type": "string",
+                                            "const": "OTP_RESEND_NOT_AVAILABLE"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "resend_available_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "resend_available_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message",
+                                        "code",
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/verify-otp": {
+            "post": {
+                "operationId": "buyerRegistration.verify",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyBuyerRegistrationOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "next": {
+                                                    "type": "string",
+                                                    "const": "registration-details"
+                                                }
+                                            },
+                                            "required": [
+                                                "next"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/registration/complete": {
+            "post": {
+                "operationId": "buyerRegistration.complete",
+                "tags": [
+                    "BuyerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteBuyerRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "redirect": {
+                                                    "type": "string",
+                                                    "const": "/"
+                                                }
+                                            },
+                                            "required": [
+                                                "redirect"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/buyer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_14",
+                "operationId": "portalAuth.login_21",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -53,7 +483,7 @@
         },
         "/v1/buyer/me": {
             "get": {
-                "operationId": "portalAuth.me_15",
+                "operationId": "portalAuth.me_22",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -84,7 +514,7 @@
         },
         "/v1/buyer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_16",
+                "operationId": "portalAuth.logout_23",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -123,7 +553,7 @@
         },
         "/v1/producer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_17",
+                "operationId": "portalAuth.login_24",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -164,7 +594,7 @@
         },
         "/v1/producer/me": {
             "get": {
-                "operationId": "portalAuth.me_18",
+                "operationId": "portalAuth.me_25",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -195,7 +625,7 @@
         },
         "/v1/producer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_19",
+                "operationId": "portalAuth.logout_26",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -234,7 +664,7 @@
         },
         "/v1/admin/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_20",
+                "operationId": "portalAuth.login_27",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -275,7 +705,7 @@
         },
         "/v1/admin/me": {
             "get": {
-                "operationId": "portalAuth.me_21",
+                "operationId": "portalAuth.me_28",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -306,7 +736,7 @@
         },
         "/v1/admin/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_22",
+                "operationId": "portalAuth.logout_29",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -843,6 +1273,104 @@
     },
     "components": {
         "schemas": {
+            "CompleteBuyerPasswordResetRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "token": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "CompleteBuyerPasswordResetRequest"
+            },
+            "CompleteBuyerRegistrationRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name_phonetic": {
+                        "type": "string",
+                        "pattern": "^[\u30a1-\u30fa\u30fc\\s]+$",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "pattern": "^0\\d{2}-?\\d{4}-?\\d{4}$",
+                        "maxLength": 32
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "pattern": "^\\d{3}-?\\d{4}$",
+                        "maxLength": 16
+                    },
+                    "prefecture": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line1": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line2": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "terms_accepted": {
+                        "enum": [
+                            "yes",
+                            "on",
+                            "1",
+                            1,
+                            "true",
+                            true
+                        ]
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "name_phonetic",
+                    "phone",
+                    "postal_code",
+                    "prefecture",
+                    "city",
+                    "address_line1",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "CompleteBuyerRegistrationRequest"
+            },
             "CompleteProducerRegistrationRequest": {
                 "type": "object",
                 "properties": {
@@ -1175,6 +1703,34 @@
                 ],
                 "title": "RequestProducerRegistrationCodeRequest"
             },
+            "StartBuyerPasswordResetRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "StartBuyerPasswordResetRequest"
+            },
+            "StartBuyerRegistrationRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "StartBuyerRegistrationRequest"
+            },
             "UploadProducerRegistrationPhotoRequest": {
                 "type": "object",
                 "properties": {
@@ -1189,6 +1745,18 @@
                     "photo"
                 ],
                 "title": "UploadProducerRegistrationPhotoRequest"
+            },
+            "VerifyBuyerRegistrationOtpRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "title": "VerifyBuyerRegistrationOtpRequest"
             },
             "VerifyProducerRegistrationCodeRequest": {
                 "type": "object",

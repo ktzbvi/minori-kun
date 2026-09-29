@@ -1,16 +1,31 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Api\BuyerPasswordResetController;
+use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
-use App\Http\Controllers\Api\ProducerRegistrationController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
+use App\Http\Controllers\Api\ProducerRegistrationController;
 use App\Http\Middleware\EnsureProducerRegistrationSession;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 Route::get('/health/live', [HealthController::class, 'live']);
 Route::get('/health/ready', [HealthController::class, 'ready']);
+
+Route::prefix('/api/v1/buyer/registration')->group(function (): void {
+    Route::post('/start', [BuyerRegistrationController::class, 'start']);
+    Route::get('/status', [BuyerRegistrationController::class, 'status']);
+    Route::post('/resend-otp', [BuyerRegistrationController::class, 'resend']);
+    Route::post('/verify-otp', [BuyerRegistrationController::class, 'verify']);
+    Route::post('/complete', [BuyerRegistrationController::class, 'complete']);
+});
+
+Route::prefix('/api/v1/buyer/password-reset')->middleware('throttle:6,1')->group(function (): void {
+    Route::post('/start', [BuyerPasswordResetController::class, 'start']);
+    Route::post('/complete', [BuyerPasswordResetController::class, 'complete']);
+});
 
 // One unconditional cookie/session/CSRF stack, including requests without Origin.
 Route::prefix('api/v1/producer')

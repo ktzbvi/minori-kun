@@ -5,14 +5,44 @@ import CategoryPage from '@/pages/CategoryPage.vue'
 import CategoryProductListPage from '@/pages/CategoryProductListPage.vue'
 import CartPage from '@/pages/CartPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import PasswordResetConfirmPage from '@/pages/PasswordResetConfirmPage.vue'
+import PasswordResetPage from '@/pages/PasswordResetPage.vue'
 import OrderConfirmationPage from '@/pages/OrderConfirmationPage.vue'
 import ProductDetailPage from '@/pages/ProductDetailPage.vue'
+import RegisterEmailPage from '@/pages/RegisterEmailPage.vue'
+import RegisterOtpPage from '@/pages/RegisterOtpPage.vue'
+import RegisterDetailsPage from '@/pages/RegisterDetailsPage.vue'
 import SearchPage from '@/pages/SearchPage.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
+    {
+      path: '/password-reset',
+      name: 'password-reset',
+      component: PasswordResetPage,
+      meta: { public: true },
+    },
+    {
+      path: '/password-reset/confirm',
+      name: 'password-reset-confirm',
+      component: PasswordResetConfirmPage,
+      meta: { public: true },
+    },
+    { path: '/register', name: 'register', component: RegisterEmailPage, meta: { public: true } },
+    {
+      path: '/register/verify',
+      name: 'register-verify',
+      component: RegisterOtpPage,
+      meta: { public: true },
+    },
+    {
+      path: '/register/details',
+      name: 'register-details',
+      component: RegisterDetailsPage,
+      meta: { public: true },
+    },
     { path: '/', name: 'home', component: HomePage, meta: { public: true } },
     { path: '/categories', name: 'categories', component: CategoryPage, meta: { public: true } },
     { path: '/cart', name: 'cart', component: CartPage, meta: { public: true } },

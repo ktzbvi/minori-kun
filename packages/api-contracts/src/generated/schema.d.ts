@@ -4,6 +4,118 @@
  */
 
 export interface paths {
+    "/v1/buyer/password-reset/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerPasswordReset.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/password-reset/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerPasswordReset.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/registration/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerRegistration.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/registration/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerRegistration.status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/registration/resend-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerRegistration.resend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/registration/verify-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerRegistration.verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/registration/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerRegistration.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/buyer/auth/login": {
         parameters: {
             query?: never;
@@ -13,7 +125,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_14"];
+        post: operations["portalAuth.login_21"];
         delete?: never;
         options?: never;
         head?: never;
@@ -27,7 +139,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_15"];
+        get: operations["portalAuth.me_22"];
         put?: never;
         post?: never;
         delete?: never;
@@ -45,7 +157,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_16"];
+        post: operations["portalAuth.logout_23"];
         delete?: never;
         options?: never;
         head?: never;
@@ -61,7 +173,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_17"];
+        post: operations["portalAuth.login_24"];
         delete?: never;
         options?: never;
         head?: never;
@@ -75,7 +187,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_18"];
+        get: operations["portalAuth.me_25"];
         put?: never;
         post?: never;
         delete?: never;
@@ -93,7 +205,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_19"];
+        post: operations["portalAuth.logout_26"];
         delete?: never;
         options?: never;
         head?: never;
@@ -109,7 +221,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_20"];
+        post: operations["portalAuth.login_27"];
         delete?: never;
         options?: never;
         head?: never;
@@ -123,7 +235,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_21"];
+        get: operations["portalAuth.me_28"];
         put?: never;
         post?: never;
         delete?: never;
@@ -141,7 +253,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_22"];
+        post: operations["portalAuth.logout_29"];
         delete?: never;
         options?: never;
         head?: never;
@@ -344,6 +456,29 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CompleteBuyerPasswordResetRequest */
+        CompleteBuyerPasswordResetRequest: {
+            /** Format: email */
+            email: string;
+            token: string;
+            password: string;
+            password_confirmation: string;
+        };
+        /** CompleteBuyerRegistrationRequest */
+        CompleteBuyerRegistrationRequest: {
+            name: string;
+            name_phonetic: string;
+            phone: string;
+            postal_code: string;
+            prefecture: string;
+            city: string;
+            address_line1: string;
+            address_line2?: string | null;
+            password: string;
+            /** @enum {unknown} */
+            terms_accepted?: "yes" | "on" | "1" | 1 | "true" | true;
+            password_confirmation: string;
+        };
         /** CompleteProducerRegistrationRequest */
         CompleteProducerRegistrationRequest: {
             email?: string;
@@ -428,6 +563,16 @@ export interface components {
             /** Format: email */
             email: string;
         };
+        /** StartBuyerPasswordResetRequest */
+        StartBuyerPasswordResetRequest: {
+            /** Format: email */
+            email: string;
+        };
+        /** StartBuyerRegistrationRequest */
+        StartBuyerRegistrationRequest: {
+            /** Format: email */
+            email: string;
+        };
         /** UploadProducerRegistrationPhotoRequest */
         UploadProducerRegistrationPhotoRequest: {
             /**
@@ -435,6 +580,10 @@ export interface components {
              * @description Maximum file size: 5120 kilobytes.
              */
             photo: string;
+        };
+        /** VerifyBuyerRegistrationOtpRequest */
+        VerifyBuyerRegistrationOtpRequest: {
+            code: string;
         };
         /** VerifyProducerRegistrationCodeRequest */
         VerifyProducerRegistrationCodeRequest: {
@@ -478,7 +627,239 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "portalAuth.login_14": {
+    "buyerPasswordReset.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartBuyerPasswordResetRequest"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            message: "パスワード再設定用メールを送信しました。";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerPasswordReset.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteBuyerPasswordResetRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            redirect: "/login";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerRegistration.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartBuyerRegistrationRequest"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            email: string;
+                            /** @constant */
+                            next: "verify-otp";
+                            otp_expires_at: string;
+                            resend_available_at: string;
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        message: "A registration code was already sent.";
+                        /** @constant */
+                        code: "OTP_RESEND_NOT_AVAILABLE";
+                        data: {
+                            email: string;
+                            resend_available_at: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "buyerRegistration.status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            email: string;
+                            verified: boolean;
+                            otp_expires_at: string;
+                            resend_available_at: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "buyerRegistration.resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            email: string;
+                            otp_expires_at: string;
+                            resend_available_at: string;
+                        };
+                    };
+                };
+            };
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        message: "A registration code was already sent.";
+                        /** @constant */
+                        code: "OTP_RESEND_NOT_AVAILABLE";
+                        data: {
+                            resend_available_at: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "buyerRegistration.verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyBuyerRegistrationOtpRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            next: "registration-details";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerRegistration.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteBuyerRegistrationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            redirect: "/";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "portalAuth.login_21": {
         parameters: {
             query?: never;
             header?: never;
@@ -505,7 +886,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_15": {
+    "portalAuth.me_22": {
         parameters: {
             query?: never;
             header?: never;
@@ -528,7 +909,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_16": {
+    "portalAuth.logout_23": {
         parameters: {
             query?: never;
             header?: never;
@@ -552,7 +933,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_17": {
+    "portalAuth.login_24": {
         parameters: {
             query?: never;
             header?: never;
@@ -579,7 +960,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_18": {
+    "portalAuth.me_25": {
         parameters: {
             query?: never;
             header?: never;
@@ -602,7 +983,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_19": {
+    "portalAuth.logout_26": {
         parameters: {
             query?: never;
             header?: never;
@@ -626,7 +1007,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_20": {
+    "portalAuth.login_27": {
         parameters: {
             query?: never;
             header?: never;
@@ -653,7 +1034,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_21": {
+    "portalAuth.me_28": {
         parameters: {
             query?: never;
             header?: never;
@@ -676,7 +1057,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_22": {
+    "portalAuth.logout_29": {
         parameters: {
             query?: never;
             header?: never;
