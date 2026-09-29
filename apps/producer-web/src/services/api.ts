@@ -7,4 +7,22 @@ const api = axios.create({
   withXSRFToken: true,
 })
 
+let csrfCookieRequest: Promise<void> | undefined
+
+function hasXsrfCookie() {
+  return document.cookie.split('; ').some((cookie) => cookie.startsWith('XSRF-TOKEN='))
+}
+
+export async function ensureCsrfCookie() {
+  if (hasXsrfCookie()) return
+
+  csrfCookieRequest ??= api.get('/sanctum/csrf-cookie')
+    .then(() => undefined)
+    .finally(() => {
+      csrfCookieRequest = undefined
+    })
+
+  await csrfCookieRequest
+}
+
 export default api
