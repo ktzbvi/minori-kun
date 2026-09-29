@@ -91,7 +91,7 @@ function Remove-GeneratedNodeModules {
         'apps/buyer-web/node_modules',
         'apps/producer-web/node_modules',
         'apps/admin-web/node_modules',
-        'packages/api-client/node_modules',
+        'packages/api-contracts/node_modules',
         'packages/ui/node_modules'
     )
 
@@ -111,7 +111,7 @@ function Remove-GeneratedNodeModules {
 }
 
 function Repair-LegacyDockerWorkspaceLinks {
-    $workspaceLink = Join-Path $PSScriptRoot 'packages/api-client/node_modules/@minorikun/config'
+    $workspaceLink = Join-Path $PSScriptRoot 'packages/api-contracts/node_modules/@minorikun/config'
 
     if ((Test-Path -LiteralPath $workspaceLink) -and -not (Test-DirectoryAccessible $workspaceLink)) {
         Write-Host 'Removing generated node_modules links left by the former Docker development environment...'

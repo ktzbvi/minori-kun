@@ -1,6 +1,7 @@
 export { default as UiButton } from './components/Button.vue'
 export { default as UiCard } from './components/Card.vue'
 export { default as UiCheckbox } from './components/Checkbox.vue'
+export { default as UiDialog } from './components/Dialog.vue'
 export { default as UiFormControl } from './components/FormControl.vue'
 export { default as UiFormItem } from './components/FormItem.vue'
 export { default as UiFormLabel } from './components/FormLabel.vue'

@@ -12,7 +12,7 @@
     "paths": {
         "/v1/buyer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_0",
+                "operationId": "portalAuth.login_14",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -53,7 +53,7 @@
         },
         "/v1/buyer/me": {
             "get": {
-                "operationId": "portalAuth.me_1",
+                "operationId": "portalAuth.me_15",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -84,7 +84,7 @@
         },
         "/v1/buyer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_2",
+                "operationId": "portalAuth.logout_16",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -123,7 +123,7 @@
         },
         "/v1/producer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_3",
+                "operationId": "portalAuth.login_17",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -164,7 +164,7 @@
         },
         "/v1/producer/me": {
             "get": {
-                "operationId": "portalAuth.me_4",
+                "operationId": "portalAuth.me_18",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -195,7 +195,7 @@
         },
         "/v1/producer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_5",
+                "operationId": "portalAuth.logout_19",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -234,7 +234,7 @@
         },
         "/v1/admin/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_6",
+                "operationId": "portalAuth.login_20",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -275,7 +275,7 @@
         },
         "/v1/admin/me": {
             "get": {
-                "operationId": "portalAuth.me_7",
+                "operationId": "portalAuth.me_21",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -306,7 +306,7 @@
         },
         "/v1/admin/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_8",
+                "operationId": "portalAuth.logout_22",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -342,10 +342,564 @@
                     }
                 }
             }
+        },
+        "/v1/producer/onboarding": {
+            "get": {
+                "operationId": "producerOnboarding.show",
+                "tags": [
+                    "ProducerOnboarding"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerOnboardingStatusResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerOnboardingStatusResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration": {
+            "get": {
+                "operationId": "producerRegistration.show",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationStateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationStateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "producerRegistration.destroy",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "deleted": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "deleted"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/code": {
+            "post": {
+                "operationId": "producerRegistration.requestCode",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestProducerRegistrationCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationStateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationStateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/code/resend": {
+            "post": {
+                "operationId": "producerRegistration.resend",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationStateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationStateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/code/verify": {
+            "post": {
+                "operationId": "producerRegistration.verify",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyProducerRegistrationCodeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationStateResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationStateResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/details": {
+            "get": {
+                "operationId": "producerRegistration.details",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationDetailsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationDetailsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/photo": {
+            "post": {
+                "operationId": "producerRegistration.uploadPhoto",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadProducerRegistrationPhotoRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerRegistrationPhotoResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerRegistrationPhotoResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/photo/{id}": {
+            "get": {
+                "operationId": "producer.registration.photo",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "producerRegistration.deletePhoto",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "deleted": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "deleted"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/complete": {
+            "post": {
+                "operationId": "producerRegistration.complete",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteProducerRegistrationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CurrentSessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CurrentSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/registration/recover": {
+            "post": {
+                "operationId": "producerRegistration.recover",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CurrentSessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CurrentSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/terms": {
+            "get": {
+                "operationId": "producerRegistration.terms",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerTermsResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerTermsResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/producer/shop-photos/{id}": {
+            "get": {
+                "operationId": "producer.shop-photo",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "CompleteProducerRegistrationRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "shop_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "contact_name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "password": {
+                        "type": "string",
+                        "pattern": "[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]",
+                        "minLength": 8,
+                        "maxLength": 64
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    },
+                    "photo_id": {
+                        "type": "string"
+                    },
+                    "terms_version": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "accepted_terms": {
+                        "enum": [
+                            "yes",
+                            "on",
+                            "1",
+                            1,
+                            "true",
+                            true
+                        ]
+                    }
+                },
+                "required": [
+                    "shop_name",
+                    "contact_name",
+                    "phone",
+                    "password",
+                    "password_confirmation",
+                    "photo_id",
+                    "terms_version",
+                    "accepted_terms"
+                ],
+                "title": "CompleteProducerRegistrationRequest"
+            },
             "CurrentSessionResource": {
                 "type": "object",
                 "properties": {
@@ -417,6 +971,236 @@
                     "password"
                 ],
                 "title": "PortalLoginRequest"
+            },
+            "ProducerOnboardingStatusResource": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "enum": [
+                            "application_required",
+                            "eligible"
+                        ]
+                    },
+                    "eligible_to_sell": {
+                        "type": "boolean"
+                    },
+                    "application_available": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "state",
+                    "eligible_to_sell",
+                    "application_available"
+                ],
+                "title": "ProducerOnboardingStatusResource"
+            },
+            "ProducerRegistrationDetailsResource": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "terms": {
+                        "type": "object",
+                        "properties": {
+                            "version": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            },
+                            "content": {
+                                "type": "string"
+                            },
+                            "is_sample": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "version",
+                            "title",
+                            "content",
+                            "is_sample"
+                        ]
+                    },
+                    "photo": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "preview_url": {
+                                "type": "string"
+                            },
+                            "expires_at": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "preview_url",
+                            "expires_at"
+                        ]
+                    },
+                    "session_expires_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "terms",
+                    "photo",
+                    "session_expires_at"
+                ],
+                "title": "ProducerRegistrationDetailsResource"
+            },
+            "ProducerRegistrationPhotoResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "preview_url": {
+                        "type": "string"
+                    },
+                    "expires_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "preview_url",
+                    "expires_at"
+                ],
+                "title": "ProducerRegistrationPhotoResource"
+            },
+            "ProducerRegistrationStateResource": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "enum": [
+                            "none",
+                            "pending",
+                            "verified",
+                            "expired",
+                            "consumed"
+                        ]
+                    },
+                    "email": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "server_time": {
+                        "type": "string"
+                    },
+                    "otp_expires_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "resend_available_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "session_expires_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "delivery_succeeded": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "state",
+                    "email",
+                    "server_time",
+                    "otp_expires_at",
+                    "resend_available_at",
+                    "session_expires_at",
+                    "delivery_succeeded"
+                ],
+                "title": "ProducerRegistrationStateResource"
+            },
+            "ProducerTermsResource": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "is_sample": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "version",
+                    "title",
+                    "content",
+                    "is_sample"
+                ],
+                "title": "ProducerTermsResource"
+            },
+            "RequestProducerRegistrationCodeRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "RequestProducerRegistrationCodeRequest"
+            },
+            "UploadProducerRegistrationPhotoRequest": {
+                "type": "object",
+                "properties": {
+                    "photo": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Maximum file size: 5120 kilobytes."
+                    }
+                },
+                "required": [
+                    "photo"
+                ],
+                "title": "UploadProducerRegistrationPhotoRequest"
+            },
+            "VerifyProducerRegistrationCodeRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "code"
+                ],
+                "title": "VerifyProducerRegistrationCodeRequest"
             }
         },
         "responses": {

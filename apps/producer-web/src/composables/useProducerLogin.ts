@@ -1,6 +1,6 @@
 import { useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
-import { getApiErrorMessage } from '@/services/api'
+import { getApiErrorMessage } from '@/lib/api-error'
 import { useProducerLoginMutation } from '@/services/auth/auth.mutation'
 
 export function useProducerLogin(clearPassword: () => void) {
@@ -11,13 +11,15 @@ export function useProducerLogin(clearPassword: () => void) {
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: () => {
-          void router.replace({ name: 'home' })
+        onSuccess: (session) => {
+          loginMutation.reset()
+          void router.replace({ name: session.producer?.eligible_to_sell ? 'home' : 'onboarding' })
         },
         onError: (error) => {
           const message = getApiErrorMessage(error)
           if (message) toast.error(message)
           clearPassword()
+          loginMutation.reset()
         },
       },
     )

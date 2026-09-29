@@ -14,7 +14,7 @@
     "test": "pnpm --parallel --filter \"./apps/*\" test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "api:types": "openapi-typescript apps/api/openapi.json -o packages/api-client/src/generated/schema.d.ts",
+    "api:types": "openapi-typescript apps/api/openapi.json -o packages/api-contracts/src/generated/schema.d.ts",
     "api:types:check": "node scripts/check-api-contract.mjs --types-only",
     "api:contract:check": "node scripts/check-api-contract.mjs"
   },

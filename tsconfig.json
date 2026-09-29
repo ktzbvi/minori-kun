@@ -4,7 +4,7 @@
     { "path": "./apps/buyer-web" },
     { "path": "./apps/producer-web" },
     { "path": "./apps/admin-web" },
-    { "path": "./packages/api-client" },
+    { "path": "./packages/api-contracts" },
     { "path": "./packages/ui" }
   ]
 }
