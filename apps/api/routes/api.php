@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Api\BuyerPasswordResetController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
@@ -15,6 +16,11 @@ Route::prefix('/api/v1/buyer/registration')->group(function (): void {
     Route::post('/resend-otp', [BuyerRegistrationController::class, 'resend']);
     Route::post('/verify-otp', [BuyerRegistrationController::class, 'verify']);
     Route::post('/complete', [BuyerRegistrationController::class, 'complete']);
+});
+
+Route::prefix('/api/v1/buyer/password-reset')->middleware('throttle:6,1')->group(function (): void {
+    Route::post('/start', [BuyerPasswordResetController::class, 'start']);
+    Route::post('/complete', [BuyerPasswordResetController::class, 'complete']);
 });
 
 foreach (UserRole::cases() as $role) {

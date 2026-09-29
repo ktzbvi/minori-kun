@@ -5,6 +5,8 @@ import CategoryPage from '@/pages/CategoryPage.vue'
 import CategoryProductListPage from '@/pages/CategoryProductListPage.vue'
 import CartPage from '@/pages/CartPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import PasswordResetConfirmPage from '@/pages/PasswordResetConfirmPage.vue'
+import PasswordResetPage from '@/pages/PasswordResetPage.vue'
 import OrderConfirmationPage from '@/pages/OrderConfirmationPage.vue'
 import ProductDetailPage from '@/pages/ProductDetailPage.vue'
 import RegisterEmailPage from '@/pages/RegisterEmailPage.vue'
@@ -16,6 +18,18 @@ export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
+    {
+      path: '/password-reset',
+      name: 'password-reset',
+      component: PasswordResetPage,
+      meta: { public: true },
+    },
+    {
+      path: '/password-reset/confirm',
+      name: 'password-reset-confirm',
+      component: PasswordResetConfirmPage,
+      meta: { public: true },
+    },
     { path: '/register', name: 'register', component: RegisterEmailPage, meta: { public: true } },
     {
       path: '/register/verify',

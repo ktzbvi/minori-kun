@@ -1,4 +1,9 @@
-import { createApiClient, createAuthApi, createBuyerRegistrationApi } from '@minorikun/api-client'
+import {
+  createApiClient,
+  createAuthApi,
+  createBuyerPasswordResetApi,
+  createBuyerRegistrationApi,
+} from '@minorikun/api-client'
 
 export const apiClient = createApiClient({
   baseURL:
@@ -8,4 +13,5 @@ export const apiClient = createApiClient({
 })
 
 export const authApi = createAuthApi(apiClient, 'buyer')
+export const buyerPasswordResetApi = createBuyerPasswordResetApi(apiClient)
 export const buyerRegistrationApi = createBuyerRegistrationApi(apiClient)

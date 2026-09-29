@@ -7,5 +7,4 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: { port: 5173 },
-  test: { environment: 'jsdom' },
 })
