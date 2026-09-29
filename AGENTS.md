@@ -43,7 +43,7 @@
 - `apps/api` contains the complete standard Laravel project, including `app`, `bootstrap`, `config`, `database`, `public`, `resources`, `routes`, `storage`, and `tests`.
 - `apps/buyer-web`, `apps/producer-web`, and `apps/admin-web` contain the Buyer, Producer, and Admin Vue applications respectively.
 - `packages/ui` contains shared UI primitives and design tokens only. Role-specific pages, layouts, navigation, and workflows remain inside their application.
-- `packages/api-client` contains the shared typed API client and generated contract types.
+- `packages/api-contracts` contains generated backend contract types only. Do not place Axios instances, request helpers, endpoint functions, or workflows in shared packages.
 - `packages/config` contains shared frontend tooling configuration.
 - Keep Laravel Composer dependencies under `apps/api/vendor` and JavaScript dependencies in workspace-managed `node_modules`; never commit either directory.
 
@@ -62,8 +62,14 @@
 
 - Use Vue 3, TypeScript, Vite, Vue Router, Pinia, Tailwind CSS, and shadcn-vue unless the user explicitly changes the approved stack.
 - Use shadcn-vue source components as owned, customizable primitives; do not use React shadcn/ui packages in Vue applications.
+- Build application screens with shared shadcn-vue primitives and Tailwind utility classes. Do not add page-level custom CSS, scoped style blocks, or replacement raw HTML form controls when a shared primitive exists. Keep global CSS limited to framework imports, base rules, and design tokens.
+- Define form validation with Zod schemas and show accessible field-level errors through shared form primitives. Preserve the exact password value; do not trim it or apply registration password-composition rules to login.
+- Prefer Lucide icons from `lucide-vue-next`, as used by shadcn-vue, for interface icons. Reuse an existing Lucide icon whenever suitable instead of drawing custom SVG icons, using emoji or text glyphs as icons, or adding another icon library. Keep icon sizes and stroke widths consistent; hide decorative icons from assistive technology and give icon-only controls accessible names. Brand logos and decorative illustrations are separate from interface icons.
 - Import shared primitives and tokens from `packages/ui`; do not place business workflows or role-specific page components there.
-- Keep API access behind `packages/api-client`; pages and components must not duplicate raw endpoint logic.
+- Each frontend owns one `src/services/api.ts` for its Axios instance, base URL, cookie/CSRF configuration, and interceptors only. It must not contain feature endpoint functions or error-display helpers.
+- Put endpoint calls directly in feature `services/<feature>/<feature>.query.ts` and `<feature>.mutation.ts` files. Keep cache keys in `<feature>.key.ts`. Do not add `<feature>.api.ts` wrappers or centralize endpoint functions in `services/api.ts`. Create only files needed by implemented behavior.
+- Import generated types from `@minorikun/api-contracts`; keep app-specific type aliases in `src/types` and error helpers in `src/lib`. Pages and components consume query/mutation services without raw endpoint calls. Preserve Sanctum cookie/CSRF authentication.
+- The current service migration covers Producer only. Buyer/Admin migration is explicitly deferred; do not expand into those applications without a user request. Their legacy shared-client references must be migrated before workspace installation or their builds can succeed.
 - Buyer UI is mobile-first. Producer and Admin portals are desktop-oriented and must remain usable at the supported viewport sizes.
 - Implement loading, empty, validation, error, retry, disabled, and unavailable states required by the relevant screen specification.
 - Communicate status with text or icon plus text, never color alone.
@@ -75,6 +81,7 @@
 - Do not generate or edit the Excel requirement workbook while the Markdown requirement is being established unless the user explicitly starts the Excel phase.
 - Treat only `docs/みのりくん_EC画面要件定義書.xlsx` as the current manager workbook; archived workbooks are historical evidence only.
 - Preserve unrelated user files and existing artifacts. Never delete or replace them merely because they are outdated.
+- Update existing documentation in place. Do not create new documentation, implementation notes, or handoff files unless the user explicitly requests a new document.
 - Make small, reviewable changes and verify the affected requirement IDs after each batch.
 - Do not install or upgrade packages unless the current task requires it. When adding a package, explain its purpose and pin versions through the appropriate lockfile.
 - Do not add generated screenshots, session transcripts, temporary scripts, machine-specific MCP configuration, logs, or build output to the application repository.

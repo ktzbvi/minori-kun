@@ -9,7 +9,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@minorikun/api-client": "workspace:*",
+    "@minorikun/api-contracts": "workspace:*",
     "@minorikun/ui": "workspace:*",
     "@tanstack/vue-query": "^5.87.1",
     "@vee-validate/zod": "^4.15.1",

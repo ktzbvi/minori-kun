@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { authApi, buyerPasswordResetApi } from '@/lib/api'
+import { startBuyerPasswordReset } from '@/services/password-reset/password-reset.mutation'
 
 const router = useRouter()
 const requestMessage = ref('')
@@ -42,9 +42,8 @@ const submit = handleSubmit(
     serviceError.value = ''
 
     try {
-      await authApi.csrf()
-      const { data } = await buyerPasswordResetApi.start(values.email)
-      requestMessage.value = data.data.message
+      const data = await startBuyerPasswordReset(values.email)
+      requestMessage.value = data.message
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 422) {
         return

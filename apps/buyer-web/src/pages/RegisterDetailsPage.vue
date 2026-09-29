@@ -4,8 +4,10 @@ import { ChevronLeft, Leaf } from 'lucide-vue-next'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { toast, UiButton, UiCard } from '@minorikun/ui'
-import { authApi, buyerRegistrationApi } from '@/lib/api'
 import { queryClient } from '@/lib/query'
+import { buyerAuthKeys } from '@/services/auth/auth.key'
+import { completeBuyerRegistration } from '@/services/registration/registration.mutation'
+import { getBuyerRegistrationStatus } from '@/services/registration/registration.query'
 
 type FieldName =
   | 'name'
@@ -112,13 +114,13 @@ const canSubmit = computed(() => form.terms_accepted && !submitting.value)
 
 onMounted(async () => {
   try {
-    const { data } = await buyerRegistrationApi.status()
+    const data = await getBuyerRegistrationStatus()
 
-    if (!data.data.verified) {
+    if (!data.verified) {
       throw new Error('Registration email is not verified.')
     }
 
-    email.value = data.data.email
+    email.value = data.email
   } catch {
     await router.replace({ name: 'register' })
   }
@@ -140,14 +142,13 @@ async function submit(): Promise<void> {
   submitting.value = true
 
   try {
-    await authApi.csrf()
-    const { data } = await buyerRegistrationApi.complete(form)
+    const data = await completeBuyerRegistration(form)
 
-    await queryClient.invalidateQueries({ queryKey: ['current-session'] })
+    await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
     await router.replace(
       typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
         ? route.query.redirect
-        : data.data.redirect,
+        : data.redirect,
     )
     toast.success('\u767b\u9332\u3057\u307e\u3057\u305f\u3002')
   } catch (error) {

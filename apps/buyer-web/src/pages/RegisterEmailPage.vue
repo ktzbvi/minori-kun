@@ -6,7 +6,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toast, UiButton, UiCard } from '@minorikun/ui'
-import { authApi, buyerRegistrationApi } from '@/lib/api'
+import { startBuyerRegistration } from '@/services/registration/registration.mutation'
 
 const router = useRouter()
 const route = useRoute()
@@ -45,8 +45,7 @@ const [email, emailAttrs] = defineField('email', (state) => ({
 const submit = handleSubmit(
   async (values) => {
     try {
-      await authApi.csrf()
-      await buyerRegistrationApi.start(values.email)
+      await startBuyerRegistration(values.email)
       await router.push({ name: 'register-verify', query: registrationRedirectQuery() })
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 429) {

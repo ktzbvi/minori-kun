@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { authApi, buyerPasswordResetApi } from '@/lib/api'
+import { completeBuyerPasswordReset } from '@/services/password-reset/password-reset.mutation'
 
 const route = useRoute()
 const router = useRouter()
@@ -71,8 +71,7 @@ const submit = handleSubmit(
     }
 
     try {
-      await authApi.csrf()
-      await buyerPasswordResetApi.complete({
+      await completeBuyerPasswordReset({
         email,
         token,
         password: values.password,

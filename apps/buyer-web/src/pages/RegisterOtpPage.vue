@@ -7,7 +7,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toast, UiButton, UiCard } from '@minorikun/ui'
-import { authApi, buyerRegistrationApi } from '@/lib/api'
+import { resendBuyerRegistrationOtp, verifyBuyerRegistrationOtp } from '@/services/registration/registration.mutation'
+import { getBuyerRegistrationStatus } from '@/services/registration/registration.query'
 
 const router = useRouter()
 const route = useRoute()
@@ -61,8 +62,7 @@ function setStatus(status: { email: string; resend_available_at: string }) {
 
 async function loadStatus() {
   try {
-    const response = await buyerRegistrationApi.status()
-    setStatus(response.data.data)
+    setStatus(await getBuyerRegistrationStatus())
   } catch {
     await router.replace({ name: 'register' })
   }
@@ -71,8 +71,7 @@ async function loadStatus() {
 const submit = handleSubmit(
   async (values) => {
     try {
-      await authApi.csrf()
-      await buyerRegistrationApi.verifyOtp(values.code)
+      await verifyBuyerRegistrationOtp(values.code)
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 422) {
         setFieldValue('code', '', false)
@@ -107,9 +106,7 @@ async function resend() {
   if (!canResend.value) return
 
   try {
-    await authApi.csrf()
-    const response = await buyerRegistrationApi.resendOtp()
-    setStatus(response.data.data)
+    setStatus(await resendBuyerRegistrationOtp())
     setFieldValue('code', '', false)
     toast.success('\u8a8d\u8a3c\u30b3\u30fc\u30c9\u3092\u518d\u9001\u3057\u307e\u3057\u305f\u3002')
   } catch (error: unknown) {

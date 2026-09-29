@@ -7,8 +7,9 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toast, UiButton, UiCard } from '@minorikun/ui'
-import { authApi } from '@/lib/api'
 import { queryClient } from '@/lib/query'
+import { loginBuyer } from '@/services/auth/auth.mutation'
+import { buyerAuthKeys } from '@/services/auth/auth.key'
 
 const errorMessage = ref('')
 const route = useRoute()
@@ -55,9 +56,8 @@ const submit = handleSubmit(
   async (values) => {
     errorMessage.value = ''
     try {
-      await authApi.csrf()
-      await authApi.login(values.email, values.password)
-      await queryClient.invalidateQueries({ queryKey: ['current-session'] })
+      await loginBuyer(values)
+      await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
 
       const redirect =
         typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')

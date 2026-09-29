@@ -14,7 +14,7 @@ apps/
 └── admin-web/       Admin Vue SPA
 packages/
 ├── ui/              Shared UI primitives and design tokens
-├── api-client/      Axios client and generated API types
+├── api-contracts/   Generated backend API types only
 └── config/          Shared frontend tooling configuration
 docs/                Requirements, workbook, and project context
 scripts/             Cross-platform project verification scripts
@@ -26,12 +26,12 @@ The files under `docker/` are production image definitions only. They are not pa
 
 Install these tools on the host and make them available on `PATH`:
 
-- PHP 8.4 with `bcmath`, `curl`, `fileinfo`, `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, and `zip` extensions.
+- PHP 8.4 with `bcmath`, `curl`, `exif`, `fileinfo`, `gd` (JPEG/PNG/WebP support), `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, and `zip` extensions. Producer shop-photo processing requires GD and EXIF.
 - Composer 2.8 or newer.
 - Node.js 22.12 or newer.
 - pnpm 10. Enable it with `corepack enable` and `corepack prepare pnpm@10.17.1 --activate` if Corepack is available.
 - MySQL 8.4 with a local database named `minori`.
-- Mailpit for browser-based local email inspection, or use Laravel's `log` mailer instead.
+- Mailpit for browser-based local SMTP email inspection. Registration OTP delivery does not permit the `log` mailer.
 - PowerShell 5.1 or newer.
 
 Verify the main tools:
@@ -172,7 +172,7 @@ Other workspace targets follow the same pattern:
 pnpm --filter @minorikun/producer-web add <package-name>
 pnpm --filter @minorikun/admin-web add <package-name>
 pnpm --filter @minorikun/ui add <package-name>
-pnpm --filter @minorikun/api-client add <package-name>
+pnpm --filter @minorikun/producer-web add <package-name>
 ```
 
 Install repository-wide tooling at the workspace root only when every application needs it:
@@ -192,11 +192,20 @@ These commands update the selected package's `package.json` and the single root 
 - Marketplace business dates and UI display use `BUSINESS_TIMEZONE=Asia/Tokyo`.
 - Mailpit is a local inspection tool, not a production email provider.
 
-If Mailpit is not installed, set this in `apps/api/.env` and inspect `apps/api/storage/logs/laravel.log`:
+For Producer registration (FR-P-002/003), run Mailpit locally and configure `apps/api/.env` to use its SMTP listener. The example environment already uses this host and port:
 
 ```dotenv
-MAIL_MAILER=log
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=127.0.0.1
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
 ```
+
+Open `http://localhost:8025` to read the actual verification email captured by Mailpit. Local messages stay in that inbox unless forwarding is explicitly configured; they do not reach the recipient's real mailbox. Registration sends synchronously after the challenge commits, so a queue worker is not required. If SMTP is unavailable, registration shows a recoverable delivery error; it must never log OTPs or pretend delivery succeeded. Production uses the same SMTP integration with the deployment's host, port, TLS scheme and credentials.
+
+Registration deployment also requires the additive database migrations, GD/EXIF image-processing support, Laravel's scheduler for expired temporary-data cleanup, and an approved versioned production terms document. Development sample terms cannot enable production account creation. PAY.JP integration and Producer registration attempt/request limits remain deferred under section 6.4 of `docs/REQUIREMENTS.md`.
 
 ## Local demo accounts
 
@@ -215,7 +224,7 @@ Laravel and Scramble generate OpenAPI. `openapi-typescript` converts the committ
 
 1. Change the Laravel API contract intentionally.
 2. Run `.\m.ps1 api-sync`.
-3. Review `apps/api/openapi.json` and `packages/api-client/src/generated/schema.d.ts`.
+3. Review `apps/api/openapi.json` and `packages/api-contracts/src/generated/schema.d.ts`.
 4. Run `.\m.ps1 check`.
 
 The freshness check generates temporary comparison files outside the repository and does not rewrite tracked files.
@@ -229,7 +238,9 @@ The freshness check generates temporary comparison files outside the repository 
 - Keep payment, refund, screening, fulfillment, and payout states independent and idempotent.
 - Dispatch queued side effects only after the authoritative transaction commits.
 - Keep role-specific pages inside their SPA. `packages/ui` contains shared primitives only.
-- Pages use endpoint functions from `packages/api-client`; they do not call raw Axios directly.
+- Each frontend owns `src/services/api.ts` for Axios configuration only. Endpoint calls live directly in feature `.query.ts` and `.mutation.ts` files, with cache keys in `.key.ts`; do not create feature `.api.ts` wrappers. Pages consume these services.
+- `packages/api-contracts` exports generated backend types only. Producer has adopted the app-owned client; Buyer/Admin still reference the removed shared client and require a separate migration before workspace installation or their builds can succeed.
+- Update existing documentation; create new documentation files only when explicitly requested.
 - Use Vue Query for server state and Pinia for client/presentation state only.
 - Store JPY as integers and percentages as basis points.
 - Keep Producer-funded discounts separate from the Company's fixed 10% commission.
