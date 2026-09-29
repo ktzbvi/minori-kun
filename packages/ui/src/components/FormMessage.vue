@@ -6,15 +6,7 @@ const props = defineProps<{ class?: HTMLAttributes['class'] }>()
 </script>
 
 <template>
-  <section
-    data-slot="card"
-    :class="
-      cn(
-        'rounded-[14px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6',
-        props.class,
-      )
-    "
-  >
+  <p data-slot="form-message" :class="cn('text-sm font-medium text-[#b33a2b]', props.class)">
     <slot />
-  </section>
+  </p>
 </template>

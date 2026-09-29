@@ -62,6 +62,9 @@
 
 - Use Vue 3, TypeScript, Vite, Vue Router, Pinia, Tailwind CSS, and shadcn-vue unless the user explicitly changes the approved stack.
 - Use shadcn-vue source components as owned, customizable primitives; do not use React shadcn/ui packages in Vue applications.
+- Build application screens with shared shadcn-vue primitives and Tailwind utility classes. Do not add page-level custom CSS, scoped style blocks, or replacement raw HTML form controls when a shared primitive exists. Keep global CSS limited to framework imports, base rules, and design tokens.
+- Define form validation with Zod schemas and show accessible field-level errors through shared form primitives. Preserve the exact password value; do not trim it or apply registration password-composition rules to login.
+- Prefer Lucide icons from `lucide-vue-next`, as used by shadcn-vue, for interface icons. Reuse an existing Lucide icon whenever suitable instead of drawing custom SVG icons, using emoji or text glyphs as icons, or adding another icon library. Keep icon sizes and stroke widths consistent; hide decorative icons from assistive technology and give icon-only controls accessible names. Brand logos and decorative illustrations are separate from interface icons.
 - Import shared primitives and tokens from `packages/ui`; do not place business workflows or role-specific page components there.
 - Keep API access behind `packages/api-client`; pages and components must not duplicate raw endpoint logic.
 - Buyer UI is mobile-first. Producer and Admin portals are desktop-oriented and must remain usable at the supported viewport sizes.
