@@ -13,7 +13,7 @@ export function useProducerLogin(clearPassword: () => void) {
       {
         onSuccess: (session) => {
           loginMutation.reset()
-          void router.replace({ name: session.producer?.eligible_to_sell ? 'home' : 'onboarding' })
+          void router.replace({ name: session.producer?.eligible_to_sell ? 'dashboard' : 'onboarding' })
         },
         onError: (error) => {
           const message = getApiErrorMessage(error)

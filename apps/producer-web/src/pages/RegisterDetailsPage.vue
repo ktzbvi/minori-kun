@@ -320,7 +320,7 @@ async function submit() {
       try {
         const session = await queryClient.fetchQuery({ ...currentSessionQuery, staleTime: 0 })
         if (session.role === 'producer') {
-          await router.replace({ name: session.producer?.eligible_to_sell ? 'home' : 'onboarding' })
+          await router.replace({ name: session.producer?.eligible_to_sell ? 'dashboard' : 'onboarding' })
           return
         }
       } catch {
@@ -358,16 +358,16 @@ onBeforeUnmount(() => {
 
 <template>
   <RegistrationShell compact-mobile>
-    <div class="w-full max-w-[724px] min-[761px]:max-w-[640px] min-[761px]:py-2">
+    <div class="w-full min-w-0 max-w-[724px] [overflow-wrap:anywhere] min-[761px]:max-w-[640px] min-[761px]:py-2">
       <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-4 min-[761px]:px-0" />
 
       <div class="w-full rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none">
         <RegistrationBrand />
         <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-2xl">アカウントを作成</h1>
 
-        <div v-if="detailsQuery.isPending.value" class="mt-7 rounded-xl border border-[#cfdfd5] bg-white p-5 text-sm text-[#687b70]" role="status">
+        <p v-if="detailsQuery.isPending.value" class="mt-4 text-sm leading-relaxed text-[#687b70]" role="status">
           登録情報を確認しています…
-        </div>
+        </p>
         <div v-else-if="detailsQuery.isError.value" class="mt-7 rounded-xl border border-[#e4c9c3] bg-white p-5">
           <p class="text-sm leading-relaxed text-[#7b3329]" role="alert">{{ registrationActions.errorMessage(detailsQuery.error.value) }}</p>
           <div class="mt-4 flex flex-wrap gap-3">
@@ -376,7 +376,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <form v-else class="mt-7 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4" novalidate :aria-busy="isSubmitting || photoBusy" @submit.prevent="submit">
+        <form v-if="!detailsQuery.isError.value" class="mt-7 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4" novalidate :aria-busy="isSubmitting || photoBusy || detailsQuery.isPending.value" @submit.prevent="submit">
           <section class="grid gap-4" aria-labelledby="producer-information-title">
             <h2 id="producer-information-title" class="text-xl font-bold text-[#25332b]">生産者情報</h2>
 
@@ -389,7 +389,7 @@ onBeforeUnmount(() => {
                 class="relative grid size-28 place-items-center overflow-visible rounded-full border-[3px] border-[#d5e4db] bg-white text-[#718178] outline-none focus-visible:ring-3 focus-visible:ring-[#237f4b]/20 disabled:cursor-not-allowed disabled:opacity-60"
                 :aria-label="displayedPhotoUrl ? 'ショッププロフィール写真を変更' : 'ショッププロフィール写真を追加'"
                 :aria-describedby="photoError ? 'shop-photo-error' : undefined"
-                :disabled="photoBusy || isSubmitting"
+                :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value"
                 @click="triggerPhotoPicker"
               >
                 <img v-if="displayedPhotoUrl" :src="displayedPhotoUrl" alt="選択したショッププロフィール写真" class="size-full rounded-full object-cover" />
@@ -403,7 +403,7 @@ onBeforeUnmount(() => {
                 class="sr-only"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                :disabled="photoBusy || isSubmitting"
+                :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value"
                 :aria-labelledby="'shop-photo-label'"
                 :aria-describedby="photoError ? 'shop-photo-error' : undefined"
                 @change="selectPhoto"
@@ -416,10 +416,10 @@ onBeforeUnmount(() => {
               <UiFormMessage v-if="photoError || errors.photo" id="shop-photo-error" role="alert">{{ photoError || errors.photo }}</UiFormMessage>
               <p v-if="photoUploadError" class="text-sm leading-relaxed text-[#7b3329]" role="alert">{{ photoUploadError }}</p>
               <div v-if="photoFile" class="flex flex-wrap gap-3">
-                <UiButton type="button" variant="outline" :disabled="photoBusy || isSubmitting" @click="retryPhotoUpload">写真を再アップロードする</UiButton>
-                <UiButton type="button" variant="ghost" :disabled="photoBusy || isSubmitting" @click="removePhoto">選択した写真を取り消す</UiButton>
+                <UiButton type="button" variant="outline" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="retryPhotoUpload">写真を再アップロードする</UiButton>
+                <UiButton type="button" variant="ghost" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="removePhoto">選択した写真を取り消す</UiButton>
               </div>
-              <UiButton v-else-if="confirmedPhoto" type="button" variant="ghost" class="w-fit min-h-0 border-0 p-0 text-sm text-[#258451] underline underline-offset-4" :disabled="photoBusy || isSubmitting" @click="removePhoto">
+              <UiButton v-else-if="confirmedPhoto" type="button" variant="ghost" class="w-fit min-h-0 border-0 p-0 text-sm text-[#258451] underline underline-offset-4" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="removePhoto">
                 写真を削除する
               </UiButton>
             </div>
@@ -506,7 +506,7 @@ onBeforeUnmount(() => {
           </div>
 
           <p v-if="feedback" class="rounded-lg bg-[#fff8e8] px-4 py-3 text-sm leading-relaxed text-[#614c22]" role="alert">{{ feedback }}</p>
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isSubmitting || photoChoicePending || !confirmedPhoto">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isSubmitting || detailsQuery.isPending.value || photoChoicePending || !confirmedPhoto">
             {{ isSubmitting ? '作成中…' : 'アカウントを作成する' }}
           </UiButton>
           <RouterLink to="/login" class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4">ログイン</RouterLink>

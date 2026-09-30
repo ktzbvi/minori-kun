@@ -4,7 +4,7 @@ import { RouterLink, useRoute } from 'vue-router'
 import { Mail } from 'lucide-vue-next'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/vue-query'
-import { UiButton, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
+import { toast, UiButton, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
 import RegistrationBrand from '@/components/registration/RegistrationBrand.vue'
 import RegistrationProgress from '@/components/registration/RegistrationProgress.vue'
 import RegistrationShell from '@/components/registration/RegistrationShell.vue'
@@ -17,7 +17,6 @@ const statusQuery = useQuery(producerRegistrationStatusQuery)
 const registrationActions = useProducerRegistration()
 const email = ref('')
 const emailError = ref('')
-const feedback = ref('')
 const clockTick = ref(Date.now())
 const clockOffset = ref(0)
 const cooldownEmail = ref('')
@@ -58,7 +57,6 @@ const recoveryMessage = computed(() => {
 async function submit() {
   if (isSubmitting.value) return
   emailError.value = ''
-  feedback.value = ''
   const result = emailSchema.safeParse(email.value)
   if (!result.success) {
     emailError.value = result.error.issues[0]?.message ?? ''
@@ -80,7 +78,8 @@ async function submit() {
       cooldownEmail.value = result.data.toLowerCase()
       cooldownUntil.value = cooldownDeadline
     }
-    feedback.value = registrationActions.errorMessage(error)
+    const message = registrationActions.errorMessage(error)
+    if (message) toast.error(message)
     await statusQuery.refetch()
   }
 }
@@ -132,7 +131,7 @@ async function submit() {
                 class="h-[58px] rounded-xl pr-4 pl-12 text-base shadow-none min-[761px]:h-12 min-[761px]:px-4 min-[761px]:text-base"
                 :disabled="isSubmitting"
                 :aria-invalid="Boolean(emailError)"
-                :aria-describedby="emailError ? 'registration-email-error' : feedback ? 'registration-feedback' : currentEmailCoolingDown ? 'registration-cooldown' : undefined"
+                :aria-describedby="emailError ? 'registration-email-error' : currentEmailCoolingDown ? 'registration-cooldown' : undefined"
               />
             </div>
             <UiFormMessage v-if="emailError" id="registration-email-error" role="alert">{{ emailError }}</UiFormMessage>
@@ -144,7 +143,6 @@ async function submit() {
           <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none" :disabled="isSubmitting || currentEmailCoolingDown">
             {{ isSubmitting ? '送信中…' : '確認コードを送信する' }}
           </UiButton>
-          <p v-if="feedback" id="registration-feedback" class="text-sm leading-relaxed text-[#7b3329]" role="alert">{{ feedback }}</p>
         </form>
 
         <p class="mt-7 text-center text-[15px] text-[#87968d] min-[761px]:mt-6 min-[761px]:text-left min-[761px]:text-sm">
