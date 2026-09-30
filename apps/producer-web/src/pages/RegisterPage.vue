@@ -68,6 +68,10 @@ async function submit() {
     await registrationActions.requestCode(result.data, statusQuery.data.value?.state)
   } catch (error) {
     const payload = getApiErrorPayload(error)
+    if (payload?.code === 'ACCOUNT_EXISTS') {
+      emailError.value = registrationActions.errorMessage(error)
+      return
+    }
     if (payload?.server_time) clockOffset.value = Date.parse(payload.server_time) - Date.now()
     const cooldownDeadline = payload?.resend_available_at
       ? Date.parse(payload.resend_available_at)
