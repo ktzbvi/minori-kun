@@ -112,13 +112,6 @@ async function submit() {
         <div v-if="statusQuery.isPending.value" class="mt-8 rounded-xl border border-[#cfdfd5] bg-white p-5 text-sm text-[#687b70]" role="status">
           登録状態を確認しています…
         </div>
-        <div v-else-if="statusQuery.isError.value" class="mt-8 rounded-xl border border-[#e4c9c3] bg-white p-5">
-          <p class="text-sm leading-relaxed text-[#7b3329]" role="alert">{{ registrationActions.errorMessage(statusQuery.error.value) }}</p>
-          <UiButton class="mt-4" variant="outline" :disabled="statusQuery.isFetching.value" @click="statusQuery.refetch()">
-            {{ statusQuery.isFetching.value ? '確認中…' : '再試行' }}
-          </UiButton>
-        </div>
-
         <form v-else class="mt-10 grid gap-5 min-[761px]:mt-7" novalidate :aria-busy="isSubmitting" @submit.prevent="submit">
           <div class="grid gap-2.5">
             <UiFormLabel for="registration-email" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
