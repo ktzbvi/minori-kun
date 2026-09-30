@@ -137,6 +137,13 @@ async function submit() {
           <span v-else>&#22793;&#26356;&#20869;&#23481;&#12434;&#20445;&#23384;</span>
         </UiButton>
       </form>
+
+      <RouterLink
+        class="mx-auto mt-4 block w-fit text-[11px] font-medium text-[#6e7e74] underline underline-offset-2"
+        :to="{ name: 'password-reset' }"
+      >
+        &#12497;&#12473;&#12527;&#12540;&#12489;&#12434;&#12362;&#24536;&#12428;&#12391;&#12377;&#12363;&#65311;
+      </RouterLink>
     </section>
   </main>
 </template>

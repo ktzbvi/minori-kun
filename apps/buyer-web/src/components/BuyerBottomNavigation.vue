@@ -76,12 +76,16 @@ function navigate(item: BuyerNavigationItem) {
       </span>
     </button>
     <button
-      class="grid place-items-center gap-0.5 border-0 bg-transparent text-[#68786e]"
+      class="grid place-items-center gap-0.5 border-0 bg-transparent"
+      :class="active === 'profile' ? 'text-[#237f4b]' : 'text-[#68786e]'"
       type="button"
+      :aria-current="active === 'profile' ? 'page' : undefined"
       @click="navigate('profile')"
     >
       <UserRound :size="18" />
-      <span class="text-[10px]">&#x30DE;&#x30A4;&#x30DA;&#x30FC;&#x30B8;</span>
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'profile' }">
+        &#x30DE;&#x30A4;&#x30DA;&#x30FC;&#x30B8;
+      </span>
     </button>
   </nav>
 </template>

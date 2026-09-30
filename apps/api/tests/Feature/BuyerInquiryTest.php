@@ -1,7 +1,14 @@
 <?php
 
+use App\Mail\BuyerSupportInquiryMail;
 use App\Models\BuyerInquiry;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+
+beforeEach(function (): void {
+    Mail::fake();
+    config()->set('mail.support_address', 'support@example.test');
+});
 
 it('accepts an inquiry from an authenticated buyer', function (): void {
     $buyer = User::factory()->buyer()->create();
@@ -16,6 +23,11 @@ it('accepts an inquiry from an authenticated buyer', function (): void {
         ->assertJsonPath('data.reference_number', fn (string $reference): bool => str_starts_with($reference, 'INQ-'));
 
     expect(BuyerInquiry::query()->where('buyer_id', $buyer->id)->count())->toBe(1);
+    Mail::assertSent(BuyerSupportInquiryMail::class, function (BuyerSupportInquiryMail $mail): bool {
+        return $mail->hasTo('support@example.test')
+            && $mail->referenceNumber !== ''
+            && str_contains($mail->render(), 'Delivery question');
+    });
 });
 
 it('returns the original inquiry when the same request is retried', function (): void {
