@@ -5,6 +5,7 @@ import EntryPage from '@/pages/EntryPage.vue'
 import HomePage from '@/pages/HomePage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
+import ProductsPage from '@/pages/ProductsPage.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
 import RegisterVerifyPage from '@/pages/RegisterVerifyPage.vue'
 import RegisterDetailsPage from '@/pages/RegisterDetailsPage.vue'
@@ -29,6 +30,7 @@ export const router = createRouter({
     { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
     { path: '/', name: 'entry', component: EntryPage, meta: { public: true } },
     { path: '/dashboard', name: 'dashboard', component: HomePage },
+    { path: '/products', name: 'products', component: ProductsPage },
   ],
 })
 
@@ -40,7 +42,7 @@ router.beforeEach(async (to) => {
     if (session.role !== 'producer') return { name: 'login' }
     const eligible = session.producer?.eligible_to_sell === true
     if (to.name === 'onboarding' && eligible) return { name: 'dashboard' }
-    if (to.name === 'dashboard' && !eligible) return { name: 'onboarding' }
+    if (to.name !== 'onboarding' && !eligible) return { name: 'onboarding' }
     return true
   } catch {
     return { name: 'login', query: { redirect: to.fullPath } }

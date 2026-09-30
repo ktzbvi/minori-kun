@@ -804,6 +804,119 @@
                 }
             }
         },
+        "/v1/producer/products": {
+            "get": {
+                "operationId": "producerProduct.index",
+                "tags": [
+                    "ProducerProduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "publication_state",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "all",
+                                "draft",
+                                "published",
+                                "unpublished",
+                                null
+                            ]
+                        }
+                    },
+                    {
+                        "name": "stock_state",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "enum": [
+                                "all",
+                                "in_stock",
+                                "low_stock",
+                                "out_of_stock",
+                                null
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ProducerProductListItemResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ProducerProductListItemResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "total",
+                                                "categories"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/producer/registration": {
             "get": {
                 "operationId": "producerRegistration.show",
@@ -1523,6 +1636,67 @@
                     "application_available"
                 ],
                 "title": "ProducerOnboardingStatusResource"
+            },
+            "ProducerProductListItemResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "display_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "price_yen": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "has_multiple_prices": {
+                        "type": "boolean"
+                    },
+                    "stock_quantity": {
+                        "type": "integer"
+                    },
+                    "discount_bps": {
+                        "type": "integer"
+                    },
+                    "publication_state": {
+                        "type": "string"
+                    },
+                    "image_url": {
+                        "type": "null"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "display_id",
+                    "name",
+                    "category",
+                    "price_yen",
+                    "has_multiple_prices",
+                    "stock_quantity",
+                    "discount_bps",
+                    "publication_state",
+                    "image_url",
+                    "updated_at"
+                ],
+                "title": "ProducerProductListItemResource"
             },
             "ProducerRegistrationDetailsResource": {
                 "type": "object",
