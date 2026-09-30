@@ -4,7 +4,6 @@ import { getApiErrorMessage, getApiErrorPayload } from '@/lib/api-error'
 import type { ProducerRegistrationCompletion } from '@/types/registration'
 import {
   useCompleteRegistrationMutation,
-  useDeleteRegistrationPhotoMutation,
   useRequestRegistrationCodeMutation,
   useResetRegistrationMutation,
   useResendRegistrationCodeMutation,
@@ -19,7 +18,6 @@ export function useProducerRegistration() {
   const verifyMutation = useVerifyRegistrationCodeMutation()
   const resetMutation = useResetRegistrationMutation()
   const uploadPhotoMutation = useUploadRegistrationPhotoMutation()
-  const deletePhotoMutation = useDeleteRegistrationPhotoMutation()
   const completeMutation = useCompleteRegistrationMutation()
 
   const isRequestingCode = computed(() => requestCodeMutation.isPending.value || resetMutation.isPending.value)
@@ -27,7 +25,6 @@ export function useProducerRegistration() {
   const isResendingCode = computed(() => resendMutation.isPending.value)
   const isResettingRegistration = computed(() => resetMutation.isPending.value)
   const isUploadingPhoto = computed(() => uploadPhotoMutation.isPending.value)
-  const isDeletingPhoto = computed(() => deletePhotoMutation.isPending.value)
   const isCompletingRegistration = computed(() => completeMutation.isPending.value)
 
   function errorMessage(error: unknown) {
@@ -62,10 +59,6 @@ export function useProducerRegistration() {
     return await uploadPhotoMutation.mutateAsync(file)
   }
 
-  async function deletePhoto(id: string) {
-    return await deletePhotoMutation.mutateAsync(id)
-  }
-
   async function completeRegistration(payload: ProducerRegistrationCompletion) {
     const session = await completeMutation.mutateAsync(payload)
     await router.replace({ name: 'onboarding' })
@@ -80,7 +73,6 @@ export function useProducerRegistration() {
 
   function resetPhotoState() {
     uploadPhotoMutation.reset()
-    deletePhotoMutation.reset()
   }
 
   function resetCompletionState() {
@@ -97,7 +89,6 @@ export function useProducerRegistration() {
     isResendingCode,
     isResettingRegistration,
     isUploadingPhoto,
-    isDeletingPhoto,
     isCompletingRegistration,
     errorMessage,
     serverErrors,
@@ -106,7 +97,6 @@ export function useProducerRegistration() {
     verifyCode,
     changeEmail,
     uploadPhoto,
-    deletePhoto,
     completeRegistration,
     resetVerificationState,
     resetPhotoState,

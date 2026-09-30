@@ -49,7 +49,7 @@ watch(phone, (value) => { registration.phone = value })
 
 const verifiedEmail = computed(() => detailsQuery.data.value?.email ?? '')
 const confirmedPhoto = computed<ProducerRegistrationPhoto | null>(() => detailsQuery.data.value?.photo ?? null)
-const photoBusy = computed(() => photoValidating.value || registrationActions.isUploadingPhoto.value || registrationActions.isDeletingPhoto.value)
+const photoBusy = computed(() => photoValidating.value || registrationActions.isUploadingPhoto.value)
 const photoChoicePending = computed(() => photoBusy.value || Boolean(photoFile.value))
 const terms = computed(() => termsQuery.data.value ?? detailsQuery.data.value?.terms)
 const displayedPhotoUrl = computed(() => localPreview.value || confirmedPhoto.value?.preview_url || '')
@@ -85,6 +85,19 @@ const completionSchema = z.object({
   if (value.password !== value.passwordConfirmation) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['passwordConfirmation'], message: 'パスワードが一致しません。' })
   }
+})
+
+const canSubmit = computed(() => {
+  if (!confirmedPhoto.value || photoChoicePending.value || detailsQuery.isPending.value) return false
+
+  return completionSchema.safeParse({
+    shopName: shopName.value,
+    contactName: contactName.value,
+    phone: phone.value,
+    password: password.value,
+    passwordConfirmation: passwordConfirmation.value,
+    acceptedTerms: acceptedTerms.value && acceptedTermsVersion.value === terms.value?.version,
+  }).success
 })
 
 watch(() => terms.value?.version, (version) => {
@@ -137,16 +150,11 @@ function revokeLocalPreview() {
 
 async function uploadSelectedPhoto(file: File) {
   photoUploadError.value = ''
-  const oldPhotoId = confirmedPhoto.value?.id
   try {
-    const uploaded = await registrationActions.uploadPhoto(file)
+    await registrationActions.uploadPhoto(file)
     photoFile.value = null
     revokeLocalPreview()
     registrationActions.resetPhotoState()
-    if (oldPhotoId && oldPhotoId !== uploaded.id) {
-      try { await registrationActions.deletePhoto(oldPhotoId) } catch { /* The new validated photo remains selected. */ }
-      registrationActions.resetPhotoState()
-    }
     photoError.value = ''
   } catch (error) {
     const code = getApiErrorPayload(error)?.code
@@ -194,23 +202,12 @@ async function retryPhotoUpload() {
   if (photoFile.value && !photoBusy.value) await uploadSelectedPhoto(photoFile.value)
 }
 
-async function removePhoto() {
+function removePhoto() {
   if (photoBusy.value) return
-  if (photoFile.value) {
-    photoFile.value = null
-    revokeLocalPreview()
-    photoUploadError.value = ''
-    return
-  }
-  if (!confirmedPhoto.value) return
-  photoError.value = ''
-  try {
-    await registrationActions.deletePhoto(confirmedPhoto.value.id)
-    registrationActions.resetPhotoState()
-  } catch (error) {
-    photoError.value = registrationActions.errorMessage(error)
-    registrationActions.resetPhotoState()
-  }
+  if (!photoFile.value) return
+  photoFile.value = null
+  revokeLocalPreview()
+  photoUploadError.value = ''
 }
 
 function triggerPhotoPicker() {
@@ -386,15 +383,17 @@ onBeforeUnmount(() => {
               </UiFormLabel>
               <button
                 type="button"
-                class="relative grid size-28 place-items-center overflow-visible rounded-full border-[3px] border-[#d5e4db] bg-white text-[#718178] outline-none focus-visible:ring-3 focus-visible:ring-[#237f4b]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                class="relative size-28 overflow-visible rounded-full text-[#718178] outline-none focus-visible:ring-3 focus-visible:ring-[#237f4b]/20 disabled:cursor-not-allowed disabled:opacity-60"
                 :aria-label="displayedPhotoUrl ? 'ショッププロフィール写真を変更' : 'ショッププロフィール写真を追加'"
                 :aria-describedby="photoError ? 'shop-photo-error' : undefined"
                 :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value"
                 @click="triggerPhotoPicker"
               >
-                <img v-if="displayedPhotoUrl" :src="displayedPhotoUrl" alt="選択したショッププロフィール写真" class="size-full rounded-full object-cover" />
-                <ImageIcon v-else class="size-14" :stroke-width="1.7" aria-hidden="true" />
-                <span class="absolute right-0 bottom-0 grid size-8 place-items-center rounded-full bg-[#237f4b] text-white ring-2 ring-[#f3f7f4]">
+                <span class="absolute inset-0 grid place-items-center overflow-hidden rounded-full border-[3px] border-[#d5e4db] bg-white">
+                  <img v-if="displayedPhotoUrl" :src="displayedPhotoUrl" alt="選択したショッププロフィール写真" class="absolute inset-0 h-full w-full rounded-full object-cover" />
+                  <ImageIcon v-else class="size-14" :stroke-width="1.7" aria-hidden="true" />
+                </span>
+                <span class="absolute -right-1 -bottom-1 z-10 grid size-8 place-items-center rounded-full bg-[#237f4b] text-white ring-2 ring-[#f3f7f4]">
                   <Camera class="size-5" :stroke-width="2.2" aria-hidden="true" />
                 </span>
               </button>
@@ -409,7 +408,7 @@ onBeforeUnmount(() => {
                 @change="selectPhoto"
               />
               <p v-if="photoBusy" class="text-sm text-[#687b70]" role="status">
-                {{ photoValidating ? '写真を確認しています…' : registrationActions.isUploadingPhoto.value ? '写真をアップロードしています…' : '写真を削除しています…' }}
+                {{ photoValidating ? '写真を確認しています…' : '写真をアップロードしています…' }}
               </p>
               <p v-if="photoFile && confirmedPhoto" class="text-xs leading-relaxed text-[#687b70]" role="status">新しい写真をアップロードしています。完了すると現在の写真と入れ替わります。</p>
               <p class="text-xs leading-relaxed text-[#87968d] min-[761px]:hidden">登録した写真は、購入者向けの商品一覧にショップ画像として表示されます。</p>
@@ -419,9 +418,6 @@ onBeforeUnmount(() => {
                 <UiButton type="button" variant="outline" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="retryPhotoUpload">写真を再アップロードする</UiButton>
                 <UiButton type="button" variant="ghost" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="removePhoto">選択した写真を取り消す</UiButton>
               </div>
-              <UiButton v-else-if="confirmedPhoto" type="button" variant="ghost" class="w-fit min-h-0 border-0 p-0 text-sm text-[#258451] underline underline-offset-4" :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value" @click="removePhoto">
-                写真を削除する
-              </UiButton>
             </div>
 
             <div class="grid gap-2">
@@ -472,7 +468,7 @@ onBeforeUnmount(() => {
                 </UiFormLabel>
                 <div class="relative">
                   <UiInput id="password" v-model="password" :type="passwordVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.password)" :aria-describedby="errors.password ? 'password-error' : undefined" />
-                  <UiButton type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="passwordVisible ? 'パスワードを隠す' : 'パスワードを表示する'" :disabled="isSubmitting" @click="passwordVisible = !passwordVisible">
+                  <UiButton tabIndex="-1" type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="passwordVisible ? 'パスワードを隠す' : 'パスワードを表示する'" :disabled="isSubmitting" @click="passwordVisible = !passwordVisible">
                     <EyeOff v-if="passwordVisible" class="size-5" aria-hidden="true" /><Eye v-else class="size-5" aria-hidden="true" />
                   </UiButton>
                 </div>
@@ -484,7 +480,7 @@ onBeforeUnmount(() => {
                 </UiFormLabel>
                 <div class="relative">
                   <UiInput id="password-confirmation" v-model="passwordConfirmation" :type="confirmationVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.passwordConfirmation)" :aria-describedby="errors.passwordConfirmation ? 'password-confirmation-error' : undefined" />
-                  <UiButton type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="confirmationVisible ? '確認用パスワードを隠す' : '確認用パスワードを表示する'" :disabled="isSubmitting" @click="confirmationVisible = !confirmationVisible">
+                  <UiButton tabIndex="-1" type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="confirmationVisible ? '確認用パスワードを隠す' : '確認用パスワードを表示する'" :disabled="isSubmitting" @click="confirmationVisible = !confirmationVisible">
                     <EyeOff v-if="confirmationVisible" class="size-5" aria-hidden="true" /><Eye v-else class="size-5" aria-hidden="true" />
                   </UiButton>
                 </div>
@@ -506,7 +502,7 @@ onBeforeUnmount(() => {
           </div>
 
           <p v-if="feedback" class="rounded-lg bg-[#fff8e8] px-4 py-3 text-sm leading-relaxed text-[#614c22]" role="alert">{{ feedback }}</p>
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isSubmitting || detailsQuery.isPending.value || photoChoicePending || !confirmedPhoto">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isSubmitting || !canSubmit">
             {{ isSubmitting ? '作成中…' : 'アカウントを作成する' }}
           </UiButton>
           <RouterLink to="/login" class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4">ログイン</RouterLink>
