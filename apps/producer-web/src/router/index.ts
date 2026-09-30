@@ -40,12 +40,9 @@ router.beforeEach(async (to) => {
         return { name: session.producer?.eligible_to_sell ? 'home' : 'onboarding' }
       }
       return { name: 'login' }
-    } catch (error) {
-      const response = typeof error === 'object' && error !== null && 'response' in error ? error.response : undefined
-      const status = typeof response === 'object' && response !== null && 'status' in response ? response.status : undefined
-      if (status !== 401) {
-        return { name: 'login', query: { recovery: 'session-unavailable', redirect: to.fullPath } }
-      }
+    } catch {
+      // Registration is a public entry point. A missing or temporarily unavailable
+      // session must not bounce a new applicant back to login.
     }
 
     try {
