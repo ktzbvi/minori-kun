@@ -26,8 +26,8 @@ it('rejects an already registered Producer email before sending an OTP', functio
     ])
         ->assertStatus(409)
         ->assertJsonPath('code', 'ACCOUNT_EXISTS')
-        ->assertJsonPath('message', 'このメールアドレスはすでに登録されています。ログインしてください。')
-        ->assertJsonPath('errors.email.0', 'このメールアドレスはすでに登録されています。ログインしてください。');
+        ->assertJsonPath('message', 'このメールアドレスはすでに登録されています。')
+        ->assertJsonPath('errors.email.0', 'このメールアドレスはすでに登録されています。');
 
     expect(ProducerRegistrationAttempt::query()->exists())->toBeFalse();
     Mail::assertNotSent(ProducerRegistrationOtpMail::class);
