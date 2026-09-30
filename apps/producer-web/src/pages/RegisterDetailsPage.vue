@@ -90,14 +90,13 @@ const completionSchema = z.object({
 const canSubmit = computed(() => {
   if (!confirmedPhoto.value || photoChoicePending.value || detailsQuery.isPending.value) return false
 
-  return completionSchema.safeParse({
-    shopName: shopName.value,
-    contactName: contactName.value,
-    phone: phone.value,
-    password: password.value,
-    passwordConfirmation: passwordConfirmation.value,
-    acceptedTerms: acceptedTerms.value && acceptedTermsVersion.value === terms.value?.version,
-  }).success
+  return shopName.value.trim() !== ''
+    && contactName.value.trim() !== ''
+    && phone.value.trim() !== ''
+    && password.value !== ''
+    && passwordConfirmation.value !== ''
+    && acceptedTerms.value
+    && acceptedTermsVersion.value === terms.value?.version
 })
 
 watch(() => terms.value?.version, (version) => {
@@ -491,7 +490,7 @@ onBeforeUnmount(() => {
 
           <div class="grid gap-2">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <UiCheckbox id="producer-terms" :model-value="acceptedTerms" :disabled="!terms || termsQuery.isFetching.value || isSubmitting" :aria-invalid="Boolean(errors.acceptedTerms)" :aria-describedby="errors.acceptedTerms ? 'accepted-terms-error' : undefined" @update:model-value="setTermsConsent" />
+              <UiCheckbox class="cursor-pointer" id="producer-terms" :model-value="acceptedTerms" :disabled="!terms || termsQuery.isFetching.value || isSubmitting" :aria-invalid="Boolean(errors.acceptedTerms)" :aria-describedby="errors.acceptedTerms ? 'accepted-terms-error' : undefined" @update:model-value="setTermsConsent" />
               <label for="producer-terms" class="text-sm text-[#258451]">
                 生産者利用規約に同意する <span class="ml-1 text-[#b74646]">*</span>
               </label>
