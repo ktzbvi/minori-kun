@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const apiBaseUrl = window.__MINORI_CONFIG__?.apiOrigin ?? import.meta.env.VITE_API_ORIGIN ?? 'http://localhost:8000'
+const apiBaseUrl =
+  window.__MINORI_CONFIG__?.apiOrigin ?? import.meta.env.VITE_API_ORIGIN ?? 'http://localhost:8000'
 const unsafeMethods = new Set(['post', 'put', 'patch', 'delete'])
 
 const api = axios.create({
@@ -25,7 +26,8 @@ function hasXsrfCookie() {
 export async function ensureCsrfCookie() {
   if (hasXsrfCookie()) return
 
-  csrfCookieRequest ??= csrfApi.get('/sanctum/csrf-cookie')
+  csrfCookieRequest ??= csrfApi
+    .get('/sanctum/csrf-cookie')
     .then(() => undefined)
     .finally(() => {
       csrfCookieRequest = undefined

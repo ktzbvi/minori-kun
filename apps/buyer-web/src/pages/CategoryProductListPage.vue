@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ChevronLeft, Search, ShoppingBag } from 'lucide-vue-next'
+import { ChevronLeft, Search, ShoppingCart } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
@@ -87,7 +87,7 @@ function formatYen(amount: number) {
             aria-label="Cart"
             @click="openCart"
           >
-            <ShoppingBag :size="21" />
+            <ShoppingCart :size="21" />
             <span
               v-if="cartItemCount"
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"

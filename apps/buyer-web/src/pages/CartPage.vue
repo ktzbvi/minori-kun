@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ChevronLeft, PackageOpen, Search, ShoppingBag, Trash2 } from 'lucide-vue-next'
+import { ChevronLeft, PackageOpen, Search, ShoppingCart, Trash2 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
@@ -123,7 +123,7 @@ function formatYen(amount: number) {
             <Search :size="21" />
           </button>
           <span class="relative grid size-9 place-items-center text-[#627469]" aria-label="Cart">
-            <ShoppingBag :size="21" />
+            <ShoppingCart :size="21" />
             <span
               v-if="cartItemCount"
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
@@ -186,9 +186,9 @@ function formatYen(amount: number) {
                       +
                     </button>
                   </div>
-                  <strong class="text-[12px] text-[#33443a]">{{
-                    formatYen(entry.lineTotal)
-                  }}</strong>
+                  <strong class="text-[12px] text-[#33443a]">
+                    {{ formatYen(entry.lineTotal) }}
+                  </strong>
                 </div>
               </div>
               <button

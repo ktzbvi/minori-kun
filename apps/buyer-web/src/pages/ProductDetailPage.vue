@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { ChevronLeft, Leaf, Search, ShoppingBag } from 'lucide-vue-next'
+import { ChevronLeft, Leaf, Search, ShoppingCart } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
@@ -77,18 +77,21 @@ function formatYen(amount: number) {
             aria-label="Search"
             @click="openSearch"
           >
-            <Search :size="21" /></button
-          ><button
+            <Search :size="21" />
+          </button>
+          <button
             class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
             type="button"
             aria-label="Cart"
             @click="openCart"
           >
-            <ShoppingBag :size="21" /><span
+            <ShoppingCart :size="21" />
+            <span
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
               v-if="cartItemCount"
-              >{{ cartItemCount }}</span
             >
+              {{ cartItemCount }}
+            </span>
           </button>
         </div>
       </header>
@@ -98,15 +101,15 @@ function formatYen(amount: number) {
       <main class="px-4 pt-3 pb-6">
         <h2 class="m-0 text-[22px] leading-[1.35] font-extrabold">{{ product.name }}</h2>
         <p class="mt-1 mb-0 text-[13px]">
-          <span v-if="product.regularPrice" class="mr-1 text-[#819086] line-through"
-            >{{ product.regularPrice.toLocaleString('ja-JP') }}&#x5186;</span
-          ><strong class="text-[17px] text-[#d94339]">{{
-            formatYen(selectedVariant.price)
-          }}</strong>
+          <span v-if="product.regularPrice" class="mr-1 text-[#819086] line-through">
+            {{ product.regularPrice.toLocaleString('ja-JP') }}&#x5186;
+          </span>
+          <strong class="text-[17px] text-[#d94339]">{{ formatYen(selectedVariant.price) }}</strong>
         </p>
         <p class="mt-2 mb-0 text-[12px] leading-[1.65] text-[#63746a]">{{ product.description }}</p>
         <p class="mt-1 mb-6 flex items-center gap-1 text-[12px] font-bold text-[#237f4b]">
-          <Leaf :size="14" />{{ product.producerName }}
+          <Leaf :size="14" />
+          {{ product.producerName }}
         </p>
         <section class="border-t border-[#e1e8e2] pt-4">
           <h3 class="m-0 text-[14px] font-bold">
@@ -144,9 +147,10 @@ function formatYen(amount: number) {
               aria-label="Decrease quantity"
               @click="decreaseQuantity"
             >
-              -</button
-            ><span class="grid flex-1 place-items-center text-[13px] font-bold">{{ quantity }}</span
-            ><button
+              -
+            </button>
+            <span class="grid flex-1 place-items-center text-[13px] font-bold">{{ quantity }}</span>
+            <button
               class="w-9 border-0 border-l border-[#dce5de] bg-white text-lg text-[#547064] disabled:text-[#c2cdc5]"
               type="button"
               :disabled="quantity === selectedVariant.stock"
@@ -164,8 +168,9 @@ function formatYen(amount: number) {
             :disabled="!canPurchase"
             @click="addToCart"
           >
-            &#x30AB;&#x30FC;&#x30C8;&#x306B;&#x8FFD;&#x52A0;</button
-          ><button
+            &#x30AB;&#x30FC;&#x30C8;&#x306B;&#x8FFD;&#x52A0;
+          </button>
+          <button
             class="min-h-10 rounded-[5px] border border-[#237f4b] bg-white text-[14px] font-bold text-[#237f4b]"
             type="button"
             @click="showCheckoutUnavailable"
