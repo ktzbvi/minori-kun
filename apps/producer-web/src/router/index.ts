@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { queryClient } from '@/lib/query'
 import { currentSessionQuery } from '@/services/auth/auth.query'
+import DashboardPage from '@/pages/DashboardPage.vue'
 import EntryPage from '@/pages/EntryPage.vue'
-import HomePage from '@/pages/HomePage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
 import ProductsPage from '@/pages/ProductsPage.vue'
@@ -29,7 +29,7 @@ export const router = createRouter({
     },
     { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
     { path: '/', name: 'entry', component: EntryPage, meta: { public: true } },
-    { path: '/dashboard', name: 'dashboard', component: HomePage },
+    { path: '/dashboard', name: 'dashboard', component: DashboardPage },
     { path: '/products', name: 'products', component: ProductsPage },
   ],
 })

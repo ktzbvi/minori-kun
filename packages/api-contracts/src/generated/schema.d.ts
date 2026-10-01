@@ -4,6 +4,70 @@
  */
 
 export interface paths {
+    "/v1/buyer/account/email-verifications/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerAccount.verifyEmailChange"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/account/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerAccount.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["buyerAccount.update"];
+        trace?: never;
+    };
+    "/v1/buyer/account/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["buyerAccount.changePassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/inquiries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["buyerInquiry.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/buyer/password-reset/start": {
         parameters: {
             query?: never;
@@ -125,7 +189,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_21"];
+        post: operations["portalAuth.login_22"];
         delete?: never;
         options?: never;
         head?: never;
@@ -139,7 +203,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_22"];
+        get: operations["portalAuth.me_23"];
         put?: never;
         post?: never;
         delete?: never;
@@ -157,7 +221,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_23"];
+        post: operations["portalAuth.logout_24"];
         delete?: never;
         options?: never;
         head?: never;
@@ -173,7 +237,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_24"];
+        post: operations["portalAuth.login_25"];
         delete?: never;
         options?: never;
         head?: never;
@@ -187,7 +251,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_25"];
+        get: operations["portalAuth.me_26"];
         put?: never;
         post?: never;
         delete?: never;
@@ -205,7 +269,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_26"];
+        post: operations["portalAuth.logout_27"];
         delete?: never;
         options?: never;
         head?: never;
@@ -221,7 +285,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_27"];
+        post: operations["portalAuth.login_28"];
         delete?: never;
         options?: never;
         head?: never;
@@ -235,7 +299,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_28"];
+        get: operations["portalAuth.me_29"];
         put?: never;
         post?: never;
         delete?: never;
@@ -253,7 +317,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_29"];
+        post: operations["portalAuth.logout_30"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerDashboard.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -472,6 +552,12 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ChangeBuyerPasswordRequest */
+        ChangeBuyerPasswordRequest: {
+            current_password: string;
+            password: string;
+            password_confirmation: string;
+        };
         /** CompleteBuyerPasswordResetRequest */
         CompleteBuyerPasswordResetRequest: {
             /** Format: email */
@@ -508,6 +594,13 @@ export interface components {
             /** @enum {unknown} */
             accepted_terms: "yes" | "on" | "1" | 1 | "true" | true;
         };
+        /** CreateBuyerInquiryRequest */
+        CreateBuyerInquiryRequest: {
+            subject: string;
+            message: string;
+            /** Format: uuid */
+            idempotency_key: string;
+        };
         /** CurrentSessionResource */
         CurrentSessionResource: {
             id: string;
@@ -526,6 +619,34 @@ export interface components {
             /** Format: email */
             email: string;
             password: string;
+        };
+        /** ProducerDashboardResource */
+        ProducerDashboardResource: {
+            products: {
+                total: number;
+                published: number;
+            };
+            orders: {
+                requiring_action: string;
+                received: number;
+                processing: number;
+            };
+            sales: {
+                period_label: string;
+                total_yen: number;
+            };
+            payout_alert: {
+                expected_payout_yen: number;
+                due_on: string | null;
+                state: string;
+            } | null;
+            action_orders: {
+                id: string;
+                display_id: string;
+                ordered_at: string;
+                product_summary: string;
+                fulfillment_state: string;
+            }[];
         };
         /** ProducerOnboardingStatusResource */
         ProducerOnboardingStatusResource: {
@@ -603,6 +724,19 @@ export interface components {
             /** Format: email */
             email: string;
         };
+        /** UpdateBuyerProfileRequest */
+        UpdateBuyerProfileRequest: {
+            name: string;
+            name_phonetic: string;
+            /** Format: email */
+            email: string;
+            phone: string;
+            postal_code: string;
+            prefecture: string;
+            city: string;
+            address_line1: string;
+            address_line2?: string | null;
+        };
         /** UploadProducerRegistrationPhotoRequest */
         UploadProducerRegistrationPhotoRequest: {
             /**
@@ -657,6 +791,157 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "buyerAccount.verifyEmailChange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "buyerAccount.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            member_id: string;
+                            name: string;
+                            name_phonetic: string;
+                            email: string;
+                            pending_email: string | null;
+                            phone: string;
+                            postal_code: string;
+                            prefecture: string;
+                            city: string;
+                            address_line1: string;
+                            address_line2: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "buyerAccount.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBuyerProfileRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            profile: {
+                                member_id: string;
+                                name: string;
+                                name_phonetic: string;
+                                email: string;
+                                pending_email: string | null;
+                                phone: string;
+                                postal_code: string;
+                                prefecture: string;
+                                city: string;
+                                address_line1: string;
+                                address_line2: string;
+                            };
+                            email_change_pending: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerAccount.changePassword": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeBuyerPasswordRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            changed: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerInquiry.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBuyerInquiryRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
     "buyerPasswordReset.start": {
         parameters: {
             query?: never;
@@ -889,7 +1174,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.login_21": {
+    "portalAuth.login_22": {
         parameters: {
             query?: never;
             header?: never;
@@ -916,7 +1201,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_22": {
+    "portalAuth.me_23": {
         parameters: {
             query?: never;
             header?: never;
@@ -939,7 +1224,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_23": {
+    "portalAuth.logout_24": {
         parameters: {
             query?: never;
             header?: never;
@@ -963,7 +1248,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_24": {
+    "portalAuth.login_25": {
         parameters: {
             query?: never;
             header?: never;
@@ -990,7 +1275,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_25": {
+    "portalAuth.me_26": {
         parameters: {
             query?: never;
             header?: never;
@@ -1013,7 +1298,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_26": {
+    "portalAuth.logout_27": {
         parameters: {
             query?: never;
             header?: never;
@@ -1037,7 +1322,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_27": {
+    "portalAuth.login_28": {
         parameters: {
             query?: never;
             header?: never;
@@ -1064,7 +1349,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_28": {
+    "portalAuth.me_29": {
         parameters: {
             query?: never;
             header?: never;
@@ -1087,7 +1372,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_29": {
+    "portalAuth.logout_30": {
         parameters: {
             query?: never;
             header?: never;
@@ -1105,6 +1390,29 @@ export interface operations {
                         data: {
                             logged_out: boolean;
                         };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "producerDashboard.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `ProducerDashboardResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerDashboardResource"];
                     };
                 };
             };

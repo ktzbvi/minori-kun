@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BuyerPasswordResetController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
+use App\Http\Controllers\Api\ProducerDashboardController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
 use App\Http\Controllers\Api\ProducerProductController;
 use App\Http\Controllers\Api\ProducerRegistrationController;
@@ -72,6 +73,8 @@ foreach (UserRole::cases() as $role) {
 }
 
 Route::get('/api/v1/producer/products', [ProducerProductController::class, 'index'])
+    ->middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible']);
+Route::get('/api/v1/producer/dashboard', [ProducerDashboardController::class, 'show'])
     ->middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible']);
 Route::middleware(['auth:sanctum', 'portal.role:buyer'])->prefix('/api/v1/buyer/account')->group(function (): void {
     Route::get('/profile', [BuyerAccountController::class, 'show']);
