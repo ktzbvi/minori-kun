@@ -2,10 +2,10 @@ import { computed, toValue, type MaybeRefOrGetter } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
 import type {
-  ProducerProductDetail,
-  ProducerProductFormOptions,
   ProducerProductListFilters,
   ProducerProductListResponse,
+  ProducerProductOptionsResponse,
+  ProducerProductShowResponse,
 } from '@/types/product'
 import { producerProductKeys } from './product.key'
 
@@ -40,7 +40,7 @@ export function useProducerProductsQuery(filters: MaybeRefOrGetter<ProducerProdu
 export function useProducerProductOptionsQuery() {
   return useQuery({
     queryKey: producerProductKeys.options(),
-    queryFn: async () => (await api.get<{ data: ProducerProductFormOptions }>('/api/v1/producer/products/options')).data.data,
+    queryFn: async () => (await api.get<ProducerProductOptionsResponse>('/api/v1/producer/products/options')).data.data,
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -48,7 +48,7 @@ export function useProducerProductOptionsQuery() {
 export function useProducerProductQuery(id: MaybeRefOrGetter<string>, enabled: MaybeRefOrGetter<boolean>) {
   return useQuery(computed(() => ({
     queryKey: producerProductKeys.detail(toValue(id)),
-    queryFn: async () => (await api.get<{ data: ProducerProductDetail }>(`/api/v1/producer/products/${toValue(id)}`)).data.data,
+    queryFn: async () => (await api.get<ProducerProductShowResponse>(`/api/v1/producer/products/${toValue(id)}`)).data.data,
     enabled: toValue(enabled),
   })))
 }

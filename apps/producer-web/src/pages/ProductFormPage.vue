@@ -194,8 +194,12 @@ async function submit(publicationState: ProducerProductPublicationState) {
   formData.set('image_order', JSON.stringify(imageOrder))
 
   try {
-    await saveMutation.mutateAsync({ id: isEdit.value ? productId.value : undefined, formData })
-    toast.success(publicationState === 'published' ? '商品を公開しました。' : '商品を保存しました。')
+    const result = await saveMutation.mutateAsync({ id: isEdit.value ? productId.value : undefined, formData })
+    if (result.rejectedImages.length > 0) {
+      toast.warning(`${result.rejectedImages.length}枚の画像を除外して商品を保存しました。`)
+    } else {
+      toast.success(publicationState === 'published' ? '商品を公開しました。' : '商品を保存しました。')
+    }
     await router.push({ name: 'products' })
   } catch (error) {
     if (axios.isAxiosError(error)) {

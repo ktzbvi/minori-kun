@@ -122,3 +122,37 @@ it('rejects disabled categories negative values and a missing product image', fu
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['category_id', 'price_yen', 'image_order']);
 });
+
+it('rejects only an invalid image while saving the valid images', function (): void {
+    Storage::fake('public');
+    $producer = productWriteEligibleProducer();
+    $category = Category::factory()->create(['is_enabled' => true]);
+    $payload = validProductPayload($category);
+    $payload['new_images'][] = UploadedFile::fake()->image('unsupported.gif', 800, 800);
+    $payload['image_order'] = ['new:0', 'new:1'];
+
+    $this->actingAs($producer)
+        ->post('/api/v1/producer/products', $payload)
+        ->assertCreated()
+        ->assertJsonCount(1, 'data.images')
+        ->assertJsonCount(1, 'meta.rejected_images')
+        ->assertJsonPath('meta.rejected_images.0.index', 1);
+
+    expect(Storage::disk('public')->allFiles())->toHaveCount(1);
+});
+
+it('rejects image payloads whose uploaded files are not all referenced', function (): void {
+    Storage::fake('public');
+    $producer = productWriteEligibleProducer();
+    $category = Category::factory()->create(['is_enabled' => true]);
+    $payload = validProductPayload($category);
+    $payload['new_images'][] = UploadedFile::fake()->image('unused.jpg', 800, 800);
+
+    $this->actingAs($producer)
+        ->post('/api/v1/producer/products', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['image_order']);
+
+    expect(Product::query()->count())->toBe(0)
+        ->and(Storage::disk('public')->allFiles())->toBeEmpty();
+});

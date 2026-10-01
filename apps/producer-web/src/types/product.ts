@@ -29,34 +29,48 @@ export type ProducerProductListResponse = Omit<
   }
 }
 
+type GeneratedProducerProductDetail = components['schemas']['ProducerProductResource']
+
 export interface ProducerProductImage {
   id: string
   url: string
   display_order: number
 }
 
-export interface ProducerProductDetail {
-  id: string
-  name: string
-  description: string
-  category_id: string
-  category_name: string | null
-  price_yen: number
-  stock_quantity: number
-  discount_bps: number
-  delivery_fee_honshu_yen: number
-  delivery_fee_hokkaido_yen: number
-  delivery_fee_okinawa_yen: number
+export type ProducerProductDetail = Omit<
+  GeneratedProducerProductDetail,
+  'images' | 'publication_state'
+> & {
   publication_state: ProducerProductPublicationState
-  lock_version: number
   images: ProducerProductImage[]
 }
 
-export interface ProducerProductCategory {
-  id: string
-  name: string
+export type ProducerProductCategory = Pick<components['schemas']['Category'], 'id' | 'name'>
+
+type GeneratedProducerProductFormOptions =
+  operations['producerProduct.options']['responses'][200]['content']['application/json']['data']
+
+export type ProducerProductFormOptions = Omit<GeneratedProducerProductFormOptions, 'categories'> & {
+  categories: ProducerProductCategory[]
 }
 
-export interface ProducerProductFormOptions {
-  categories: ProducerProductCategory[]
+type GeneratedProducerProductOptionsResponse =
+  operations['producerProduct.options']['responses'][200]['content']['application/json']
+
+export type ProducerProductOptionsResponse = Omit<GeneratedProducerProductOptionsResponse, 'data'> & {
+  data: ProducerProductFormOptions
+}
+
+type GeneratedProducerProductShowResponse =
+  operations['producerProduct.show']['responses'][200]['content']['application/json']
+
+export type ProducerProductShowResponse = Omit<GeneratedProducerProductShowResponse, 'data'> & {
+  data: ProducerProductDetail
+}
+
+type GeneratedProducerProductSaveResponse =
+  operations['producerProduct.update']['responses'][200]['content']['application/json']
+
+export type ProducerProductSaveResponse = Omit<GeneratedProducerProductSaveResponse, 'data'> & {
+  data: ProducerProductDetail
 }

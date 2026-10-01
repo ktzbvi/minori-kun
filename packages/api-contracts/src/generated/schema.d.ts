@@ -189,7 +189,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_22"];
+        post: operations["portalAuth.login_32"];
         delete?: never;
         options?: never;
         head?: never;
@@ -203,7 +203,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_23"];
+        get: operations["portalAuth.me_33"];
         put?: never;
         post?: never;
         delete?: never;
@@ -221,7 +221,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_24"];
+        post: operations["portalAuth.logout_34"];
         delete?: never;
         options?: never;
         head?: never;
@@ -237,7 +237,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_25"];
+        post: operations["portalAuth.login_35"];
         delete?: never;
         options?: never;
         head?: never;
@@ -251,7 +251,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_26"];
+        get: operations["portalAuth.me_36"];
         put?: never;
         post?: never;
         delete?: never;
@@ -269,7 +269,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_27"];
+        post: operations["portalAuth.logout_37"];
         delete?: never;
         options?: never;
         head?: never;
@@ -285,7 +285,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_28"];
+        post: operations["portalAuth.login_38"];
         delete?: never;
         options?: never;
         head?: never;
@@ -299,7 +299,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_29"];
+        get: operations["portalAuth.me_39"];
         put?: never;
         post?: never;
         delete?: never;
@@ -317,7 +317,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_30"];
+        post: operations["portalAuth.logout_40"];
         delete?: never;
         options?: never;
         head?: never;
@@ -356,6 +356,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/producer/products/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerProduct.options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/producer/products": {
         parameters: {
             query?: never;
@@ -364,6 +380,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["producerProduct.index"];
+        put?: never;
+        post: operations["producerProduct.store"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/products/{product}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerProduct.show"];
+        put?: never;
+        post: operations["producerProduct.update"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/shop-photos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producer.shop-photo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -532,26 +580,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/producer/shop-photos/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["producer.shop-photo"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Category */
+        Category: {
+            id: string;
+            name: string;
+            is_enabled: boolean;
+            display_order: number;
+            lock_version: number;
+            /** Format: date-time */
+            created_at: string | null;
+            /** Format: date-time */
+            updated_at: string | null;
+        };
         /** ChangeBuyerPasswordRequest */
         ChangeBuyerPasswordRequest: {
             current_password: string;
@@ -669,6 +713,23 @@ export interface components {
             image_url: null;
             updated_at: string | null;
         };
+        /** ProducerProductResource */
+        ProducerProductResource: {
+            id: string;
+            name: string;
+            description: string;
+            category_id: string;
+            category_name: string | null;
+            price_yen: number;
+            stock_quantity: number;
+            discount_bps: number;
+            delivery_fee_honshu_yen: number;
+            delivery_fee_hokkaido_yen: number;
+            delivery_fee_okinawa_yen: number;
+            publication_state: string;
+            lock_version: number;
+            images: string;
+        };
         /** ProducerRegistrationDetailsResource */
         ProducerRegistrationDetailsResource: {
             email: string;
@@ -709,6 +770,11 @@ export interface components {
             content: string;
             is_sample: boolean;
         };
+        /**
+         * ProductPublicationState
+         * @enum {string}
+         */
+        ProductPublicationState: "draft" | "published" | "unpublished";
         /** RequestProducerRegistrationCodeRequest */
         RequestProducerRegistrationCodeRequest: {
             /** Format: email */
@@ -745,6 +811,22 @@ export interface components {
              */
             photo: string;
         };
+        /** UpsertProducerProductRequest */
+        UpsertProducerProductRequest: {
+            name: string;
+            category_id: string;
+            description: string;
+            price_yen: number;
+            stock_quantity: number;
+            discount_percent?: number | null;
+            delivery_fee_honshu_yen: number;
+            delivery_fee_hokkaido_yen: number;
+            delivery_fee_okinawa_yen: number;
+            publication_state: components["schemas"]["ProductPublicationState"];
+            lock_version?: number | null;
+            image_order: string[];
+            new_images?: string[];
+        };
         /** VerifyBuyerRegistrationOtpRequest */
         VerifyBuyerRegistrationOtpRequest: {
             code: string;
@@ -773,6 +855,18 @@ export interface components {
         };
         /** @description Unauthenticated */
         AuthenticationException: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Error overview. */
+                    message: string;
+                };
+            };
+        };
+        /** @description Authorization error */
+        AuthorizationException: {
             headers: {
                 [name: string]: unknown;
             };
@@ -1174,7 +1268,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.login_22": {
+    "portalAuth.login_32": {
         parameters: {
             query?: never;
             header?: never;
@@ -1201,7 +1295,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_23": {
+    "portalAuth.me_33": {
         parameters: {
             query?: never;
             header?: never;
@@ -1224,7 +1318,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_24": {
+    "portalAuth.logout_34": {
         parameters: {
             query?: never;
             header?: never;
@@ -1248,7 +1342,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_25": {
+    "portalAuth.login_35": {
         parameters: {
             query?: never;
             header?: never;
@@ -1275,7 +1369,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_26": {
+    "portalAuth.me_36": {
         parameters: {
             query?: never;
             header?: never;
@@ -1298,7 +1392,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_27": {
+    "portalAuth.logout_37": {
         parameters: {
             query?: never;
             header?: never;
@@ -1322,7 +1416,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.login_28": {
+    "portalAuth.login_38": {
         parameters: {
             query?: never;
             header?: never;
@@ -1349,7 +1443,7 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.me_29": {
+    "portalAuth.me_39": {
         parameters: {
             query?: never;
             header?: never;
@@ -1372,7 +1466,7 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
-    "portalAuth.logout_30": {
+    "portalAuth.logout_40": {
         parameters: {
             query?: never;
             header?: never;
@@ -1442,6 +1536,30 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "producerProduct.options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            categories: components["schemas"]["Category"][];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "producerProduct.index": {
         parameters: {
             query?: {
@@ -1473,6 +1591,128 @@ export interface operations {
             };
             401: components["responses"]["AuthenticationException"];
             422: components["responses"]["ValidationException"];
+        };
+    };
+    "producerProduct.store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpsertProducerProductRequest"];
+            };
+        };
+        responses: {
+            /** @description `ProducerProductResource` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerProductResource"];
+                        meta: {
+                            rejected_images: {
+                                index: number;
+                                name: string;
+                                message: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "producerProduct.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `ProducerProductResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerProductResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "producerProduct.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpsertProducerProductRequest"];
+            };
+        };
+        responses: {
+            /** @description `ProducerProductResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerProductResource"];
+                        meta: {
+                            rejected_images: {
+                                index: number;
+                                name: string;
+                                message: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "producer.shop-photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "Transfer-Encoding": "chunked";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
         };
     };
     "producerRegistration.show": {
@@ -1759,28 +1999,6 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["ProducerTermsResource"];
                     };
-                };
-            };
-        };
-    };
-    "producer.shop-photo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    "Transfer-Encoding": "chunked";
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/octet-stream": string;
                 };
             };
         };

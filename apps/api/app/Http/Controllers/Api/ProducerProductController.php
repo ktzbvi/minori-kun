@@ -114,13 +114,17 @@ class ProducerProductController extends Controller
     public function store(UpsertProducerProductRequest $request, SaveProducerProduct $save): JsonResponse
     {
         Gate::authorize('create', Product::class);
+        $submission = $request->productSubmission();
         $product = $save->execute(
             $request->user(),
-            $request->validated(),
-            $request->file('new_images', []),
+            $submission['data'],
+            $submission['images'],
         );
 
-        return (new ProducerProductResource($product))->response()->setStatusCode(201);
+        return (new ProducerProductResource($product))
+            ->additional(['meta' => ['rejected_images' => $submission['rejected_images']]])
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function update(
@@ -132,12 +136,13 @@ class ProducerProductController extends Controller
             ->where('producer_id', $request->user()->id)
             ->findOrFail($product);
         Gate::authorize('update', $ownedProduct);
+        $submission = $request->productSubmission();
 
-        return new ProducerProductResource($save->execute(
+        return (new ProducerProductResource($save->execute(
             $request->user(),
-            $request->validated(),
-            $request->file('new_images', []),
+            $submission['data'],
+            $submission['images'],
             $ownedProduct,
-        ));
+        )))->additional(['meta' => ['rejected_images' => $submission['rejected_images']]]);
     }
 }
