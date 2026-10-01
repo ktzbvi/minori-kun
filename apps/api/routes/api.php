@@ -80,7 +80,11 @@ Route::prefix('api/v1')->group(function (): void {
 
         Route::middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible'])->group(function (): void {
             Route::get('/dashboard', [ProducerDashboardController::class, 'show']);
+            Route::get('/products/options', [ProducerProductController::class, 'options']);
             Route::get('/products', [ProducerProductController::class, 'index']);
+            Route::post('/products', [ProducerProductController::class, 'store']);
+            Route::get('/products/{product}', [ProducerProductController::class, 'show'])->whereUlid('product');
+            Route::post('/products/{product}', [ProducerProductController::class, 'update'])->whereUlid('product');
         });
     });
 

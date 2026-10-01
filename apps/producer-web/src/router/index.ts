@@ -7,6 +7,7 @@ import EntryPage from '@/pages/EntryPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
 import ProductsPage from '@/pages/ProductsPage.vue'
+import ProductFormPage from '@/pages/ProductFormPage.vue'
 import PortalUnavailablePage from '@/pages/PortalUnavailablePage.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
 import RegisterVerifyPage from '@/pages/RegisterVerifyPage.vue'
@@ -69,6 +70,18 @@ export const router = createRouter({
           name: 'products',
           component: ProductsPage,
           meta: { portalTitle: '商品管理', activeRoute: '/products' },
+        },
+        {
+          path: 'products/new',
+          name: 'product-create',
+          component: ProductFormPage,
+          meta: { portalTitle: '商品を登録', activeRoute: '/products' },
+        },
+        {
+          path: 'products/:id',
+          name: 'product-edit',
+          component: ProductFormPage,
+          meta: { portalTitle: '商品を編集', activeRoute: '/products' },
         },
         {
           path: 'orders',

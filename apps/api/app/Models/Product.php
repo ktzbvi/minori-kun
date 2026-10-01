@@ -33,6 +33,12 @@ class Product extends DomainModel
 
     protected function casts(): array
     {
-        return ['publication_state' => ProductPublicationState::class];
+        return [
+            'publication_state' => ProductPublicationState::class,
+            'delivery_fee_honshu_yen' => 'integer',
+            'delivery_fee_hokkaido_yen' => 'integer',
+            'delivery_fee_okinawa_yen' => 'integer',
+            'lock_version' => 'integer',
+        ];
     }
 }
