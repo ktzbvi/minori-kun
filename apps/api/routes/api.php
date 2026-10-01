@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Api\BuyerAccountController;
+use App\Http\Controllers\Api\BuyerInquiryController;
 use App\Http\Controllers\Api\BuyerPasswordResetController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
@@ -27,6 +29,9 @@ Route::prefix('/api/v1/buyer/password-reset')->middleware('throttle:6,1')->group
     Route::post('/start', [BuyerPasswordResetController::class, 'start']);
     Route::post('/complete', [BuyerPasswordResetController::class, 'complete']);
 });
+
+Route::get('/api/v1/buyer/account/email-verifications/{token}', [BuyerAccountController::class, 'verifyEmailChange'])
+    ->where('token', '[A-Za-z0-9]+');
 
 // One unconditional cookie/session/CSRF stack, including requests without Origin.
 Route::prefix('api/v1/producer')
@@ -68,3 +73,13 @@ foreach (UserRole::cases() as $role) {
 
 Route::get('/api/v1/producer/products', [ProducerProductController::class, 'index'])
     ->middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible']);
+Route::middleware(['auth:sanctum', 'portal.role:buyer'])->prefix('/api/v1/buyer/account')->group(function (): void {
+    Route::get('/profile', [BuyerAccountController::class, 'show']);
+    Route::patch('/profile', [BuyerAccountController::class, 'update']);
+    Route::put('/password', [BuyerAccountController::class, 'changePassword']);
+});
+
+Route::middleware(['auth:sanctum', 'portal.role:buyer'])->post(
+    '/api/v1/buyer/inquiries',
+    [BuyerInquiryController::class, 'store'],
+);

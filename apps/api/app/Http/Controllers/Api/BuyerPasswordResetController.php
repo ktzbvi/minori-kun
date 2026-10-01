@@ -11,6 +11,7 @@ use App\Mail\BuyerPasswordResetMail;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class BuyerPasswordResetController extends Controller
         $email = mb_strtolower(trim((string) $request->validated('email')));
         $tokenHash = hash('sha256', (string) $request->validated('token'));
 
-        $completed = DB::transaction(function () use ($email, $tokenHash, $request): bool {
+        $completedBuyerId = DB::transaction(function () use ($email, $tokenHash, $request): ?string {
             $buyer = User::query()
                 ->where('email', $email)
                 ->where('role', UserRole::Buyer->value)
@@ -60,7 +61,7 @@ class BuyerPasswordResetController extends Controller
                 ->first();
 
             if (! $buyer) {
-                return false;
+                return null;
             }
 
             $resetToken = PasswordResetToken::query()
@@ -72,7 +73,7 @@ class BuyerPasswordResetController extends Controller
                 ->first();
 
             if (! $resetToken) {
-                return false;
+                return null;
             }
 
             $buyer->forceFill([
@@ -81,14 +82,20 @@ class BuyerPasswordResetController extends Controller
             ])->save();
             $resetToken->update(['consumed_at' => now()]);
 
-            return true;
+            return $buyer->id;
         });
 
-        if (! $completed) {
+        if (! $completedBuyerId) {
             return response()->json([
                 'message' => '再設定用リンクが無効または有効期限切れです。もう一度メールを送信してください。',
                 'code' => 'PASSWORD_RESET_TOKEN_INVALID',
             ], 422);
+        }
+
+        if (Auth::id() === $completedBuyerId && $request->hasSession()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         return response()->json(['data' => ['redirect' => '/login']]);

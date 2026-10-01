@@ -4,7 +4,12 @@ import HomePage from '@/pages/HomePage.vue'
 import CategoryPage from '@/pages/CategoryPage.vue'
 import CategoryProductListPage from '@/pages/CategoryProductListPage.vue'
 import CartPage from '@/pages/CartPage.vue'
+import ContactCompletePage from '@/pages/ContactCompletePage.vue'
+import ContactPage from '@/pages/ContactPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import MyPage from '@/pages/MyPage.vue'
+import MemberInfoPage from '@/pages/MemberInfoPage.vue'
+import PasswordChangePage from '@/pages/PasswordChangePage.vue'
 import PasswordResetConfirmPage from '@/pages/PasswordResetConfirmPage.vue'
 import PasswordResetPage from '@/pages/PasswordResetPage.vue'
 import OrderConfirmationPage from '@/pages/OrderConfirmationPage.vue'
@@ -18,6 +23,27 @@ export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
+    { path: '/my-page', name: 'my-page', component: MyPage },
+    {
+      path: '/my-page/contact',
+      name: 'contact',
+      component: ContactPage,
+    },
+    {
+      path: '/my-page/contact/complete',
+      name: 'contact-complete',
+      component: ContactCompletePage,
+    },
+    {
+      path: '/my-page/member-info',
+      name: 'member-info',
+      component: MemberInfoPage,
+    },
+    {
+      path: '/my-page/password',
+      name: 'password-change',
+      component: PasswordChangePage,
+    },
     {
       path: '/password-reset',
       name: 'password-reset',

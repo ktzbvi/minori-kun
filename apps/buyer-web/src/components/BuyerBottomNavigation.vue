@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Grid2X2, House, ShoppingBag, UserRound } from 'lucide-vue-next'
+import { Grid2X2, House, ShoppingCart, UserRound } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 
@@ -30,7 +30,7 @@ function navigate(item: BuyerNavigationItem) {
     return
   }
 
-  toast.warning('\u3053\u306e\u753b\u9762\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+  void router.push({ name: 'my-page' })
 }
 </script>
 
@@ -47,9 +47,9 @@ function navigate(item: BuyerNavigationItem) {
       @click="navigate('home')"
     >
       <House :size="19" />
-      <span class="text-[10px]" :class="{ 'font-bold': active === 'home' }"
-        >&#x30DB;&#x30FC;&#x30E0;</span
-      >
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'home' }">
+        &#x30DB;&#x30FC;&#x30E0;
+      </span>
     </button>
     <button
       class="grid place-items-center gap-0.5 border-0 bg-transparent"
@@ -59,9 +59,9 @@ function navigate(item: BuyerNavigationItem) {
       @click="navigate('category')"
     >
       <Grid2X2 :size="18" />
-      <span class="text-[10px]" :class="{ 'font-bold': active === 'category' }"
-        >&#x30AB;&#x30C6;&#x30B4;&#x30EA;</span
-      >
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'category' }">
+        &#x30AB;&#x30C6;&#x30B4;&#x30EA;
+      </span>
     </button>
     <button
       class="grid place-items-center gap-0.5 border-0 bg-transparent"
@@ -70,18 +70,22 @@ function navigate(item: BuyerNavigationItem) {
       :aria-current="active === 'cart' ? 'page' : undefined"
       @click="navigate('cart')"
     >
-      <ShoppingBag :size="18" />
-      <span class="text-[10px]" :class="{ 'font-bold': active === 'cart' }"
-        >&#x30AB;&#x30FC;&#x30C8;</span
-      >
+      <ShoppingCart :size="18" />
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'cart' }">
+        &#x30AB;&#x30FC;&#x30C8;
+      </span>
     </button>
     <button
-      class="grid place-items-center gap-0.5 border-0 bg-transparent text-[#68786e]"
+      class="grid place-items-center gap-0.5 border-0 bg-transparent"
+      :class="active === 'profile' ? 'text-[#237f4b]' : 'text-[#68786e]'"
       type="button"
+      :aria-current="active === 'profile' ? 'page' : undefined"
       @click="navigate('profile')"
     >
       <UserRound :size="18" />
-      <span class="text-[10px]">&#x30DE;&#x30A4;&#x30DA;&#x30FC;&#x30B8;</span>
+      <span class="text-[10px]" :class="{ 'font-bold': active === 'profile' }">
+        &#x30DE;&#x30A4;&#x30DA;&#x30FC;&#x30B8;
+      </span>
     </button>
   </nav>
 </template>

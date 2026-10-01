@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { Leaf, Search, ShoppingBag } from 'lucide-vue-next'
+import { Leaf, Search, ShoppingCart } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
@@ -82,10 +82,12 @@ function formatYen(amount: number) {
           <span
             class="grid size-7 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
             aria-hidden="true"
-            ><Leaf :size="17" stroke-width="2.5" /></span
-          ><strong class="text-[17px] tracking-[0.05em] text-[#237d4a]"
-            >&#x307F;&#x306E;&#x308A;&#x304F;&#x3093;</strong
           >
+            <Leaf :size="17" stroke-width="2.5" />
+          </span>
+          <strong class="text-[17px] tracking-[0.05em] text-[#237d4a]">
+            &#x307F;&#x306E;&#x308A;&#x304F;&#x3093;
+          </strong>
         </div>
         <div class="flex items-center gap-3">
           <button
@@ -94,18 +96,21 @@ function formatYen(amount: number) {
             aria-label="Search"
             @click="openSearch"
           >
-            <Search :size="21" /></button
-          ><button
+            <Search :size="21" />
+          </button>
+          <button
             class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
             type="button"
             aria-label="Cart"
             @click="openCart"
           >
-            <ShoppingBag :size="21" /><span
+            <ShoppingCart :size="21" />
+            <span
               v-if="cartItemCount"
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-              >{{ cartItemCount }}</span
             >
+              {{ cartItemCount }}
+            </span>
           </button>
         </div>
       </header>
@@ -145,24 +150,23 @@ function formatYen(amount: number) {
               @click="openProduct(product.id)"
             >
               <div class="relative aspect-[1.35] overflow-hidden bg-[#e7eee8]">
-                <img
-                  :src="product.imageUrl"
-                  :alt="product.name"
-                  class="size-full object-cover"
-                /><span
+                <img :src="product.imageUrl" :alt="product.name" class="size-full object-cover" />
+                <span
                   v-if="product.discountRate"
                   class="absolute top-0 right-0 bg-[#df483f] px-2 py-1 text-[11px] font-extrabold text-white"
-                  >{{ product.discountRate }}%</span
                 >
+                  {{ product.discountRate }}%
+                </span>
               </div>
               <div class="px-2.5 pt-2">
                 <h2 class="m-0 truncate text-[13px] font-bold text-[#29392f]">
                   {{ product.name }}
                 </h2>
                 <p class="mt-1 mb-0 min-h-[18px] text-[11px] leading-[1.35]">
-                  <span v-if="product.regularPrice" class="mr-1 text-[#819086] line-through"
-                    >{{ product.regularPrice.toLocaleString('ja-JP') }}&#x5186;</span
-                  ><strong class="text-[#d94339]">{{ formatYen(product.price) }}</strong>
+                  <span v-if="product.regularPrice" class="mr-1 text-[#819086] line-through">
+                    {{ product.regularPrice.toLocaleString('ja-JP') }}&#x5186;
+                  </span>
+                  <strong class="text-[#d94339]">{{ formatYen(product.price) }}</strong>
                 </p>
               </div>
             </button>

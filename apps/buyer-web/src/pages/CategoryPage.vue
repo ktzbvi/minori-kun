@@ -5,7 +5,7 @@ import {
   Grid2X2,
   Package,
   Search,
-  ShoppingBag,
+  ShoppingCart,
   Sprout,
   Wheat,
 } from 'lucide-vue-next'
@@ -81,7 +81,7 @@ function openCart() {
             aria-label="Cart"
             @click="openCart"
           >
-            <ShoppingBag :size="21" />
+            <ShoppingCart :size="21" />
             <span
               v-if="cartItemCount"
               class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
