@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
 import { UiButton } from '@minorikun/ui'
@@ -16,6 +16,7 @@ const keyword = ref('')
 const categoryFilter = ref('all')
 const publicationFilter = ref<'all' | ProducerProductPublicationState>('all')
 const stockFilter = ref<ProducerProductStockState>('all')
+const failedProductImages = reactive(new Set<string>())
 
 const productFilters = computed<ProducerProductListFilters>(() => ({
   keyword: keyword.value.trim(),
@@ -68,6 +69,10 @@ function resetFilters() {
   categoryFilter.value = 'all'
   publicationFilter.value = 'all'
   stockFilter.value = 'all'
+}
+
+function markProductImageFailed(productId: string) {
+  failedProductImages.add(productId)
 }
 </script>
 
@@ -174,7 +179,13 @@ function resetFilters() {
             >
               <span class="text-base font-medium text-[#68766e]">{{ product.display_id }}</span>
               <span class="flex min-w-0 items-center gap-4">
-                <img v-if="product.image_url" :src="product.image_url" :alt="`${product.name}の商品画像`" class="size-14 shrink-0 rounded-[10px] object-cover" />
+                <img
+                  v-if="product.image_url && !failedProductImages.has(product.id)"
+                  :src="product.image_url"
+                  :alt="`${product.name}の商品画像`"
+                  class="size-14 shrink-0 rounded-[10px] object-cover"
+                  @error="markProductImageFailed(product.id)"
+                />
                 <span v-else class="grid size-14 shrink-0 place-items-center rounded-[10px] bg-[#edf3ef] text-[#7a8880]" aria-hidden="true">
                   <ImageIcon class="size-8" :stroke-width="1.8" />
                 </span>
@@ -204,7 +215,13 @@ function resetFilters() {
             :to="`/products/${product.id}`"
             class="relative grid min-h-[156px] grid-cols-[88px_minmax(0,1fr)] gap-4 rounded-[16px] border border-[#d9e3dc] bg-white p-4 pr-12 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#237f4b] min-[600px]:min-h-[206px] min-[600px]:grid-cols-[144px_minmax(0,1fr)_154px] min-[600px]:gap-6 min-[600px]:rounded-[18px] min-[600px]:p-[22px] min-[600px]:pr-14 lg:min-h-[164px] lg:grid-cols-[104px_minmax(0,1fr)_132px] lg:gap-5 lg:p-5 lg:pr-12"
           >
-            <img v-if="product.image_url" :src="product.image_url" :alt="`${product.name}の商品画像`" class="row-span-2 size-[88px] self-center rounded-[12px] object-cover min-[600px]:row-span-1 min-[600px]:size-[144px] min-[600px]:rounded-[14px] lg:size-[104px]" />
+            <img
+              v-if="product.image_url && !failedProductImages.has(product.id)"
+              :src="product.image_url"
+              :alt="`${product.name}の商品画像`"
+              class="row-span-2 size-[88px] self-center rounded-[12px] object-cover min-[600px]:row-span-1 min-[600px]:size-[144px] min-[600px]:rounded-[14px] lg:size-[104px]"
+              @error="markProductImageFailed(product.id)"
+            />
             <span v-else class="row-span-2 grid size-[88px] self-center place-items-center rounded-[12px] bg-[#edf3ef] text-[#7a8880] min-[600px]:row-span-1 min-[600px]:size-[144px] min-[600px]:rounded-[14px] lg:size-[104px]" aria-hidden="true">
               <ImageIcon class="size-9" :stroke-width="1.8" />
             </span>

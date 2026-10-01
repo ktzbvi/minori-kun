@@ -12,6 +12,7 @@ function Show-Help {
 Minori-kun native development commands
 
   .\m.ps1 bootstrap       Install locked dependencies and initialize the app
+  .\m.ps1 api             Run the Laravel API with development-safe OPcache
   .\m.ps1 web             Run all three Vue development servers
   .\m.ps1 mail            Run the local Mailpit inbox for registration emails
   .\m.ps1 test            Run backend and frontend unit tests
@@ -211,6 +212,32 @@ try {
             Assert-Command 'node' 'Install Node.js 22 LTS or newer.'
             Assert-Command 'pnpm' 'Enable Corepack and activate pnpm 10.'
             Invoke-Checked 'pnpm' @('dev')
+        }
+        'api' {
+            Assert-Command 'php' 'Install PHP 8.4 with the extensions listed in README.md.'
+            $apiRoot = Join-Path $PSScriptRoot 'apps/api'
+            $publicRoot = Join-Path $apiRoot 'public'
+            $serverRouter = Join-Path $apiRoot 'vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php'
+
+            if (-not (Test-Path -LiteralPath $serverRouter)) {
+                throw 'Laravel development server router was not found. Run .\m.ps1 bootstrap first.'
+            }
+
+            Push-Location $publicRoot
+            try {
+                Invoke-Checked 'php' @(
+                    '-d', 'zend_extension=opcache',
+                    '-d', 'opcache.enable=1',
+                    '-d', 'opcache.enable_cli=1',
+                    '-d', 'opcache.validate_timestamps=1',
+                    '-d', 'opcache.revalidate_freq=0',
+                    '-S', 'localhost:8000',
+                    $serverRouter
+                )
+            }
+            finally {
+                Pop-Location
+            }
         }
         'mail' {
             $mailpit = Resolve-MailpitExecutable

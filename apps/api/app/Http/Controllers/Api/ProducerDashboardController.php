@@ -30,6 +30,30 @@ class ProducerDashboardController extends Controller
             FulfillmentState::Processing->value,
         ];
 
+        $productSummary = (clone $productQuery)
+            ->selectRaw('COUNT(*) as total_count')
+            ->selectRaw(
+                'SUM(CASE WHEN publication_state = ? THEN 1 ELSE 0 END) as published_count',
+                [ProductPublicationState::Published->value],
+            )
+            ->first();
+
+        $orderSummary = (clone $orderQuery)
+            ->leftJoin('orders', 'orders.id', '=', 'producer_orders.order_id')
+            ->selectRaw(
+                'SUM(CASE WHEN producer_orders.fulfillment_state = ? THEN 1 ELSE 0 END) as received_count',
+                [FulfillmentState::Received->value],
+            )
+            ->selectRaw(
+                'SUM(CASE WHEN producer_orders.fulfillment_state = ? THEN 1 ELSE 0 END) as processing_count',
+                [FulfillmentState::Processing->value],
+            )
+            ->selectRaw(
+                'SUM(CASE WHEN orders.payment_state = ? AND orders.placed_at BETWEEN ? AND ? THEN producer_orders.total_yen ELSE 0 END) as period_sales_yen',
+                [PaymentState::Succeeded->value, $periodStart, $periodEnd],
+            )
+            ->first();
+
         $actionOrders = (clone $orderQuery)
             ->whereIn('fulfillment_state', $actionStates)
             ->with([
@@ -48,22 +72,12 @@ class ProducerDashboardController extends Controller
             ->first();
 
         return new ProducerDashboardResource([
-            'products_total' => (clone $productQuery)->count(),
-            'products_published' => (clone $productQuery)
-                ->where('publication_state', ProductPublicationState::Published->value)
-                ->count(),
-            'orders_received' => (clone $orderQuery)
-                ->where('fulfillment_state', FulfillmentState::Received->value)
-                ->count(),
-            'orders_processing' => (clone $orderQuery)
-                ->where('fulfillment_state', FulfillmentState::Processing->value)
-                ->count(),
+            'products_total' => (int) ($productSummary?->total_count ?? 0),
+            'products_published' => (int) ($productSummary?->published_count ?? 0),
+            'orders_received' => (int) ($orderSummary?->received_count ?? 0),
+            'orders_processing' => (int) ($orderSummary?->processing_count ?? 0),
             'period_label' => $periodStart->format('Y年n月'),
-            'period_sales_yen' => (int) (clone $orderQuery)
-                ->whereHas('order', fn ($query) => $query
-                    ->where('payment_state', PaymentState::Succeeded->value)
-                    ->whereBetween('placed_at', [$periodStart, $periodEnd]))
-                ->sum('total_yen'),
+            'period_sales_yen' => (int) ($orderSummary?->period_sales_yen ?? 0),
             'action_orders' => $actionOrders,
             'payout_settlement' => $payoutSettlement,
         ]);
