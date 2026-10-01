@@ -1,3 +1,5 @@
+import { producerKeys } from '@/services/producer.key'
+
 export const producerAuthKeys = {
-  currentSession: () => ['current-session'] as const,
+  currentSession: () => [...producerKeys.all(), 'session'] as const,
 }

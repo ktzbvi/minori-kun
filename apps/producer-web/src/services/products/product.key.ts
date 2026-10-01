@@ -1,6 +1,7 @@
 import type { ProducerProductListFilters } from '@/types/product'
+import { producerKeys } from '@/services/producer.key'
 
 export const producerProductKeys = {
-  all: () => ['producer-products'] as const,
+  all: () => [...producerKeys.all(), 'products'] as const,
   list: (filters: ProducerProductListFilters) => [...producerProductKeys.all(), 'list', filters] as const,
 }

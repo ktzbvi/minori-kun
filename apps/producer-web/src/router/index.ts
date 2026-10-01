@@ -7,6 +7,7 @@ import EntryPage from '@/pages/EntryPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
 import ProductsPage from '@/pages/ProductsPage.vue'
+import PortalUnavailablePage from '@/pages/PortalUnavailablePage.vue'
 import RegisterPage from '@/pages/RegisterPage.vue'
 import RegisterVerifyPage from '@/pages/RegisterVerifyPage.vue'
 import RegisterDetailsPage from '@/pages/RegisterDetailsPage.vue'
@@ -28,11 +29,34 @@ export const router = createRouter({
       component: RegisterDetailsPage,
       meta: { public: true },
     },
-    { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
+    {
+      path: '/onboarding',
+      name: 'onboarding',
+      component: OnboardingPage,
+      beforeEnter: async () => {
+        try {
+          const session = await queryClient.fetchQuery(currentSessionQueryOptions())
+          if (session.role !== 'producer') return { name: 'login' }
+          return session.producer?.eligible_to_sell ? { name: 'dashboard' } : true
+        } catch {
+          return { name: 'login', query: { redirect: '/onboarding' } }
+        }
+      },
+    },
     { path: '/', name: 'entry', component: EntryPage, meta: { public: true } },
     {
       path: '/',
       component: ProducerPortalLayout,
+      beforeEnter: async (to) => {
+        try {
+          const session = await queryClient.fetchQuery(currentSessionQueryOptions())
+          if (session.role !== 'producer') return { name: 'login' }
+          if (session.producer?.eligible_to_sell !== true) return { name: 'onboarding' }
+          return true
+        } catch {
+          return { name: 'login', query: { redirect: to.fullPath } }
+        }
+      },
       children: [
         {
           path: 'dashboard',
@@ -46,22 +70,21 @@ export const router = createRouter({
           component: ProductsPage,
           meta: { portalTitle: '商品管理', activeRoute: '/products' },
         },
+        {
+          path: 'orders',
+          name: 'orders',
+          component: PortalUnavailablePage,
+          props: { title: '注文管理' },
+          meta: { portalTitle: '注文管理', activeRoute: '/orders' },
+        },
+        {
+          path: 'sales',
+          name: 'sales',
+          component: PortalUnavailablePage,
+          props: { title: '売上・振込' },
+          meta: { portalTitle: '売上・振込', activeRoute: '/sales' },
+        },
       ],
     },
   ],
-})
-
-router.beforeEach(async (to) => {
-  if (to.meta.public) return true
-
-  try {
-    const session = await queryClient.fetchQuery(currentSessionQueryOptions())
-    if (session.role !== 'producer') return { name: 'login' }
-    const eligible = session.producer?.eligible_to_sell === true
-    if (to.name === 'onboarding' && eligible) return { name: 'dashboard' }
-    if (to.name !== 'onboarding' && !eligible) return { name: 'onboarding' }
-    return true
-  } catch {
-    return { name: 'login', query: { redirect: to.fullPath } }
-  }
 })

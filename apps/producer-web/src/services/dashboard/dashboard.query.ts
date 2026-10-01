@@ -9,6 +9,5 @@ export function useProducerDashboardQuery() {
     queryFn: async () => {
       return (await api.get<ProducerDashboardResponse>('/api/v1/producer/dashboard')).data
     },
-    staleTime: 0,
   })
 }

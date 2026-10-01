@@ -27,7 +27,6 @@ export function useProducerProductsQuery(filters: MaybeRefOrGetter<ProducerProdu
 
           return (await api.get<ProducerProductListResponse>('/api/v1/producer/products', { params })).data
         },
-        staleTime: 0,
       }
     }),
   )

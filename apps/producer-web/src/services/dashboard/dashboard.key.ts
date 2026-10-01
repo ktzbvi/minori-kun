@@ -1,4 +1,6 @@
+import { producerKeys } from '@/services/producer.key'
+
 export const producerDashboardKeys = {
-  all: () => ['producer-dashboard'] as const,
+  all: () => [...producerKeys.all(), 'dashboard'] as const,
   detail: () => [...producerDashboardKeys.all(), 'detail'] as const,
 }
