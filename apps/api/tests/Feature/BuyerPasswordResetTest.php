@@ -65,9 +65,36 @@ it('changes a buyer password once and rejects reuse of the token', function (): 
         ->assertJsonPath('data.redirect', '/login');
 
     expect(Hash::check('New-password1!', $buyer->refresh()->password))->toBeTrue();
+    $this->postJson('/api/v1/buyer/auth/login', [
+        'email' => $buyer->email,
+        'password' => 'New-password1!',
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.email', $buyer->email);
+
     $this->postJson('/api/v1/buyer/password-reset/complete', $payload)
         ->assertUnprocessable()
         ->assertJsonPath('code', 'PASSWORD_RESET_TOKEN_INVALID');
+});
+
+it('ends the current session when a buyer resets their own password', function (): void {
+    $buyer = User::factory()->buyer()->create(['password' => 'Old-password1!']);
+    PasswordResetToken::query()->create([
+        'user_id' => $buyer->id,
+        'token_hash' => hash('sha256', 'current-session-reset-token'),
+        'expires_at' => now()->addMinutes(30),
+    ]);
+
+    $this->actingAs($buyer)
+        ->postJson('/api/v1/buyer/password-reset/complete', [
+            'email' => $buyer->email,
+            'token' => 'current-session-reset-token',
+            'password' => 'New-password1!',
+            'password_confirmation' => 'New-password1!',
+        ])
+        ->assertOk();
+
+    $this->getJson('/api/v1/buyer/me')->assertUnauthorized();
 });
 
 it('rejects an expired reset token', function (): void {

@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { UiButton, UiCard } from '@minorikun/ui'
+import { ensureCsrfCookie } from '@/services/api'
 import { completeBuyerPasswordReset } from '@/services/password-reset/password-reset.mutation'
 
 const route = useRoute()
@@ -77,6 +78,7 @@ const submit = handleSubmit(
         password: values.password,
         password_confirmation: values.password_confirmation,
       })
+      await ensureCsrfCookie(true)
       await router.replace({ name: 'login', query: { passwordReset: 'success' } })
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 422) {
