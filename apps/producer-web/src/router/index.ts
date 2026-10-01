@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { queryClient } from '@/lib/query'
 import { currentSessionQuery } from '@/services/auth/auth.query'
+import ProducerPortalLayout from '@/components/layout/ProducerPortalLayout.vue'
 import DashboardPage from '@/pages/DashboardPage.vue'
 import EntryPage from '@/pages/EntryPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
@@ -29,8 +30,24 @@ export const router = createRouter({
     },
     { path: '/onboarding', name: 'onboarding', component: OnboardingPage },
     { path: '/', name: 'entry', component: EntryPage, meta: { public: true } },
-    { path: '/dashboard', name: 'dashboard', component: DashboardPage },
-    { path: '/products', name: 'products', component: ProductsPage },
+    {
+      path: '/',
+      component: ProducerPortalLayout,
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: DashboardPage,
+          meta: { portalTitle: 'ダッシュボード', activeRoute: '/dashboard' },
+        },
+        {
+          path: 'products',
+          name: 'products',
+          component: ProductsPage,
+          meta: { portalTitle: '商品管理', activeRoute: '/products' },
+        },
+      ],
+    },
   ],
 })
 
