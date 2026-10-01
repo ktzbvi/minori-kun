@@ -10,6 +10,311 @@
         }
     ],
     "paths": {
+        "/v1/buyer/account/email-verifications/{token}": {
+            "get": {
+                "operationId": "buyerAccount.verifyEmailChange",
+                "tags": [
+                    "BuyerAccount"
+                ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/buyer/account/profile": {
+            "get": {
+                "operationId": "buyerAccount.show",
+                "tags": [
+                    "BuyerAccount"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "member_id": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "name_phonetic": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "pending_email": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "postal_code": {
+                                                    "type": "string"
+                                                },
+                                                "prefecture": {
+                                                    "type": "string"
+                                                },
+                                                "city": {
+                                                    "type": "string"
+                                                },
+                                                "address_line1": {
+                                                    "type": "string"
+                                                },
+                                                "address_line2": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "member_id",
+                                                "name",
+                                                "name_phonetic",
+                                                "email",
+                                                "pending_email",
+                                                "phone",
+                                                "postal_code",
+                                                "prefecture",
+                                                "city",
+                                                "address_line1",
+                                                "address_line2"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "buyerAccount.update",
+                "tags": [
+                    "BuyerAccount"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateBuyerProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "profile": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "member_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "name_phonetic": {
+                                                            "type": "string"
+                                                        },
+                                                        "email": {
+                                                            "type": "string"
+                                                        },
+                                                        "pending_email": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "phone": {
+                                                            "type": "string"
+                                                        },
+                                                        "postal_code": {
+                                                            "type": "string"
+                                                        },
+                                                        "prefecture": {
+                                                            "type": "string"
+                                                        },
+                                                        "city": {
+                                                            "type": "string"
+                                                        },
+                                                        "address_line1": {
+                                                            "type": "string"
+                                                        },
+                                                        "address_line2": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "member_id",
+                                                        "name",
+                                                        "name_phonetic",
+                                                        "email",
+                                                        "pending_email",
+                                                        "phone",
+                                                        "postal_code",
+                                                        "prefecture",
+                                                        "city",
+                                                        "address_line1",
+                                                        "address_line2"
+                                                    ]
+                                                },
+                                                "email_change_pending": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "profile",
+                                                "email_change_pending"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/account/password": {
+            "put": {
+                "operationId": "buyerAccount.changePassword",
+                "tags": [
+                    "BuyerAccount"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChangeBuyerPasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "changed": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "changed"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/inquiries": {
+            "post": {
+                "operationId": "buyerInquiry.store",
+                "tags": [
+                    "BuyerInquiry"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateBuyerInquiryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/v1/buyer/password-reset/start": {
             "post": {
                 "operationId": "buyerPasswordReset.start",
@@ -442,7 +747,7 @@
         },
         "/v1/buyer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_21",
+                "operationId": "portalAuth.login_32",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -483,7 +788,7 @@
         },
         "/v1/buyer/me": {
             "get": {
-                "operationId": "portalAuth.me_22",
+                "operationId": "portalAuth.me_33",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -514,7 +819,7 @@
         },
         "/v1/buyer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_23",
+                "operationId": "portalAuth.logout_34",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -553,7 +858,7 @@
         },
         "/v1/producer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_24",
+                "operationId": "portalAuth.login_35",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -594,7 +899,7 @@
         },
         "/v1/producer/me": {
             "get": {
-                "operationId": "portalAuth.me_25",
+                "operationId": "portalAuth.me_36",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -625,7 +930,7 @@
         },
         "/v1/producer/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_26",
+                "operationId": "portalAuth.logout_37",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -664,7 +969,7 @@
         },
         "/v1/admin/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_27",
+                "operationId": "portalAuth.login_38",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -705,7 +1010,7 @@
         },
         "/v1/admin/me": {
             "get": {
-                "operationId": "portalAuth.me_28",
+                "operationId": "portalAuth.me_39",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -736,7 +1041,7 @@
         },
         "/v1/admin/auth/logout": {
             "post": {
-                "operationId": "portalAuth.logout_29",
+                "operationId": "portalAuth.logout_40",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -773,6 +1078,37 @@
                 }
             }
         },
+        "/v1/producer/dashboard": {
+            "get": {
+                "operationId": "producerDashboard.show",
+                "tags": [
+                    "ProducerDashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerDashboardResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerDashboardResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/v1/producer/onboarding": {
             "get": {
                 "operationId": "producerOnboarding.show",
@@ -789,6 +1125,48 @@
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/ProducerOnboardingStatusResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/products/options": {
+            "get": {
+                "operationId": "producerProduct.options",
+                "tags": [
+                    "ProducerProduct"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Category"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "categories"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -913,6 +1291,254 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "producerProduct.store",
+                "tags": [
+                    "ProducerProduct"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpsertProducerProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "`ProducerProductResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerProductResource"
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "rejected_images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "index": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "message": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "index",
+                                                            "name",
+                                                            "message"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "rejected_images"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/products/{product}": {
+            "get": {
+                "operationId": "producerProduct.show",
+                "tags": [
+                    "ProducerProduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerProductResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerProductResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "producerProduct.update",
+                "tags": [
+                    "ProducerProduct"
+                ],
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpsertProducerProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerProductResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerProductResource"
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "rejected_images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "index": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "message": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "index",
+                                                            "name",
+                                                            "message"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "rejected_images"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/shop-photos/{id}": {
+            "get": {
+                "operationId": "producer.shop-photo",
+                "tags": [
+                    "ProducerRegistration"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1340,52 +1966,75 @@
                     }
                 }
             }
-        },
-        "/v1/producer/shop-photos/{id}": {
-            "get": {
-                "operationId": "producer.shop-photo",
-                "tags": [
-                    "ProducerRegistration"
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/octet-stream": {
-                                "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        },
-                        "headers": {
-                            "Transfer-Encoding": {
-                                "required": true,
-                                "schema": {
-                                    "type": "string",
-                                    "enum": [
-                                        "chunked"
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
     "components": {
         "schemas": {
+            "Category": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "is_enabled": {
+                        "type": "boolean"
+                    },
+                    "display_order": {
+                        "type": "integer"
+                    },
+                    "lock_version": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "is_enabled",
+                    "display_order",
+                    "lock_version",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "Category"
+            },
+            "ChangeBuyerPasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "current_password": {
+                        "type": "string",
+                        "maxLength": 4096
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "current_password",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "ChangeBuyerPasswordRequest"
+            },
             "CompleteBuyerPasswordResetRequest": {
                 "type": "object",
                 "properties": {
@@ -1541,6 +2190,29 @@
                 ],
                 "title": "CompleteProducerRegistrationRequest"
             },
+            "CreateBuyerInquiryRequest": {
+                "type": "object",
+                "properties": {
+                    "subject": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "message": {
+                        "type": "string",
+                        "maxLength": 5000
+                    },
+                    "idempotency_key": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "required": [
+                    "subject",
+                    "message",
+                    "idempotency_key"
+                ],
+                "title": "CreateBuyerInquiryRequest"
+            },
             "CurrentSessionResource": {
                 "type": "object",
                 "properties": {
@@ -1612,6 +2284,123 @@
                     "password"
                 ],
                 "title": "PortalLoginRequest"
+            },
+            "ProducerDashboardResource": {
+                "type": "object",
+                "properties": {
+                    "products": {
+                        "type": "object",
+                        "properties": {
+                            "total": {
+                                "type": "integer"
+                            },
+                            "published": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "total",
+                            "published"
+                        ]
+                    },
+                    "orders": {
+                        "type": "object",
+                        "properties": {
+                            "requiring_action": {
+                                "type": "string"
+                            },
+                            "received": {
+                                "type": "integer"
+                            },
+                            "processing": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "requiring_action",
+                            "received",
+                            "processing"
+                        ]
+                    },
+                    "sales": {
+                        "type": "object",
+                        "properties": {
+                            "period_label": {
+                                "type": "string"
+                            },
+                            "total_yen": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "period_label",
+                            "total_yen"
+                        ]
+                    },
+                    "payout_alert": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "expected_payout_yen": {
+                                "type": "integer"
+                            },
+                            "due_on": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "state": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "expected_payout_yen",
+                            "due_on",
+                            "state"
+                        ]
+                    },
+                    "action_orders": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "display_id": {
+                                    "type": "string"
+                                },
+                                "ordered_at": {
+                                    "type": "string"
+                                },
+                                "product_summary": {
+                                    "type": "string"
+                                },
+                                "fulfillment_state": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "display_id",
+                                "ordered_at",
+                                "product_summary",
+                                "fulfillment_state"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "products",
+                    "orders",
+                    "sales",
+                    "payout_alert",
+                    "action_orders"
+                ],
+                "title": "ProducerDashboardResource"
             },
             "ProducerOnboardingStatusResource": {
                 "type": "object",
@@ -1697,6 +2486,73 @@
                     "updated_at"
                 ],
                 "title": "ProducerProductListItemResource"
+            },
+            "ProducerProductResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category_id": {
+                        "type": "string"
+                    },
+                    "category_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "price_yen": {
+                        "type": "integer"
+                    },
+                    "stock_quantity": {
+                        "type": "integer"
+                    },
+                    "discount_bps": {
+                        "type": "integer"
+                    },
+                    "delivery_fee_honshu_yen": {
+                        "type": "integer"
+                    },
+                    "delivery_fee_hokkaido_yen": {
+                        "type": "integer"
+                    },
+                    "delivery_fee_okinawa_yen": {
+                        "type": "integer"
+                    },
+                    "publication_state": {
+                        "type": "string"
+                    },
+                    "lock_version": {
+                        "type": "integer"
+                    },
+                    "images": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "category_id",
+                    "category_name",
+                    "price_yen",
+                    "stock_quantity",
+                    "discount_bps",
+                    "delivery_fee_honshu_yen",
+                    "delivery_fee_hokkaido_yen",
+                    "delivery_fee_okinawa_yen",
+                    "publication_state",
+                    "lock_version",
+                    "images"
+                ],
+                "title": "ProducerProductResource"
             },
             "ProducerRegistrationDetailsResource": {
                 "type": "object",
@@ -1863,6 +2719,15 @@
                 ],
                 "title": "ProducerTermsResource"
             },
+            "ProductPublicationState": {
+                "type": "string",
+                "enum": [
+                    "draft",
+                    "published",
+                    "unpublished"
+                ],
+                "title": "ProductPublicationState"
+            },
             "RequestProducerRegistrationCodeRequest": {
                 "type": "object",
                 "properties": {
@@ -1905,6 +2770,65 @@
                 ],
                 "title": "StartBuyerRegistrationRequest"
             },
+            "UpdateBuyerProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "name_phonetic": {
+                        "type": "string",
+                        "pattern": "^[\u30a1-\u30fa\u30fc\\s]+$",
+                        "maxLength": 255
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "phone": {
+                        "type": "string",
+                        "pattern": "^0\\d{2}-?\\d{4}-?\\d{4}$",
+                        "maxLength": 32
+                    },
+                    "postal_code": {
+                        "type": "string",
+                        "pattern": "^\\d{3}-?\\d{4}$",
+                        "maxLength": 16
+                    },
+                    "prefecture": {
+                        "type": "string",
+                        "maxLength": 64
+                    },
+                    "city": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line1": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "address_line2": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "name",
+                    "name_phonetic",
+                    "email",
+                    "phone",
+                    "postal_code",
+                    "prefecture",
+                    "city",
+                    "address_line1"
+                ],
+                "title": "UpdateBuyerProfileRequest"
+            },
             "UploadProducerRegistrationPhotoRequest": {
                 "type": "object",
                 "properties": {
@@ -1919,6 +2843,86 @@
                     "photo"
                 ],
                 "title": "UploadProducerRegistrationPhotoRequest"
+            },
+            "UpsertProducerProductRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "category_id": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 10000
+                    },
+                    "price_yen": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "stock_quantity": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "discount_percent": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "delivery_fee_honshu_yen": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "delivery_fee_hokkaido_yen": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "delivery_fee_okinawa_yen": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "publication_state": {
+                        "$ref": "#/components/schemas/ProductPublicationState"
+                    },
+                    "lock_version": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
+                    },
+                    "image_order": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "pattern": "^(existing:[0-9A-HJKMNP-TV-Z]{26}|new:[0-9]+)$"
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    },
+                    "new_images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "category_id",
+                    "description",
+                    "price_yen",
+                    "stock_quantity",
+                    "delivery_fee_honshu_yen",
+                    "delivery_fee_hokkaido_yen",
+                    "delivery_fee_okinawa_yen",
+                    "publication_state",
+                    "image_order"
+                ],
+                "title": "UpsertProducerProductRequest"
             },
             "VerifyBuyerRegistrationOtpRequest": {
                 "type": "object",
@@ -1978,6 +2982,25 @@
             },
             "AuthenticationException": {
                 "description": "Unauthenticated",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
+            "AuthorizationException": {
+                "description": "Authorization error",
                 "content": {
                     "application/json": {
                         "schema": {

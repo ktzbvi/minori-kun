@@ -85,8 +85,7 @@ Start local MySQL first. Then use separate terminals so logs remain understandab
 Terminal 1 — Laravel API:
 
 ```powershell
-cd apps/api
-php artisan serve
+.\m.ps1 api
 ```
 
 Terminal 2 — all three Vue applications with hot reload:

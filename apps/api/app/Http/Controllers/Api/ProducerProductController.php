@@ -2,15 +2,32 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Catalog\SaveProducerProduct;
 use App\Enums\ProductPublicationState;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IndexProducerProductsRequest;
+use App\Http\Requests\UpsertProducerProductRequest;
 use App\Http\Resources\ProducerProductListItemResource;
+use App\Http\Resources\ProducerProductResource;
+use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 
 class ProducerProductController extends Controller
 {
+    public function options(): JsonResponse
+    {
+        return response()->json(['data' => [
+            'categories' => Category::query()
+                ->where('is_enabled', true)
+                ->orderBy('display_order')
+                ->orderBy('name')
+                ->get(['id', 'name']),
+        ]]);
+    }
+
     public function index(IndexProducerProductsRequest $request): AnonymousResourceCollection
     {
         $producerId = (string) $request->user()->id;
@@ -81,5 +98,51 @@ class ProducerProductController extends Controller
                 'total' => $products->count(),
                 'categories' => $categories,
             ]]);
+    }
+
+    public function show(string $product): ProducerProductResource
+    {
+        $ownedProduct = Product::query()
+            ->where('producer_id', request()->user()->id)
+            ->with(['category:id,name', 'variants', 'images'])
+            ->findOrFail($product);
+        Gate::authorize('view', $ownedProduct);
+
+        return new ProducerProductResource($ownedProduct);
+    }
+
+    public function store(UpsertProducerProductRequest $request, SaveProducerProduct $save): JsonResponse
+    {
+        Gate::authorize('create', Product::class);
+        $submission = $request->productSubmission();
+        $product = $save->execute(
+            $request->user(),
+            $submission['data'],
+            $submission['images'],
+        );
+
+        return (new ProducerProductResource($product))
+            ->additional(['meta' => ['rejected_images' => $submission['rejected_images']]])
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function update(
+        UpsertProducerProductRequest $request,
+        string $product,
+        SaveProducerProduct $save,
+    ): ProducerProductResource {
+        $ownedProduct = Product::query()
+            ->where('producer_id', $request->user()->id)
+            ->findOrFail($product);
+        Gate::authorize('update', $ownedProduct);
+        $submission = $request->productSubmission();
+
+        return (new ProducerProductResource($save->execute(
+            $request->user(),
+            $submission['data'],
+            $submission['images'],
+            $ownedProduct,
+        )))->additional(['meta' => ['rejected_images' => $submission['rejected_images']]]);
     }
 }

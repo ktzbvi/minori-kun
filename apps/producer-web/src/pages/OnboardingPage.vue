@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { producerOnboardingQuery } from '@/services/registration/registration.query'
+import { useProducerOnboardingQuery } from '@/services/registration/registration.query'
 
-const onboardingQuery = useQuery(producerOnboardingQuery)
+const onboardingQuery = useProducerOnboardingQuery()
 </script>
 
 <template>

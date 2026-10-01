@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\MissingValue;
 
 /** @mixin Product */
 class ProducerProductListItemResource extends JsonResource
@@ -15,12 +16,12 @@ class ProducerProductListItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         $variants = $this->whenLoaded('variants');
-        $variantCollection = collect($variants instanceof \Illuminate\Support\MissingValue ? [] : $variants);
+        $variantCollection = collect($variants instanceof MissingValue ? [] : $variants);
         $prices = $variantCollection->pluck('price_yen')->filter(static fn ($price): bool => is_numeric($price))->values();
         $stock = (int) $variantCollection->sum('stock_quantity');
         $maxDiscountBps = (int) $variantCollection->max('discount_bps');
         $image = $this->whenLoaded('images');
-        $firstImage = collect($image instanceof \Illuminate\Support\MissingValue ? [] : $image)->first();
+        $firstImage = collect($image instanceof MissingValue ? [] : $image)->first();
 
         return [
             'id' => (string) $this->id,
@@ -39,7 +40,7 @@ class ProducerProductListItemResource extends JsonResource
 
     private function imageUrl(ProductImage $image): ?string
     {
-        if (! in_array($image->disk, ['public', 's3'], true) || ! Storage::disk($image->disk)->exists($image->object_path)) {
+        if (! in_array($image->disk, ['public', 's3'], true)) {
             return null;
         }
 

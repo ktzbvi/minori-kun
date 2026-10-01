@@ -28,3 +28,49 @@ export type ProducerProductListResponse = Omit<
     categories: string[]
   }
 }
+
+type GeneratedProducerProductDetail = components['schemas']['ProducerProductResource']
+
+export interface ProducerProductImage {
+  id: string
+  url: string
+  display_order: number
+}
+
+export type ProducerProductDetail = Omit<
+  GeneratedProducerProductDetail,
+  'images' | 'publication_state'
+> & {
+  publication_state: ProducerProductPublicationState
+  images: ProducerProductImage[]
+}
+
+export type ProducerProductCategory = Pick<components['schemas']['Category'], 'id' | 'name'>
+
+type GeneratedProducerProductFormOptions =
+  operations['producerProduct.options']['responses'][200]['content']['application/json']['data']
+
+export type ProducerProductFormOptions = Omit<GeneratedProducerProductFormOptions, 'categories'> & {
+  categories: ProducerProductCategory[]
+}
+
+type GeneratedProducerProductOptionsResponse =
+  operations['producerProduct.options']['responses'][200]['content']['application/json']
+
+export type ProducerProductOptionsResponse = Omit<GeneratedProducerProductOptionsResponse, 'data'> & {
+  data: ProducerProductFormOptions
+}
+
+type GeneratedProducerProductShowResponse =
+  operations['producerProduct.show']['responses'][200]['content']['application/json']
+
+export type ProducerProductShowResponse = Omit<GeneratedProducerProductShowResponse, 'data'> & {
+  data: ProducerProductDetail
+}
+
+type GeneratedProducerProductSaveResponse =
+  operations['producerProduct.update']['responses'][200]['content']['application/json']
+
+export type ProducerProductSaveResponse = Omit<GeneratedProducerProductSaveResponse, 'data'> & {
+  data: ProducerProductDetail
+}
