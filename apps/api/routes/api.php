@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
+use App\Http\Controllers\Api\ProducerProductController;
 use App\Http\Controllers\Api\ProducerRegistrationController;
 use App\Http\Middleware\EnsureProducerRegistrationSession;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,8 @@ foreach (UserRole::cases() as $role) {
     });
 }
 
+Route::get('/api/v1/producer/products', [ProducerProductController::class, 'index'])
+    ->middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible']);
 Route::middleware(['auth:sanctum', 'portal.role:buyer'])->prefix('/api/v1/buyer/account')->group(function (): void {
     Route::get('/profile', [BuyerAccountController::class, 'show']);
     Route::patch('/profile', [BuyerAccountController::class, 'update']);

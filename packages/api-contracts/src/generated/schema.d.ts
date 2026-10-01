@@ -276,6 +276,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/producer/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerProduct.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/producer/registration": {
         parameters: {
             query?: never;
@@ -517,6 +533,20 @@ export interface components {
             state: "application_required" | "eligible";
             eligible_to_sell: boolean;
             application_available: boolean;
+        };
+        /** ProducerProductListItemResource */
+        ProducerProductListItemResource: {
+            id: string;
+            display_id: string;
+            name: string;
+            category: string | null;
+            price_yen: number | null;
+            has_multiple_prices: boolean;
+            stock_quantity: number;
+            discount_bps: number;
+            publication_state: string;
+            image_url: null;
+            updated_at: string | null;
         };
         /** ProducerRegistrationDetailsResource */
         ProducerRegistrationDetailsResource: {
@@ -1102,6 +1132,39 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "producerProduct.index": {
+        parameters: {
+            query?: {
+                keyword?: string | null;
+                category?: string | null;
+                publication_state?: "all" | "draft" | "published" | "unpublished" | null;
+                stock_state?: "all" | "in_stock" | "low_stock" | "out_of_stock" | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `ProducerProductListItemResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerProductListItemResource"][];
+                        meta: {
+                            total: number;
+                            categories: unknown[];
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
     "producerRegistration.show": {

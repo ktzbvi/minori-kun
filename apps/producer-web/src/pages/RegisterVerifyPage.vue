@@ -24,7 +24,8 @@ const isBusy = computed(() => registrationActions.isVerifyingCode.value || regis
 const state = computed(() => statusQuery.data.value)
 const destinationEmail = computed(() => state.value?.email ?? '')
 const deliveryStatus = computed(() => state.value?.delivery_succeeded)
-const mayHaveCode = computed(() => deliveryStatus.value !== false)
+const deliveryFailed = computed(() => deliveryStatus.value === false)
+const mayHaveCode = computed(() => !deliveryFailed.value)
 
 watch(() => state.value?.server_time, (serverTime) => {
   if (serverTime) clockOffset.value = Date.parse(serverTime) - Date.now()
@@ -39,6 +40,7 @@ function secondsUntil(timestamp: string | null | undefined) {
 
 const otpSeconds = computed(() => {
   clockTick.value
+  if (deliveryFailed.value) return 0
   return secondsUntil(state.value?.otp_expires_at)
 })
 const resendSeconds = computed(() => {
@@ -46,6 +48,7 @@ const resendSeconds = computed(() => {
   return secondsUntil(state.value?.resend_available_at)
 })
 const otpExpired = computed(() => state.value?.state === 'expired' || otpSeconds.value === 0)
+const resendBlocked = computed(() => resendSeconds.value > 0)
 const formattedResendCountdown = computed(() => {
   const minutes = Math.floor(resendSeconds.value / 60).toString().padStart(2, '0')
   const seconds = (resendSeconds.value % 60).toString().padStart(2, '0')
@@ -89,7 +92,7 @@ async function submit() {
 }
 
 async function resend() {
-  if (isBusy.value || resendSeconds.value > 0) return
+  if (isBusy.value || resendBlocked.value) return
   codeError.value = ''
   feedback.value = ''
   try {
@@ -190,9 +193,10 @@ onBeforeRouteLeave(() => {
           </form>
 
           <p v-if="mayHaveCode" class="mt-6 text-sm leading-relaxed text-[#87968d] min-[761px]:mt-4">メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>
-          <UiButton variant="outline" class="mt-5 min-h-[56px] w-full rounded-xl text-base min-[761px]:mt-4 min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isBusy || resendSeconds > 0" @click="resend">
+          <UiButton variant="outline" class="mt-5 min-h-[56px] w-full rounded-xl text-base min-[761px]:mt-4 min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isBusy || resendBlocked" @click="resend">
             <template v-if="isBusy">送信中…</template>
-            <template v-else-if="resendSeconds > 0">再送可能まであと {{ formattedResendCountdown }}</template>
+            <template v-else-if="deliveryFailed && resendBlocked">時間をおいて再送してください</template>
+            <template v-else-if="resendBlocked">再送可能まであと {{ formattedResendCountdown }}</template>
             <template v-else>確認コードを再送する</template>
           </UiButton>
           <p v-if="feedback" class="mt-3 text-sm leading-relaxed text-[#247d4c]" role="status">{{ feedback }}</p>

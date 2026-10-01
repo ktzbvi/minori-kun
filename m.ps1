@@ -13,6 +13,7 @@ Minori-kun native development commands
 
   .\m.ps1 bootstrap       Install locked dependencies and initialize the app
   .\m.ps1 web             Run all three Vue development servers
+  .\m.ps1 mail            Run the local Mailpit inbox for registration emails
   .\m.ps1 test            Run backend and frontend unit tests
   .\m.ps1 check           Run the complete non-mutating quality gate
   .\m.ps1 api-sync        Regenerate OpenAPI and TypeScript API types
@@ -53,6 +54,25 @@ function Assert-Toolchain {
 
     Invoke-Checked 'php' @('-r', "exit(version_compare(PHP_VERSION, '8.4.0', '>=') ? 0 : 1);")
     Invoke-Checked 'node' @('-e', "const [major, minor] = process.versions.node.split('.').map(Number); process.exit(major > 22 || (major === 22 && minor >= 12) ? 0 : 1)")
+}
+
+function Resolve-MailpitExecutable {
+    $command = Get-Command 'mailpit' -ErrorAction SilentlyContinue
+    if ($command) {
+        return $command.Source
+    }
+
+    $wingetPackageRoot = Join-Path $env:LOCALAPPDATA 'Microsoft/WinGet/Packages'
+    if (Test-Path -LiteralPath $wingetPackageRoot) {
+        $installed = Get-ChildItem -LiteralPath $wingetPackageRoot -Recurse -Filter 'mailpit.exe' -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+
+        if ($installed) {
+            return $installed.FullName
+        }
+    }
+
+    throw 'mailpit was not found. Install Mailpit from https://mailpit.axllent.org/install/ and rerun .\m.ps1 mail.'
 }
 
 function Invoke-ApiCommand {
@@ -191,6 +211,10 @@ try {
             Assert-Command 'node' 'Install Node.js 22 LTS or newer.'
             Assert-Command 'pnpm' 'Enable Corepack and activate pnpm 10.'
             Invoke-Checked 'pnpm' @('dev')
+        }
+        'mail' {
+            $mailpit = Resolve-MailpitExecutable
+            Invoke-Checked $mailpit
         }
         'test' {
             Assert-Toolchain

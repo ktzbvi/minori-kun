@@ -165,7 +165,6 @@ final class ProducerRegistrationPhotoProcessor
     private function assertRuntimeAvailable(): void
     {
         if (! extension_loaded('gd')
-            || ! extension_loaded('exif')
             || ! class_exists(finfo::class)
             || ! function_exists('getimagesizefromstring')
             || ! function_exists('imagecreatefromstring')

@@ -62,6 +62,16 @@ class ProducerRegistrationService
     public function requestCode(?ProducerRegistrationAttempt $attempt, string $email): RegistrationMutationResult
     {
         $email = mb_strtolower(trim($email));
+        if (User::query()->whereRaw('LOWER(email) = ?', [$email])->exists()) {
+            throw $this->problem(
+                'ACCOUNT_EXISTS',
+                409,
+                ['email' => ['このメールアドレスはすでに登録されています。']],
+                [],
+                'このメールアドレスはすでに登録されています。',
+            );
+        }
+
         $token = null;
         $code = null;
         $mailRecipient = null;
