@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
-import { useQuery } from '@tanstack/vue-query'
 import { ChevronDown, ClipboardList, Home, Leaf, Menu, UserRound, WalletCards } from 'lucide-vue-next'
-import { currentSessionQuery } from '@/services/auth/auth.query'
+import { useCurrentSessionQuery } from '@/services/auth/auth.query'
 
 const props = defineProps<{
   activeRoute?: '/dashboard' | '/products' | '/orders' | '/sales'
@@ -11,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const sessionQuery = useQuery(currentSessionQuery)
+const sessionQuery = useCurrentSessionQuery()
 const producerName = computed(() => sessionQuery.data.value?.display_name || '生産者')
 const activeRoute = computed(() => props.activeRoute ?? route.meta.activeRoute ?? '/dashboard')
 const title = computed(() => props.title ?? route.meta.portalTitle ?? '')

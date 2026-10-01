@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, RouterLink, useRouter } from 'vue-router'
-import { useQuery } from '@tanstack/vue-query'
 import { Camera, CircleCheck, Eye, EyeOff, Image as ImageIcon } from 'lucide-vue-next'
 import { z } from 'zod'
 import { UiButton, UiCheckbox, UiDialog, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
@@ -11,8 +10,12 @@ import RegistrationShell from '@/components/registration/RegistrationShell.vue'
 import { getApiErrorPayload } from '@/lib/api-error'
 import { useProducerRegistration } from '@/composables/useProducerRegistration'
 import { queryClient } from '@/lib/query'
-import { currentSessionQuery } from '@/services/auth/auth.query'
-import { producerRegistrationDetailsQuery, producerTermsQuery } from '@/services/registration/registration.query'
+import { currentSessionQueryOptions } from '@/services/auth/auth.query'
+import {
+  producerTermsQueryOptions,
+  useProducerRegistrationDetailsQuery,
+  useProducerTermsQuery,
+} from '@/services/registration/registration.query'
 import { producerRegistrationKeys } from '@/services/registration/registration.key'
 import { useProducerRegistrationStore } from '@/stores/producerRegistration'
 import type { ProducerRegistrationPhoto } from '@/types/registration'
@@ -23,8 +26,8 @@ const registration = useProducerRegistrationStore()
 const shopName = ref(registration.shopName)
 const contactName = ref(registration.contactName)
 const phone = ref(registration.phone)
-const detailsQuery = useQuery(producerRegistrationDetailsQuery)
-const termsQuery = useQuery({ ...producerTermsQuery, enabled: false })
+const detailsQuery = useProducerRegistrationDetailsQuery()
+const termsQuery = useProducerTermsQuery(false)
 const photoInputId = 'shop-photo-input'
 const photoFile = ref<File | null>(null)
 const localPreview = ref('')
@@ -266,7 +269,7 @@ async function submit() {
 
   isSubmitting.value = true
   try {
-    const latestTerms = await queryClient.fetchQuery({ ...producerTermsQuery, staleTime: 0 })
+    const latestTerms = await queryClient.fetchQuery(producerTermsQueryOptions())
     if (latestTerms.version !== acceptedTermsVersion.value) {
       await handleTermsChanged()
       return
@@ -314,7 +317,7 @@ async function submit() {
       }
 
       try {
-        const session = await queryClient.fetchQuery({ ...currentSessionQuery, staleTime: 0 })
+        const session = await queryClient.fetchQuery(currentSessionQueryOptions())
         if (session.role === 'producer') {
           await router.replace({ name: session.producer?.eligible_to_sell ? 'dashboard' : 'onboarding' })
           return

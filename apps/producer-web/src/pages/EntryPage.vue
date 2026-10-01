@@ -3,15 +3,15 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Leaf } from 'lucide-vue-next'
 import { queryClient } from '@/lib/query'
-import { currentSessionQuery } from '@/services/auth/auth.query'
-import { producerRegistrationStatusQuery } from '@/services/registration/registration.query'
+import { currentSessionQueryOptions } from '@/services/auth/auth.query'
+import { producerRegistrationStatusQueryOptions } from '@/services/registration/registration.query'
 import { recoverCompletedProducerRegistration } from '@/services/registration/registration.mutation'
 
 const router = useRouter()
 
 async function routeToRegistrationState() {
   try {
-    const registration = await queryClient.fetchQuery({ ...producerRegistrationStatusQuery, staleTime: 0 })
+    const registration = await queryClient.fetchQuery(producerRegistrationStatusQueryOptions())
 
     if (registration.state === 'pending') return await router.replace({ name: 'register-verify' })
     if (registration.state === 'verified') return await router.replace({ name: 'register-details' })
@@ -21,7 +21,7 @@ async function routeToRegistrationState() {
     if (registration.state === 'consumed') {
       try {
         const session = await recoverCompletedProducerRegistration()
-        queryClient.setQueryData(currentSessionQuery.queryKey, session)
+        queryClient.setQueryData(currentSessionQueryOptions().queryKey, session)
         return await router.replace({ name: session.producer?.eligible_to_sell ? 'dashboard' : 'onboarding' })
       } catch {
         return await router.replace({ name: 'login', query: { recovery: 'registration-complete' } })
@@ -36,7 +36,7 @@ async function routeToRegistrationState() {
 
 onMounted(async () => {
   try {
-    const session = await queryClient.fetchQuery({ ...currentSessionQuery, staleTime: 0 })
+    const session = await queryClient.fetchQuery(currentSessionQueryOptions())
     if (session.role !== 'producer') {
       await router.replace({ name: 'login' })
       return

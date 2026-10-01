@@ -3,17 +3,16 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { Mail } from 'lucide-vue-next'
 import { z } from 'zod'
-import { useQuery } from '@tanstack/vue-query'
 import { toast, UiButton, UiFormLabel, UiFormMessage, UiInput } from '@minorikun/ui'
 import RegistrationBrand from '@/components/registration/RegistrationBrand.vue'
 import RegistrationProgress from '@/components/registration/RegistrationProgress.vue'
 import RegistrationShell from '@/components/registration/RegistrationShell.vue'
 import { getApiErrorPayload } from '@/lib/api-error'
 import { useProducerRegistration } from '@/composables/useProducerRegistration'
-import { producerRegistrationStatusQuery } from '@/services/registration/registration.query'
+import { useProducerRegistrationStatusQuery } from '@/services/registration/registration.query'
 
 const route = useRoute()
-const statusQuery = useQuery(producerRegistrationStatusQuery)
+const statusQuery = useProducerRegistrationStatusQuery()
 const registrationActions = useProducerRegistration()
 const email = ref('')
 const emailError = ref('')

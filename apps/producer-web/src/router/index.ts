@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { queryClient } from '@/lib/query'
-import { currentSessionQuery } from '@/services/auth/auth.query'
+import { currentSessionQueryOptions } from '@/services/auth/auth.query'
 import ProducerPortalLayout from '@/components/layout/ProducerPortalLayout.vue'
 import DashboardPage from '@/pages/DashboardPage.vue'
 import EntryPage from '@/pages/EntryPage.vue'
@@ -55,7 +55,7 @@ router.beforeEach(async (to) => {
   if (to.meta.public) return true
 
   try {
-    const session = await queryClient.fetchQuery({ ...currentSessionQuery, staleTime: 0 })
+    const session = await queryClient.fetchQuery(currentSessionQueryOptions())
     if (session.role !== 'producer') return { name: 'login' }
     const eligible = session.producer?.eligible_to_sell === true
     if (to.name === 'onboarding' && eligible) return { name: 'dashboard' }

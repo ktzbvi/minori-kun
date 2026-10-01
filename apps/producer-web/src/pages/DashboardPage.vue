@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useQuery } from '@tanstack/vue-query'
 import { AlertCircle, ChartNoAxesColumn, ChevronRight, Package, ReceiptText, RefreshCw } from 'lucide-vue-next'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { currentSessionQuery } from '@/services/auth/auth.query'
-import { producerDashboardQuery } from '@/services/dashboard/dashboard.query'
+import { useCurrentSessionQuery } from '@/services/auth/auth.query'
+import { useProducerDashboardQuery } from '@/services/dashboard/dashboard.query'
 
-const sessionQuery = useQuery(currentSessionQuery)
-const dashboardQuery = useQuery(producerDashboardQuery)
+const sessionQuery = useCurrentSessionQuery()
+const dashboardQuery = useProducerDashboardQuery()
 const producerName = computed(() => sessionQuery.data.value?.display_name || '生産者')
 const dashboard = computed(() => dashboardQuery.data.value?.data)
 

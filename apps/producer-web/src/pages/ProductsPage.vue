@@ -2,9 +2,8 @@
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
-import { useQuery } from '@tanstack/vue-query'
 import { UiButton } from '@minorikun/ui'
-import { producerProductsQuery } from '@/services/products/product.query'
+import { useProducerProductsQuery } from '@/services/products/product.query'
 import type {
   ProducerProductListFilters,
   ProducerProductListItem,
@@ -25,7 +24,7 @@ const productFilters = computed<ProducerProductListFilters>(() => ({
   stock_state: stockFilter.value,
 }))
 
-const productsQuery = useQuery(computed(() => producerProductsQuery(productFilters.value)))
+const productsQuery = useProducerProductsQuery(productFilters)
 const products = computed(() => productsQuery.data.value?.data ?? [])
 const categories = computed(() => productsQuery.data.value?.meta.categories ?? [])
 
