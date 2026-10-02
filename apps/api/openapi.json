@@ -747,7 +747,7 @@
         },
         "/v1/buyer/auth/login": {
             "post": {
-                "operationId": "portalAuth.login_32",
+                "operationId": "portalAuth.login_35",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -788,117 +788,6 @@
         },
         "/v1/buyer/me": {
             "get": {
-                "operationId": "portalAuth.me_33",
-                "tags": [
-                    "PortalAuth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "`CurrentSessionResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/CurrentSessionResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/v1/buyer/auth/logout": {
-            "post": {
-                "operationId": "portalAuth.logout_34",
-                "tags": [
-                    "PortalAuth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "logged_out": {
-                                                    "type": "boolean"
-                                                }
-                                            },
-                                            "required": [
-                                                "logged_out"
-                                            ]
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/v1/producer/auth/login": {
-            "post": {
-                "operationId": "portalAuth.login_35",
-                "tags": [
-                    "PortalAuth"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/PortalLoginRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "`CurrentSessionResource`",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/CurrentSessionResource"
-                                        }
-                                    },
-                                    "required": [
-                                        "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                }
-            }
-        },
-        "/v1/producer/me": {
-            "get": {
                 "operationId": "portalAuth.me_36",
                 "tags": [
                     "PortalAuth"
@@ -928,7 +817,7 @@
                 }
             }
         },
-        "/v1/producer/auth/logout": {
+        "/v1/buyer/auth/logout": {
             "post": {
                 "operationId": "portalAuth.logout_37",
                 "tags": [
@@ -967,7 +856,7 @@
                 }
             }
         },
-        "/v1/admin/auth/login": {
+        "/v1/producer/auth/login": {
             "post": {
                 "operationId": "portalAuth.login_38",
                 "tags": [
@@ -1008,7 +897,7 @@
                 }
             }
         },
-        "/v1/admin/me": {
+        "/v1/producer/me": {
             "get": {
                 "operationId": "portalAuth.me_39",
                 "tags": [
@@ -1039,9 +928,120 @@
                 }
             }
         },
-        "/v1/admin/auth/logout": {
+        "/v1/producer/auth/logout": {
             "post": {
                 "operationId": "portalAuth.logout_40",
+                "tags": [
+                    "PortalAuth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "logged_out": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "logged_out"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/auth/login": {
+            "post": {
+                "operationId": "portalAuth.login_41",
+                "tags": [
+                    "PortalAuth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PortalLoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`CurrentSessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CurrentSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/me": {
+            "get": {
+                "operationId": "portalAuth.me_42",
+                "tags": [
+                    "PortalAuth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`CurrentSessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CurrentSessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/admin/auth/logout": {
+            "post": {
+                "operationId": "portalAuth.logout_43",
                 "tags": [
                     "PortalAuth"
                 ],
@@ -1136,6 +1136,155 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/password-reset/start": {
+            "post": {
+                "operationId": "producerPasswordReset.start",
+                "tags": [
+                    "ProducerPasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProducerPasswordResetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "const": "\u8a72\u5f53\u3059\u308b\u30a2\u30ab\u30a6\u30f3\u30c8\u304c\u3042\u308b\u5834\u5408\u3001\u30d1\u30b9\u30ef\u30fc\u30c9\u518d\u8a2d\u5b9a\u7528\u30e1\u30fc\u30eb\u3092\u9001\u4fe1\u3057\u307e\u3057\u305f\u3002"
+                                                }
+                                            },
+                                            "required": [
+                                                "message"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/password-reset/validate": {
+            "post": {
+                "operationId": "producerPasswordReset.validateToken",
+                "tags": [
+                    "ProducerPasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ValidateProducerPasswordResetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "valid": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "valid"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/password-reset/complete": {
+            "post": {
+                "operationId": "producerPasswordReset.complete",
+                "tags": [
+                    "ProducerPasswordReset"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteProducerPasswordResetRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "redirect": {
+                                                    "type": "string",
+                                                    "const": "/login"
+                                                }
+                                            },
+                                            "required": [
+                                                "redirect"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -2133,6 +2282,38 @@
                 ],
                 "title": "CompleteBuyerRegistrationRequest"
             },
+            "CompleteProducerPasswordResetRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "token": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "minLength": 64,
+                        "maxLength": 64
+                    },
+                    "password": {
+                        "type": "string",
+                        "pattern": "[^\\p{L}\\p{N}\\s]",
+                        "minLength": 8,
+                        "maxLength": 64
+                    },
+                    "password_confirmation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "token",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "CompleteProducerPasswordResetRequest"
+            },
             "CompleteProducerRegistrationRequest": {
                 "type": "object",
                 "properties": {
@@ -2153,7 +2334,7 @@
                     },
                     "password": {
                         "type": "string",
-                        "pattern": "[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E]",
+                        "pattern": "[^\\p{L}\\p{N}\\s]",
                         "minLength": 8,
                         "maxLength": 64
                     },
@@ -2425,6 +2606,20 @@
                     "application_available"
                 ],
                 "title": "ProducerOnboardingStatusResource"
+            },
+            "ProducerPasswordResetRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    }
+                },
+                "required": [
+                    "email"
+                ],
+                "title": "ProducerPasswordResetRequest"
             },
             "ProducerProductListItemResource": {
                 "type": "object",
@@ -2923,6 +3118,27 @@
                     "image_order"
                 ],
                 "title": "UpsertProducerProductRequest"
+            },
+            "ValidateProducerPasswordResetRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "token": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9]+$",
+                        "minLength": 64,
+                        "maxLength": 64
+                    }
+                },
+                "required": [
+                    "email",
+                    "token"
+                ],
+                "title": "ValidateProducerPasswordResetRequest"
             },
             "VerifyBuyerRegistrationOtpRequest": {
                 "type": "object",

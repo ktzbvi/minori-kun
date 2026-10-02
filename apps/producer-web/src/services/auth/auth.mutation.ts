@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import type { CurrentSession } from '@/types/auth'
+import type { CurrentSession, ProducerLoginCredentials } from '@/types/auth'
 import api from '../api'
 import { producerAuthKeys } from './auth.key'
-
-export type ProducerLoginCredentials = { email: string; password: string }
 
 export function useProducerLoginMutation() {
   const queryClient = useQueryClient()

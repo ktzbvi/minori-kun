@@ -54,7 +54,7 @@
 - Use server-side role and object-ownership authorization for every protected endpoint; hiding UI controls is not authorization.
 - Wrap multi-record financial and inventory changes in database transactions.
 - Process provider callbacks, payments, refunds, screening, payouts, and repeated commands idempotently.
-- Dispatch asynchronous side effects only after the authoritative transaction commits.
+- Dispatch asynchronous side effects only after the authoritative transaction commits. This rule does not require every email or side effect to use a queue. Follow the feature's documented delivery behavior; when introducing a queue, document its worker requirement and operational impact. Producer password reset and Producer registration send synchronously after commit. Password reset must retain a neutral request response even when mail delivery fails; log only a safe failure event and allow the user to request a new link.
 - Keep order, payment, refund, fulfillment, screening, and payout states separate and validate every state transition.
 - Version public application endpoints under `/api/v1`; webhook routes use their own authenticated/verified boundary.
 
@@ -63,13 +63,13 @@
 - Use Vue 3, TypeScript, Vite, Vue Router, Pinia, Tailwind CSS, and shadcn-vue unless the user explicitly changes the approved stack.
 - Use shadcn-vue source components as owned, customizable primitives; do not use React shadcn/ui packages in Vue applications.
 - Build application screens with shared shadcn-vue primitives and Tailwind utility classes. Do not add page-level custom CSS, scoped style blocks, or replacement raw HTML form controls when a shared primitive exists. Keep global CSS limited to framework imports, base rules, and design tokens.
-- Define form validation with Zod schemas and show accessible field-level errors through shared form primitives. Preserve the exact password value; do not trim it or apply registration password-composition rules to login.
+- Define form validation with Zod schemas and show accessible field-level errors through shared form primitives. Keep a schema used by one page inside that page, matching the existing Producer page pattern. Extract schemas only when implemented consumers require reuse; keep reused schemas within their feature, not in the generic `src/lib` folder. Keep page-specific timers and lifecycle behavior inside the page rather than introducing generic helpers for a single consumer. Preserve the exact password value; do not trim it or apply registration password-composition rules to login.
 - Prefer Lucide icons from `lucide-vue-next`, as used by shadcn-vue, for interface icons. Reuse an existing Lucide icon whenever suitable instead of drawing custom SVG icons, using emoji or text glyphs as icons, or adding another icon library. Keep icon sizes and stroke widths consistent; hide decorative icons from assistive technology and give icon-only controls accessible names. Brand logos and decorative illustrations are separate from interface icons.
 - Import shared primitives and tokens from `packages/ui`; do not place business workflows or role-specific page components there.
 - Each frontend owns one `src/services/api.ts` for its Axios instance, base URL, cookie/CSRF configuration, and interceptors only. It must not contain feature endpoint functions or error-display helpers.
 - Put endpoint calls directly in feature `services/<feature>/<feature>.query.ts` and `<feature>.mutation.ts` files. Keep cache keys in `<feature>.key.ts`. Do not add `<feature>.api.ts` wrappers or centralize endpoint functions in `services/api.ts`. Create only files needed by implemented behavior.
 - Import generated types from `@minorikun/api-contracts`; keep app-specific type aliases in `src/types` and error helpers in `src/lib`. Pages and components consume query/mutation services without raw endpoint calls. Preserve Sanctum cookie/CSRF authentication.
-- The current service migration covers Producer only. Buyer/Admin migration is explicitly deferred; do not expand into those applications without a user request. Their legacy shared-client references must be migrated before workspace installation or their builds can succeed.
+- Keep the current implementation scope in Producer unless the user requests Buyer/Admin changes. Buyer now has its own Axios client and uses `@minorikun/api-contracts`; this does not establish that every Buyer feature follows the final service layout. Admin still references the removed `@minorikun/api-client` package and requires migration before workspace installation or its build can succeed. Do not expand a Producer task to repair Admin.
 - Buyer UI is mobile-first. Producer and Admin portals are desktop-oriented and must remain usable at the supported viewport sizes.
 - Implement loading, empty, validation, error, retry, disabled, and unavailable states required by the relevant screen specification.
 - Communicate status with text or icon plus text, never color alone.
@@ -91,7 +91,7 @@
 - Before implementing a screen or behavior, read its `FR-*`, `SCR-*`, detailed screen requirements, related `BR-*`/`DATA-*`/`INT-*`/`SEC-*`, and acceptance test IDs.
 - Use short-lived feature branches and keep changes scoped to one coherent requirement group.
 - Backend changes require focused unit/feature tests, including authorization and invalid-state cases.
-- Frontend changes require type checking and focused component/store tests; critical cross-application flows require browser-level tests when the test harness exists.
+- Frontend changes require the affected application's type checking and build, plus focused lint and manual verification where applicable. Do not create frontend automated test files, test scripts, or a new test harness unless the user explicitly requests them. Existing frontend checks may be run when available. Backend automated tests remain required.
 - Payment and financial changes must test duplicate, replayed, delayed, mismatched, out-of-order, and partially failed behavior.
 - Never use real credentials, card data, bank data, or unnecessary personal information in source, fixtures, logs, screenshots, or tests.
 - Run the smallest relevant checks during iteration and the affected application test/build suite before handoff.

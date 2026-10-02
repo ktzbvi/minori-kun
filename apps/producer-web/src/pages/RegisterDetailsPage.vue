@@ -65,14 +65,8 @@ const passwordSchema = z.string().superRefine((value, context) => {
   const hasUpper = /[A-Z]/.test(value)
   const hasLower = /[a-z]/.test(value)
   const hasDigit = /[0-9]/.test(value)
-  const hasAsciiPunctuation = Array.from(value).some((character) => {
-    const codePoint = character.codePointAt(0) ?? 0
-    return (codePoint >= 33 && codePoint <= 47)
-      || (codePoint >= 58 && codePoint <= 64)
-      || (codePoint >= 91 && codePoint <= 96)
-      || (codePoint >= 123 && codePoint <= 126)
-  })
-  if (!hasUpper || !hasLower || !hasDigit || !hasAsciiPunctuation) {
+  const hasSpecial = /[^\p{L}\p{N}\s]/u.test(value)
+  if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
     context.addIssue({ code: z.ZodIssueCode.custom, message: '大文字・小文字・数字・記号をそれぞれ1文字以上含めてください。' })
   }
 })
