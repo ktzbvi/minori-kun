@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\ProducerOperationalState;
-use App\Enums\ProductPublicationState;
 use App\Enums\ScreeningState;
 use App\Models\BuyerAddress;
 use App\Models\BuyerProfile;
@@ -11,13 +10,9 @@ use App\Models\Category;
 use App\Models\PayjpScreening;
 use App\Models\PayjpTenant;
 use App\Models\ProducerProfile;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class DatabaseSeeder extends Seeder
@@ -81,43 +76,8 @@ class DatabaseSeeder extends Seeder
                 );
             }
 
-            $single = Product::query()->updateOrCreate(
-                ['producer_id' => $producer->id, 'name' => '高崎トマト'],
-                [
-                    'category_id' => $categories['野菜']->id, 'description' => 'ローカル開発用の商品データです。',
-                    'publication_state' => ProductPublicationState::Published, 'moderation_state' => 'clear',
-                ],
-            );
-            ProductVariant::query()->updateOrCreate(
-                ['product_id' => $single->id, 'option_label' => '通常商品'],
-                ['is_default' => true, 'price_yen' => 1200, 'stock_quantity' => 30, 'discount_bps' => 0, 'display_order' => 0],
-            );
-
-            $typed = Product::query()->updateOrCreate(
-                ['producer_id' => $producer->id, 'name' => '季節の野菜セット'],
-                [
-                    'category_id' => $categories['野菜']->id, 'description' => '種類ごとの価格・在庫・割引確認用データです。',
-                    'type_name' => 'セット', 'publication_state' => ProductPublicationState::Published, 'moderation_state' => 'clear',
-                ],
-            );
-            ProductVariant::query()->updateOrCreate(
-                ['product_id' => $typed->id, 'option_label' => '通常セット'],
-                ['is_default' => false, 'price_yen' => 2980, 'stock_quantity' => 20, 'discount_bps' => 1000, 'display_order' => 0],
-            );
-            ProductVariant::query()->updateOrCreate(
-                ['product_id' => $typed->id, 'option_label' => '大容量セット'],
-                ['is_default' => false, 'price_yen' => 4500, 'stock_quantity' => 8, 'discount_bps' => 500, 'display_order' => 1],
-            );
-
-            $fixture = (string) file_get_contents(database_path('fixtures/vegetable-set.svg'));
-            Storage::disk('public')->put('demo/vegetable-set.svg', $fixture);
-            ProductImage::query()->updateOrCreate(
-                ['object_path' => 'demo/vegetable-set.svg'],
-                [
-                    'product_id' => $typed->id, 'disk' => 'public', 'mime_type' => 'image/svg+xml',
-                    'size_bytes' => strlen($fixture), 'display_order' => 0,
-                ],
-            );
         });
+
+        $this->call(ProductSampleSeeder::class);
     }
 }
