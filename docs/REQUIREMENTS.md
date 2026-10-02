@@ -935,6 +935,8 @@ These decisions supersede conflicting Producer-specific numeric-policy and deliv
 - **Actor:** Producer Applicant / Producer
 - **Purpose:** Recover Producer access without revealing account state.
 - **Main entry:** Producer Login (P01) / reset email link
+- **User-confirmed implementation refinement (2026-10-02; FR-P-015, AT-P-015):** Email submission opens a neutral sent state. The emailed link opens the Producer new-password page; successful reset displays success for five seconds before automatically opening P01, with an immediate Login action. Match the existing Producer authentication design. Use configurable 30-minute expiry and six requests per minute as accepted implementation defaults, not management-confirmed business policy. Invalidate existing Producer sessions on completion. Reset email delivery is queued on the database connection only after commit; run the Laravel queue worker to deliver emails. Encrypt queued reset credentials and retry transport failures independently of the neutral HTTP response. Frontend automated test files are omitted at the user's explicit request; retain backend tests and Producer type checking/build verification.
+
 - **Summary:** Producer Password Reset combines the reset request and valid-token password entry in one specification using neutral responses, rate limits, and an expiring one-use token.
 
 | Element ID | Element (EN / JP) | Display or input | Japanese display/input | User action | Processing / destination |

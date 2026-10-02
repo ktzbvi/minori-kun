@@ -211,12 +211,12 @@ function submit() {
             </UiFormMessage>
           </div>
           <div class="flex justify-end min-[761px]:justify-start">
-            <a
-              href="/password-reset"
+            <RouterLink
+              to="/password-reset"
               class="text-sm font-medium text-[#368357] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               パスワードをお忘れですか？
-            </a>
+            </RouterLink>
           </div>
           <UiButton
             type="submit"
