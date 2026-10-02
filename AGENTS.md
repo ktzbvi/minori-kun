@@ -54,7 +54,7 @@
 - Use server-side role and object-ownership authorization for every protected endpoint; hiding UI controls is not authorization.
 - Wrap multi-record financial and inventory changes in database transactions.
 - Process provider callbacks, payments, refunds, screening, payouts, and repeated commands idempotently.
-- Dispatch asynchronous side effects only after the authoritative transaction commits. This rule does not require every email or side effect to use a queue. Follow the feature's documented delivery behavior; when introducing a queue, document its worker requirement and operational impact. Producer password reset currently uses the database queue; Producer registration sends synchronously after commit.
+- Dispatch asynchronous side effects only after the authoritative transaction commits. This rule does not require every email or side effect to use a queue. Follow the feature's documented delivery behavior; when introducing a queue, document its worker requirement and operational impact. Producer password reset and Producer registration send synchronously after commit. Password reset must retain a neutral request response even when mail delivery fails; log only a safe failure event and allow the user to request a new link.
 - Keep order, payment, refund, fulfillment, screening, and payout states separate and validate every state transition.
 - Version public application endpoints under `/api/v1`; webhook routes use their own authenticated/verified boundary.
 

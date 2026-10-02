@@ -10,8 +10,10 @@ use App\Models\PasswordResetToken;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ProducerPasswordResetService
 {
@@ -38,7 +40,14 @@ class ProducerPasswordResetService
             $url = rtrim(config('producer-password-reset.web_url'), '/').'/password-reset/confirm#'.http_build_query([
                 'email' => $producer->email, 'token' => $token,
             ]);
-            DB::afterCommit(fn () => Mail::to($producer->email)->queue(new ProducerPasswordResetMail($url)));
+            DB::afterCommit(function () use ($producer, $url): void {
+                try {
+                    Mail::to($producer->email)->send(new ProducerPasswordResetMail($url));
+                } catch (Throwable) {
+                    // Keep the response neutral; never log email, link, or transport exception data.
+                    Log::warning('Producer password reset email delivery failed.');
+                }
+            });
         });
     }
 

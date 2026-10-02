@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 
 // FR-P-015, P15-01/02/03, SEC-009, AT-P-015.
@@ -47,7 +46,7 @@ it('returns identical neutral responses without exposing role or account state',
         expect($response)->toBe($responses[0]);
     }
     expect(PasswordResetToken::count())->toBe(1);
-    Mail::assertQueued(ProducerPasswordResetMail::class, function ($mail) use ($producer): bool {
+    Mail::assertSent(ProducerPasswordResetMail::class, function ($mail) use ($producer): bool {
         parse_str(parse_url($mail->resetUrl, PHP_URL_FRAGMENT), $fragment);
 
         return $mail->hasTo($producer->email)
@@ -154,7 +153,7 @@ it('requires CSRF even without an Origin header', function (): void {
     $this->postJson('/api/v1/producer/password-reset/start', ['email' => 'unknown@example.test'])->assertStatus(419);
 });
 
-it('keeps mail transport failure outside the neutral request and encrypts queued credentials', function (): void {
+it('sends synchronously and preserves the neutral response when delivery fails', function (): void {
     $producer = User::factory()->producer()->create();
     $sendAttempts = 0;
     Event::listen(MessageSending::class, function () use (&$sendAttempts): void {
@@ -164,13 +163,8 @@ it('keeps mail transport failure outside the neutral request and encrypts queued
     $known = $this->postJson('/api/v1/producer/password-reset/start', ['email' => $producer->email])->assertAccepted()->json();
     $unknown = $this->postJson('/api/v1/producer/password-reset/start', ['email' => 'unknown@example.test'])->assertAccepted()->json();
     expect($known)->toBe($unknown);
-    expect($sendAttempts)->toBe(0);
-    $payload = DB::table('jobs')->sole()->payload;
-    expect($payload)->not->toContain($producer->email)->not->toContain('/password-reset/confirm');
-    $job = Queue::connection('database')->pop();
-    expect(fn () => $job->fire())->toThrow(RuntimeException::class, 'Synthetic mail transport failure');
     expect($sendAttempts)->toBe(1);
-    $job->delete();
+    expect(DB::table('jobs')->count())->toBe(0);
 });
 
 it('applies the same confirmed password policy to registration and reset', function (string $password, bool $valid): void {
