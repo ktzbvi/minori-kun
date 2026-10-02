@@ -4,6 +4,7 @@ import HomePage from '@/pages/HomePage.vue'
 import CategoryPage from '@/pages/CategoryPage.vue'
 import CategoryProductListPage from '@/pages/CategoryProductListPage.vue'
 import CartPage from '@/pages/CartPage.vue'
+import CheckoutAddressPage from '@/pages/CheckoutAddressPage.vue'
 import ContactCompletePage from '@/pages/ContactCompletePage.vue'
 import ContactPage from '@/pages/ContactPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
@@ -13,6 +14,10 @@ import PasswordChangePage from '@/pages/PasswordChangePage.vue'
 import PasswordResetConfirmPage from '@/pages/PasswordResetConfirmPage.vue'
 import PasswordResetPage from '@/pages/PasswordResetPage.vue'
 import OrderConfirmationPage from '@/pages/OrderConfirmationPage.vue'
+import BuyerPaymentPage from '@/pages/BuyerPaymentPage.vue'
+import BuyerOrderCompletePage from '@/pages/BuyerOrderCompletePage.vue'
+import OrderHistoryPage from '@/pages/OrderHistoryPage.vue'
+import OrderDetailPage from '@/pages/OrderDetailPage.vue'
 import ProductDetailPage from '@/pages/ProductDetailPage.vue'
 import RegisterEmailPage from '@/pages/RegisterEmailPage.vue'
 import RegisterOtpPage from '@/pages/RegisterOtpPage.vue'
@@ -24,6 +29,8 @@ export const router = createRouter({
   routes: [
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
     { path: '/my-page', name: 'my-page', component: MyPage },
+    { path: '/my-page/orders', name: 'order-history', component: OrderHistoryPage },
+    { path: '/my-page/orders/:orderId', name: 'order-detail', component: OrderDetailPage },
     {
       path: '/my-page/contact',
       name: 'contact',
@@ -76,7 +83,17 @@ export const router = createRouter({
       path: '/order-confirmation',
       name: 'order-confirmation',
       component: OrderConfirmationPage,
-      meta: { public: true },
+    },
+    { path: '/payment', name: 'buyer-payment', component: BuyerPaymentPage },
+    {
+      path: '/orders/:orderId/complete',
+      name: 'order-complete',
+      component: BuyerOrderCompletePage,
+    },
+    {
+      path: '/order-confirmation/delivery-address',
+      name: 'checkout-address',
+      component: CheckoutAddressPage,
     },
     {
       path: '/categories/:categoryId',
