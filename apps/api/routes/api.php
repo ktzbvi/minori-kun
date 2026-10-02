@@ -2,7 +2,10 @@
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Api\BuyerAccountController;
+use App\Http\Controllers\Api\BuyerCartController;
+use App\Http\Controllers\Api\BuyerCatalogController;
 use App\Http\Controllers\Api\BuyerInquiryController;
+use App\Http\Controllers\Api\BuyerOrderController;
 use App\Http\Controllers\Api\BuyerPasswordResetController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
@@ -38,6 +41,8 @@ Route::prefix('api/v1')->group(function (): void {
         Route::get('/account/email-verifications/{token}', [BuyerAccountController::class, 'verifyEmailChange'])
             ->where('token', '[A-Za-z0-9]+');
 
+        Route::get('/products', [BuyerCatalogController::class, 'index']);
+
         Route::middleware(['auth:sanctum', 'portal.role:buyer'])->group(function (): void {
             Route::prefix('account')->group(function (): void {
                 Route::get('/profile', [BuyerAccountController::class, 'show']);
@@ -46,6 +51,19 @@ Route::prefix('api/v1')->group(function (): void {
             });
 
             Route::post('/inquiries', [BuyerInquiryController::class, 'store']);
+
+            Route::get('/payment-mode', [BuyerOrderController::class, 'paymentMode']);
+
+            Route::post('/orders/checkout', [BuyerOrderController::class, 'checkout']);
+            Route::get('/orders', [BuyerOrderController::class, 'index']);
+            Route::get('/orders/{order}', [BuyerOrderController::class, 'show'])->whereUlid('order');
+            Route::get('/orders/{order}/receipt', [BuyerOrderController::class, 'receipt'])->whereUlid('order');
+            Route::post('/orders/{order}/cancel', [BuyerOrderController::class, 'cancel'])->whereUlid('order');
+
+            Route::get('/cart', [BuyerCartController::class, 'index']);
+            Route::post('/cart/items', [BuyerCartController::class, 'store']);
+            Route::patch('/cart/items/{item}', [BuyerCartController::class, 'update'])->whereUlid('item');
+            Route::delete('/cart/items/{item}', [BuyerCartController::class, 'destroy'])->whereUlid('item');
         });
     });
 
