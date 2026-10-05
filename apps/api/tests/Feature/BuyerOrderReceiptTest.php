@@ -75,8 +75,10 @@ it('makes an order complete at its cancellation deadline and serves its receipt'
     $response = $this->actingAs($buyer)->get("/api/v1/buyer/orders/{$order->id}/receipt");
     $response->assertOk()
         ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('Content-Disposition', 'attachment; filename="receipt-'.$order->order_number.'.pdf"')
         ->assertHeader('Cache-Control', 'no-store, private');
-    expect(substr($response->getContent(), 0, 5))->toBe('%PDF-');
+    expect(substr($response->getContent(), 0, 5))->toBe('%PDF-')
+        ->and(strlen($response->getContent()))->toBeGreaterThan(1000);
 
     $this->actingAs($buyer)->getJson("/api/v1/buyer/orders/{$order->id}")
         ->assertOk()

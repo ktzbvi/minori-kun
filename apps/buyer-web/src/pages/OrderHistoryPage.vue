@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Search, ShoppingCart } from 'lucide-vue-next'
 import BuyerPageShell from '@/components/BuyerPageShell.vue'
 import { useBuyerOrdersQuery } from '@/services/orders/orders.query'
+import { orderStatusLabel, paymentStatusLabel, refundStatusLabel } from '@/services/orders/orders.status'
 
 const router = useRouter()
 const filters = reactive({
@@ -23,6 +24,12 @@ function applyFilters() {
     return
   Object.assign(applied, filters)
 }
+function openSearch() {
+  void router.push({ name: 'search' })
+}
+function openCart() {
+  void router.push({ name: 'cart' })
+}
 
 function yen(value: number) {
   return `${value.toLocaleString('ja-JP')}円`
@@ -30,31 +37,42 @@ function yen(value: number) {
 function date(value: string) {
   return new Date(value).toLocaleString('ja-JP', { dateStyle: 'medium' })
 }
-function paymentLabel(value: string) {
-  return value === 'succeeded'
-    ? '完了'
-    : value === 'refunded'
-      ? '返金済み'
-      : value === 'failed'
-        ? '失敗'
-        : '処理中'
-}
 </script>
 
 <template>
   <BuyerPageShell active="profile">
     <header
-      class="flex h-[60px] shrink-0 items-center gap-2 border-b border-[#e3e9e3] bg-white px-3"
+      class="flex h-[60px] shrink-0 items-center justify-between border-b border-[#e3e9e3] bg-white px-3"
     >
-      <button
-        class="grid size-9 place-items-center border-0 bg-transparent text-[#237d4a]"
-        type="button"
-        aria-label="戻る"
-        @click="router.push({ name: 'my-page' })"
-      >
-        <ChevronLeft :size="22" />
-      </button>
-      <h1 class="m-0 text-base font-bold text-[#237d4a]">注文履歴</h1>
+      <div class="flex items-center gap-2">
+        <button
+          class="grid size-9 place-items-center border-0 bg-transparent text-[#237d4a]"
+          type="button"
+          aria-label="戻る"
+          @click="router.push({ name: 'my-page' })"
+        >
+          <ChevronLeft :size="22" />
+        </button>
+        <h1 class="m-0 text-base font-bold text-[#237d4a]">注文履歴</h1>
+      </div>
+      <div class="flex gap-2">
+        <button
+          class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
+          type="button"
+          aria-label="検索"
+          @click="openSearch"
+        >
+          <Search :size="21" />
+        </button>
+        <button
+          class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
+          type="button"
+          aria-label="カート"
+          @click="openCart"
+        >
+          <ShoppingCart :size="21" />
+        </button>
+      </div>
     </header>
     <section class="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 pb-[78px]">
       <form class="flex gap-2" @submit.prevent="applyFilters">
@@ -158,12 +176,18 @@ function paymentLabel(value: string) {
           class="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#e5ebe5] pt-2 text-xs"
         >
           <strong>合計 {{ yen(order.total_yen) }}</strong>
-          <span class="flex gap-1">
+          <span class="flex flex-wrap justify-end gap-1">
             <span class="rounded bg-[#edf3f8] px-2 py-1 text-[10px]">
-              注文：{{ order.order_state }}
+              注文：{{ orderStatusLabel(order.order_state) }}
             </span>
             <span class="rounded bg-[#e9f5ee] px-2 py-1 text-[10px]">
-              決済：{{ paymentLabel(order.payment_state) }}
+              支払：{{ paymentStatusLabel(order.payment_state) }}
+            </span>
+            <span
+              v-if="refundStatusLabel(order.refund_state)"
+              class="rounded bg-[#fff4e5] px-2 py-1 text-[10px]"
+            >
+              返金：{{ refundStatusLabel(order.refund_state) }}
             </span>
           </span>
         </span>

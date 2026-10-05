@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('producer-registration:cleanup')->hourly()->withoutOverlapping();
+Schedule::command('buyer:dispatch-refund-email-outbox')->everyMinute()->withoutOverlapping();
 Schedule::call(fn () => DB::table('orders')
     ->where('order_state', '注文確定')
     ->where('payment_state', 'succeeded')

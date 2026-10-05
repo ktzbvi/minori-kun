@@ -46,7 +46,7 @@
 </table>
 <br>
 <div class="section-title">ご注文内容</div>
-<table cellpadding="6" border="0" width="100%">
+<table cellpadding="5" cellspacing="0" border="1" bordercolor="#dce5dc" width="100%">
     <thead>
     <tr class="header-cell">
         <th width="52%">商品</th>
@@ -68,22 +68,22 @@
 </table>
 <table cellpadding="4" width="100%">
     <tr>
-        <td width="60%"></td>
-        <td width="22%">商品小計（税込）</td>
+        <td width="50%"></td>
+        <td width="32%">商品小計（税込・送料込み）</td>
         <td width="18%" class="right">{{ number_format($order->subtotal_yen) }}円</td>
     </tr>
     @if ($order->discount_yen > 0)
         <tr>
-            <td></td><td>商品割引</td><td class="right">-{{ number_format($order->discount_yen) }}円</td>
+            <td width="50%"></td><td width="32%">商品割引</td><td width="18%" class="right">-{{ number_format($order->discount_yen) }}円</td>
         </tr>
     @endif
     @if ($order->shipping_yen > 0)
         <tr>
-            <td></td><td>送料</td><td class="right">{{ number_format($order->shipping_yen) }}円</td>
+            <td width="50%"></td><td width="32%">送料</td><td width="18%" class="right">{{ number_format($order->shipping_yen) }}円</td>
         </tr>
     @endif
     <tr class="total">
-        <td></td><td>領収金額（税込・送料込み）</td><td class="right">{{ number_format($order->total_yen) }}円</td>
+        <td width="50%"></td><td width="32%">領収金額（税込・送料込み）</td><td width="18%" class="right">{{ number_format($order->total_yen) }}円</td>
     </tr>
 </table>
 <br>

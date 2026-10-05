@@ -12,6 +12,7 @@ export function useBuyerOrdersQuery(filters: MaybeRefOrGetter<Record<string, str
     queryKey: computed(() => buyerOrderKeys.list(toValue(filters))),
     queryFn: () => getBuyerOrders(toValue(filters)),
     refetchInterval: (query) =>
+      (query.state.data?.some((order) => ['pending', 'requires_action'].includes(order.refund_state)) ?? false) ||
       query.state.data?.some(
         (order) =>
           order.order_state === '注文確定'
@@ -27,6 +28,10 @@ export function useBuyerOrderQuery(id: MaybeRefOrGetter<string>) {
     queryKey: computed(() => buyerOrderKeys.detail(toValue(id))),
     queryFn: () => getBuyerOrder(toValue(id)),
     enabled: computed(() => Boolean(toValue(id))),
-    refetchInterval: (query) => (query.state.data?.can_cancel ? 15_000 : false),
+    refetchInterval: (query) =>
+      query.state.data?.can_cancel ||
+      ['pending', 'requires_action'].includes(query.state.data?.refund_state ?? '')
+        ? 15_000
+        : false,
   })
 }

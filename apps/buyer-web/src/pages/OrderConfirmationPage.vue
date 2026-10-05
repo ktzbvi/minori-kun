@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { ChevronLeft, Pencil } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
@@ -54,6 +54,20 @@ const selectedProducerGroup = computed(() => {
     producerGroups.value[0]
   )
 })
+
+watch(
+  () => ({
+    data: cartQuery.data.value,
+    isFetching: cartQuery.isFetching.value,
+    isSuccess: cartQuery.isSuccess.value,
+  }),
+  ({ data, isFetching, isSuccess }) => {
+    if (!isSuccess || isFetching || !data || selectedProducerGroup.value) return
+
+    void router.replace({ name: data.items.length ? 'cart' : 'order-history' })
+  },
+  { immediate: true },
+)
 
 const total = computed(() =>
   selectedProducerGroup.value ? shopTotal(selectedProducerGroup.value.items) : 0,

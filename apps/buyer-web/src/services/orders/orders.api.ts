@@ -106,3 +106,15 @@ export async function cancelBuyerOrder(id: string, idempotencyKey: string) {
     })
   ).data.data
 }
+
+export async function createBuyerProducerInquiry(
+  id: string,
+  values: { topic: string; message: string; idempotency_key: string },
+) {
+  return (
+    await api.post<{ data: { reference_number: string } }>(
+      `/api/v1/buyer/orders/${id}/producer-inquiries`,
+      values,
+    )
+  ).data.data
+}
