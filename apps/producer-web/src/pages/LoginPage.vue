@@ -50,7 +50,7 @@ function submit() {
       class="hidden items-center bg-[#123729] px-[clamp(40px,3.8vw,64px)] py-10 text-[#eaf0dd] min-[761px]:flex"
     >
       <div class="w-full max-w-[700px]">
-        <p class="mb-3 text-[28px] font-extrabold tracking-[.04em] italic">
+        <p class="mb-3 text-[28px] font-extrabold tracking-[.04em] italic max-[760px]:text-2xl">
           みのりくん
         </p>
         <h2 class="mb-3 text-lg font-semibold text-[#a8c2ae]">
@@ -63,7 +63,7 @@ function submit() {
     </aside>
 
     <section
-      class="relative isolate grid min-h-svh min-w-0 place-items-center overflow-hidden bg-linear-[145deg,#e5f3ed_0%,#f4f8ef_68%,#f4f7ec_100%] px-4 pt-7 pb-[175px] min-[761px]:bg-[#f2f6f3] min-[761px]:bg-none min-[761px]:px-[clamp(32px,4vw,64px)] min-[761px]:py-10"
+      class="relative isolate grid min-h-svh min-w-0 place-items-center overflow-hidden bg-linear-[145deg,#e5f3ed_0%,#f4f8ef_68%,#f4f7ec_100%] px-4 pt-7 pb-10 min-[761px]:bg-[#f2f6f3] min-[761px]:bg-none min-[761px]:px-[clamp(32px,4vw,64px)] min-[761px]:py-10"
     >
       <div
         class="absolute right-[12%] bottom-[14%] -z-10 size-[120px] rounded-full bg-[#eee6b7] opacity-50 min-[761px]:hidden"
@@ -100,18 +100,18 @@ function submit() {
         </g>
       </svg>
       <UiCard
-        class="w-full max-w-[724px] rounded-[30px] border-0 bg-white px-6 pt-[34px] pb-8 shadow-[0_25px_60px_rgb(33_75_54/11%)] max-[360px]:px-4.5 min-[761px]:max-w-[496px] min-[761px]:-translate-y-[4vh] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none"
+        class="w-full max-w-[724px] rounded-[30px] border-0 bg-white px-6 pt-[34px] pb-8 shadow-[0_25px_60px_rgb(33_75_54/11%)] max-[360px]:px-4.5 min-[761px]:max-w-[496px] min-[761px]:-translate-y-[4vh] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none max-[760px]:rounded-2xl max-[760px]:px-5 max-[760px]:pt-6 max-[760px]:pb-6"
       >
         <header class="flex items-center gap-3.5 min-[761px]:hidden">
           <span
-            class="grid size-[62px] shrink-0 place-items-center rounded-full bg-[#e8f4ed] text-white"
+            class="grid size-[62px] shrink-0 place-items-center rounded-full bg-[#e8f4ed] text-white max-[760px]:size-12"
             aria-hidden="true"
           >
-            <Leaf class="size-[42px] rounded-full bg-[#20794d] p-[7px]" :stroke-width="2.2" />
+            <Leaf class="size-[42px] rounded-full bg-[#20794d] p-[7px] max-[760px]:size-8" :stroke-width="2.2" />
           </span>
-          <span class="text-[29px] font-extrabold tracking-[.08em] text-[#20794d]">みのりくん</span>
+          <span class="text-[29px] font-extrabold tracking-[.08em] text-[#20794d] max-[760px]:text-2xl">みのりくん</span>
         </header>
-        <section class="mt-7 min-[761px]:mt-0 min-[761px]:mb-5">
+        <section class="mt-7 min-[761px]:mt-0 min-[761px]:mb-5 max-[760px]:mt-5">
           <h1
             class="text-[22px] leading-[1.4] font-bold text-[#183c2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]"
           >
@@ -156,7 +156,7 @@ function submit() {
                 inputmode="email"
                 placeholder="メールアドレスを入力"
                 required
-                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-4 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:px-4 min-[761px]:text-base"
+                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-4 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:px-4 min-[761px]:text-base max-[760px]:h-12"
                 :disabled="isLoggingIn"
                 :aria-invalid="Boolean(errors.email)"
                 :aria-describedby="errors.email ? 'producer-email-error' : undefined"
@@ -186,7 +186,7 @@ function submit() {
                 autocomplete="current-password"
                 placeholder="パスワードを入力"
                 required
-                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-14 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:pr-11 min-[761px]:pl-4 min-[761px]:text-base"
+                class="h-[58px] rounded-2xl border-[1.5px] border-[#cbded2] pr-14 pl-12 text-base min-[761px]:h-12 min-[761px]:rounded-lg min-[761px]:border-[#d5e2da] min-[761px]:pr-11 min-[761px]:pl-4 min-[761px]:text-base max-[760px]:h-12"
                 :disabled="isLoggingIn"
                 :aria-invalid="Boolean(errors.password)"
                 :aria-describedby="errors.password ? 'producer-password-error' : undefined"
@@ -221,7 +221,7 @@ function submit() {
           <UiButton
             type="submit"
             :disabled="isLoggingIn"
-            class="mt-0.5 min-h-[62px] w-full rounded-2xl border-0 bg-linear-to-r from-[#2b9257] to-[#17643e] text-lg shadow-[0_12px_22px_rgb(29_98_59/22%)] min-[761px]:min-h-12 min-[761px]:rounded-lg min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none"
+            class="mt-0.5 min-h-[62px] w-full rounded-2xl border-0 bg-linear-to-r from-[#2b9257] to-[#17643e] text-lg shadow-[0_12px_22px_rgb(29_98_59/22%)] min-[761px]:min-h-12 min-[761px]:rounded-lg min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12"
           >
             {{ isLoggingIn ? 'ログイン中…' : 'ログインする' }}
           </UiButton>

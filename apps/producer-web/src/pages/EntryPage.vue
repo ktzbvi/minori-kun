@@ -31,7 +31,7 @@ async function routeToRegistrationState() {
     return await router.replace({ name: 'login' })
   }
 
-  return await router.replace({ name: 'register' })
+  return await router.replace({ name: 'login' })
 }
 
 onMounted(async () => {

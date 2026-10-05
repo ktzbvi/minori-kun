@@ -91,12 +91,12 @@ async function submit() {
 <template>
   <RegistrationShell>
     <div class="w-full max-w-[724px] min-[761px]:max-w-[496px]">
-      <RegistrationProgress :current-step="1" class="mb-10 px-1 min-[761px]:mb-4 min-[761px]:px-0" />
+      <RegistrationProgress :current-step="1" class="mb-10 px-1 min-[761px]:mb-4 min-[761px]:px-0 max-[760px]:mb-5" />
 
-      <div class="rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none">
+      <div class="rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none max-[760px]:rounded-2xl max-[760px]:px-5 max-[760px]:py-6">
         <RegistrationBrand />
 
-        <header class="mt-8 min-[761px]:mt-0">
+        <header class="mt-8 min-[761px]:mt-0 max-[760px]:mt-5">
           <h1 class="text-[24px] leading-tight font-bold text-[#173b2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]">生産者登録</h1>
           <p class="mt-2 text-[16px] leading-[1.7] text-[#687b70] min-[761px]:mt-2.5 min-[761px]:text-base min-[761px]:text-[#87968d]">
             <span class="min-[761px]:hidden">確認コードをメールでお送りします。</span>
@@ -111,10 +111,10 @@ async function submit() {
           {{ recoveryMessage }}
         </p>
 
-        <div v-if="statusQuery.isPending.value" class="mt-8 rounded-xl border border-[#cfdfd5] bg-white p-5 text-sm text-[#687b70]" role="status">
+        <div v-if="statusQuery.isPending.value" class="mt-8 rounded-xl border border-[#cfdfd5] bg-white p-5 text-sm text-[#687b70] max-[760px]:mt-5" role="status">
           登録状態を確認しています…
         </div>
-        <form v-else class="mt-10 grid gap-5 min-[761px]:mt-7" novalidate :aria-busy="isSubmitting" @submit.prevent="submit">
+        <form v-else class="mt-10 grid gap-5 min-[761px]:mt-7 max-[760px]:mt-6" novalidate :aria-busy="isSubmitting" @submit.prevent="submit">
           <div class="grid gap-2.5">
             <UiFormLabel for="registration-email" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
               メールアドレス
@@ -131,7 +131,7 @@ async function submit() {
                 autocomplete="email"
                 inputmode="email"
                 required
-                class="h-[58px] rounded-xl pr-4 pl-12 text-base shadow-none min-[761px]:h-12 min-[761px]:px-4 min-[761px]:text-base"
+                class="h-[58px] rounded-xl pr-4 pl-12 text-base shadow-none min-[761px]:h-12 min-[761px]:px-4 min-[761px]:text-base max-[760px]:h-12"
                 :disabled="isSubmitting"
                 :aria-invalid="Boolean(emailError)"
                 :aria-describedby="emailError ? 'registration-email-error' : currentEmailCoolingDown ? 'registration-cooldown' : undefined"
@@ -143,12 +143,12 @@ async function submit() {
           <p v-if="currentEmailCoolingDown" id="registration-cooldown" class="text-sm leading-relaxed text-[#614c22]" role="status">
             確認コードはあと {{ cooldownText }} 後に再送できます。
           </p>
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none" :disabled="isSubmitting || currentEmailCoolingDown">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isSubmitting || currentEmailCoolingDown">
             {{ isSubmitting ? '送信中…' : '確認コードを送信する' }}
           </UiButton>
         </form>
 
-        <p class="mt-7 text-center text-[15px] text-[#87968d] min-[761px]:mt-6 min-[761px]:text-left min-[761px]:text-sm">
+        <p class="mt-7 text-center text-[15px] text-[#87968d] min-[761px]:mt-6 min-[761px]:text-left min-[761px]:text-sm max-[760px]:mt-5">
           アカウントをお持ちですか？
           <RouterLink to="/login" class="ml-2 font-medium text-[#237f4b] underline underline-offset-4">ログイン</RouterLink>
         </p>

@@ -352,16 +352,16 @@ onBeforeUnmount(() => {
 <template>
   <RegistrationShell compact-mobile>
     <div class="w-full min-w-0 max-w-[724px] [overflow-wrap:anywhere] min-[761px]:max-w-[640px] min-[761px]:py-2">
-      <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-4 min-[761px]:px-0" />
+      <RegistrationProgress :current-step="3" class="mb-7 px-1 min-[761px]:mb-4 min-[761px]:px-0 max-[760px]:mb-5" />
 
-      <div class="w-full rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none">
+      <div class="w-full rounded-[28px] bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-none min-[761px]:bg-transparent min-[761px]:p-0 min-[761px]:shadow-none max-[760px]:rounded-2xl max-[760px]:px-5 max-[760px]:py-6">
         <RegistrationBrand />
-        <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-2xl">アカウントを作成</h1>
+        <h1 class="mt-8 text-[30px] font-bold text-[#1e2923] min-[761px]:mt-0 min-[761px]:text-2xl max-[760px]:mt-5 max-[760px]:text-2xl">アカウントを作成</h1>
 
         <p v-if="detailsQuery.isPending.value" class="mt-4 text-sm leading-relaxed text-[#687b70]" role="status">
           登録情報を確認しています…
         </p>
-        <div v-else-if="detailsQuery.isError.value" class="mt-7 rounded-xl border border-[#e4c9c3] bg-white p-5">
+        <div v-else-if="detailsQuery.isError.value" class="mt-7 rounded-xl border border-[#e4c9c3] bg-white p-5 max-[760px]:mt-5">
           <p class="text-sm leading-relaxed text-[#7b3329]" role="alert">{{ registrationActions.errorMessage(detailsQuery.error.value) }}</p>
           <div class="mt-4 flex flex-wrap gap-3">
             <UiButton variant="outline" :disabled="detailsQuery.isFetching.value" @click="retryDetails">{{ detailsQuery.isFetching.value ? '確認中…' : '再試行' }}</UiButton>
@@ -369,7 +369,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <form v-if="!detailsQuery.isError.value" class="mt-7 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4" novalidate :aria-busy="isSubmitting || photoBusy || detailsQuery.isPending.value" @submit.prevent="submit">
+        <form v-if="!detailsQuery.isError.value" class="mt-7 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4 max-[760px]:mt-5" novalidate :aria-busy="isSubmitting || photoBusy || detailsQuery.isPending.value" @submit.prevent="submit">
           <section class="grid gap-4" aria-labelledby="producer-information-title">
             <h2 id="producer-information-title" class="text-xl font-bold text-[#25332b]">生産者情報</h2>
 
@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
               </UiFormLabel>
               <button
                 type="button"
-                class="relative size-28 overflow-visible rounded-full text-[#718178] outline-none focus-visible:ring-3 focus-visible:ring-[#237f4b]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                class="relative size-28 overflow-visible rounded-full text-[#718178] outline-none focus-visible:ring-3 focus-visible:ring-[#237f4b]/20 disabled:cursor-not-allowed disabled:opacity-60 max-[760px]:size-24"
                 :aria-label="displayedPhotoUrl ? 'ショッププロフィール写真を変更' : 'ショッププロフィール写真を追加'"
                 :aria-describedby="photoError ? 'shop-photo-error' : undefined"
                 :disabled="photoBusy || isSubmitting || detailsQuery.isPending.value"
@@ -419,7 +419,7 @@ onBeforeUnmount(() => {
             <div class="grid gap-2">
               <UiFormLabel for="verified-email" class="text-[16px] font-medium text-[#687b70] min-[761px]:text-sm">メールアドレス</UiFormLabel>
               <div class="relative">
-                <UiInput id="verified-email" :model-value="verifiedEmail" class="h-14 pr-28 text-base shadow-none min-[761px]:h-12" readonly />
+                <UiInput id="verified-email" :model-value="verifiedEmail" class="h-14 pr-28 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" readonly />
                 <span class="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-1 text-sm font-semibold text-[#258451]">
                   <CircleCheck class="size-4" aria-hidden="true" /> 確認済み
                 </span>
@@ -430,7 +430,7 @@ onBeforeUnmount(() => {
               <UiFormLabel for="shop-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 ショップ名・農園名 <span class="ml-1 text-[#b74646]">*</span>
               </UiFormLabel>
-              <UiInput id="shop-name" v-model="shopName" required class="h-14 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.shopName)" :aria-describedby="errors.shopName ? 'shop-name-error' : undefined" />
+              <UiInput id="shop-name" v-model="shopName" required class="h-14 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.shopName)" :aria-describedby="errors.shopName ? 'shop-name-error' : undefined" />
               <UiFormMessage v-if="errors.shopName" id="shop-name-error" role="alert">{{ errors.shopName }}</UiFormMessage>
             </div>
 
@@ -439,14 +439,14 @@ onBeforeUnmount(() => {
                 <UiFormLabel for="contact-name" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                   担当者名 <span class="ml-1 text-[#b74646]">*</span>
                 </UiFormLabel>
-                <UiInput id="contact-name" v-model="contactName" required class="h-14 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.contactName)" :aria-describedby="errors.contactName ? 'contact-name-error' : undefined" />
+                <UiInput id="contact-name" v-model="contactName" required class="h-14 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.contactName)" :aria-describedby="errors.contactName ? 'contact-name-error' : undefined" />
                 <UiFormMessage v-if="errors.contactName" id="contact-name-error" role="alert">{{ errors.contactName }}</UiFormMessage>
               </div>
               <div class="grid gap-2">
                 <UiFormLabel for="phone" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                   電話番号 <span class="ml-1 text-[#b74646]">*</span>
                 </UiFormLabel>
-                <UiInput id="phone" v-model="phone" type="tel" autocomplete="tel" required class="h-14 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.phone)" :aria-describedby="errors.phone ? 'phone-error' : undefined" />
+                <UiInput id="phone" v-model="phone" type="tel" autocomplete="tel" required class="h-14 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.phone)" :aria-describedby="errors.phone ? 'phone-error' : undefined" />
                 <UiFormMessage v-if="errors.phone" id="phone-error" role="alert">{{ errors.phone }}</UiFormMessage>
               </div>
             </div>
@@ -463,7 +463,7 @@ onBeforeUnmount(() => {
                   パスワード <span class="ml-1 text-[#b74646]">*</span>
                 </UiFormLabel>
                 <div class="relative">
-                  <UiInput id="password" v-model="password" :type="passwordVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.password)" :aria-describedby="errors.password ? 'password-error' : undefined" />
+                  <UiInput id="password" v-model="password" :type="passwordVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.password)" :aria-describedby="errors.password ? 'password-error' : undefined" />
                   <UiButton tabIndex="-1" type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="passwordVisible ? 'パスワードを隠す' : 'パスワードを表示する'" :disabled="isSubmitting" @click="passwordVisible = !passwordVisible">
                     <EyeOff v-if="passwordVisible" class="size-5" aria-hidden="true" /><Eye v-else class="size-5" aria-hidden="true" />
                   </UiButton>
@@ -475,7 +475,7 @@ onBeforeUnmount(() => {
                   パスワード（確認） <span class="ml-1 text-[#b74646]">*</span>
                 </UiFormLabel>
                 <div class="relative">
-                  <UiInput id="password-confirmation" v-model="passwordConfirmation" :type="confirmationVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.passwordConfirmation)" :aria-describedby="errors.passwordConfirmation ? 'password-confirmation-error' : undefined" />
+                  <UiInput id="password-confirmation" v-model="passwordConfirmation" :type="confirmationVisible ? 'text' : 'password'" autocomplete="new-password" required class="h-14 pr-12 text-base shadow-none min-[761px]:h-12 max-[760px]:h-12" :disabled="isSubmitting" :aria-invalid="Boolean(errors.passwordConfirmation)" :aria-describedby="errors.passwordConfirmation ? 'password-confirmation-error' : undefined" />
                   <UiButton tabIndex="-1" type="button" variant="ghost" class="absolute top-1/2 right-1 min-h-9 -translate-y-1/2 border-0 p-2 text-[#718178]" :aria-label="confirmationVisible ? '確認用パスワードを隠す' : '確認用パスワードを表示する'" :disabled="isSubmitting" @click="confirmationVisible = !confirmationVisible">
                     <EyeOff v-if="confirmationVisible" class="size-5" aria-hidden="true" /><Eye v-else class="size-5" aria-hidden="true" />
                   </UiButton>
@@ -498,7 +498,7 @@ onBeforeUnmount(() => {
           </div>
 
           <p v-if="feedback" class="rounded-lg bg-[#fff8e8] px-4 py-3 text-sm leading-relaxed text-[#614c22]" role="alert">{{ feedback }}</p>
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isSubmitting || !canSubmit">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl text-[17px] min-[761px]:min-h-12 min-[761px]:text-base max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isSubmitting || !canSubmit">
             {{ isSubmitting ? '作成中…' : 'アカウントを作成する' }}
           </UiButton>
           <RouterLink to="/login" class="w-fit text-sm font-medium text-[#258451] underline underline-offset-4">ログイン</RouterLink>
