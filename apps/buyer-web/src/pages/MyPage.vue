@@ -39,10 +39,6 @@ function openCart() {
   void router.push({ name: 'cart' })
 }
 
-function showInPreparation() {
-  toast.warning('この画面は準備中です。')
-}
-
 async function confirmLogout() {
   loggingOut.value = true
 
@@ -105,10 +101,9 @@ async function confirmLogout() {
 
         <p class="mb-1 mt-4 text-[10px] text-[#718075]">&#27880;&#25991;&#38306;&#36899;</p>
         <div class="menu-group">
-          <button class="menu-row" type="button" @click="showInPreparation">
+          <button class="menu-row" type="button" @click="router.push({ name: 'order-history' })">
             <PackageOpen :size="15" />
             <span>&#27880;&#25991;&#23653;&#27508;</span>
-            <small>&#28310;&#20633;&#20013;</small>
             <ChevronRight :size="16" />
           </button>
         </div>
@@ -215,11 +210,6 @@ async function confirmLogout() {
 
 .menu-row > span {
   flex: 1;
-}
-
-.menu-row small {
-  color: #8c9a90;
-  font-size: 9px;
 }
 
 .modal-button {

@@ -1,82 +1,89 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ChevronLeft, PackageOpen, Search, ShoppingCart, Trash2 } from 'lucide-vue-next'
+import { computed, onMounted, ref } from 'vue'
+import { ChevronLeft, PackageOpen, Search, ShoppingCart, Store, Trash2 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { useCart, type CartLine } from '@/lib/cart'
-import { products, type CatalogueProduct, type ProductVariant } from '@/lib/catalog'
-
-type CartEntry = {
-  line: CartLine
-  product: CatalogueProduct
-  variant: ProductVariant
-  unitPrice: number
-  lineTotal: number
-  regularPrice?: number
-}
+import {
+  useRemoveBuyerCartItemMutation,
+  useUpdateBuyerCartItemMutation,
+} from '@/services/cart/cart.mutation'
+import { useBuyerCartQuery, type BuyerCartItem } from '@/services/cart/cart.query'
+import { getBuyerAccountProfile } from '@/services/account/account.api'
 
 const router = useRouter()
-const { cartItemCount, cartLines, removeItem, setItemQuantity } = useCart()
+const cartQuery = useBuyerCartQuery()
+const updateCartItemMutation = useUpdateBuyerCartItemMutation()
+const removeCartItemMutation = useRemoveBuyerCartItemMutation()
+const cartItems = computed(() => cartQuery.data.value?.items ?? [])
+const deliveryPrefecture = ref('')
 
-const cartEntries = computed<CartEntry[]>(() =>
-  cartLines.value.flatMap((line) => {
-    const product = products.find((item) => item.id === line.productId)
-    const variant = line.variantId
-      ? product?.variants.find((item) => item.id === line.variantId)
-      : product?.variants[0]
-
-    if (!product || !variant) return []
-
-    const unitPrice = variant.price
-
-    return [
-      {
-        line,
-        product,
-        variant,
-        unitPrice,
-        lineTotal: unitPrice * line.quantity,
-        regularPrice: unitPrice === product.price ? product.regularPrice : undefined,
-      },
-    ]
-  }),
-)
-
-const producerGroups = computed(() => {
-  const grouped = new Map<string, CartEntry[]>()
-
-  for (const entry of cartEntries.value) {
-    const current = grouped.get(entry.product.producerName) ?? []
-    current.push(entry)
-    grouped.set(entry.product.producerName, current)
+onMounted(async () => {
+  try {
+    deliveryPrefecture.value = (await getBuyerAccountProfile()).prefecture
+  } catch {
+    // The protected Cart route redirects to login before this can affect checkout.
   }
-
-  return Array.from(grouped, ([producerName, entries]) => ({ producerName, entries }))
 })
 
-const subtotal = computed(() =>
-  cartEntries.value.reduce((total, entry) => total + entry.lineTotal, 0),
-)
+const producerGroups = computed(() => {
+  const grouped = new Map<string, BuyerCartItem[]>()
 
-function decreaseQuantity(entry: CartEntry) {
-  if (entry.line.quantity === 1) return
+  for (const item of cartItems.value) {
+    const current = grouped.get(item.producer_id) ?? []
+    current.push(item)
+    grouped.set(item.producer_id, current)
+  }
 
-  setItemQuantity(entry.line.productId, entry.line.quantity - 1, entry.line.variantId)
+  return Array.from(grouped, ([producerId, items]) => ({
+    producerId,
+    shopName: items[0]?.shop_name ?? '\u30b7\u30e7\u30c3\u30d7',
+    items,
+    itemCount: items.reduce((total, item) => total + item.quantity, 0),
+    subtotal: shopSubtotal(items),
+  }))
+})
+
+function decreaseQuantity(item: BuyerCartItem) {
+  if (item.quantity === 1) return
+
+  updateCartItemMutation.mutate(
+    { itemId: item.id, quantity: item.quantity - 1 },
+    {
+      onError: () =>
+        toast.error(
+          '\u6570\u91cf\u3092\u5909\u66f4\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002',
+        ),
+    },
+  )
 }
 
-function increaseQuantity(entry: CartEntry) {
-  if (entry.line.quantity >= entry.variant.stock) {
+function increaseQuantity(item: BuyerCartItem) {
+  if (item.quantity >= item.stock_quantity) {
     toast.warning('\u5728\u5eab\u6570\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044')
     return
   }
 
-  setItemQuantity(entry.line.productId, entry.line.quantity + 1, entry.line.variantId)
+  updateCartItemMutation.mutate(
+    { itemId: item.id, quantity: item.quantity + 1 },
+    {
+      onError: () =>
+        toast.error(
+          '\u6570\u91cf\u3092\u5909\u66f4\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002',
+        ),
+    },
+  )
 }
 
-function removeLine(entry: CartEntry) {
-  removeItem(entry.line.productId, entry.line.variantId)
-  toast.error('\u30ab\u30fc\u30c8\u304b\u3089\u524a\u9664\u3057\u307e\u3057\u305f')
+function removeLine(item: BuyerCartItem) {
+  removeCartItemMutation.mutate(item.id, {
+    onSuccess: () =>
+      toast.error('\u30ab\u30fc\u30c8\u304b\u3089\u524a\u9664\u3057\u307e\u3057\u305f'),
+    onError: () =>
+      toast.error(
+        '\u5546\u54c1\u3092\u524a\u9664\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002',
+      ),
+  })
 }
 
 function openSearch() {
@@ -87,12 +94,65 @@ function goHome() {
   void router.push({ name: 'home' })
 }
 
-function proceedToOrderConfirmation() {
-  void router.push({ name: 'order-confirmation' })
+function proceedToOrderConfirmation(producerId: string) {
+  void router.push({ name: 'order-confirmation', query: { producer: producerId } })
 }
 
 function formatYen(amount: number) {
   return `\u7a0e\u8fbc ${amount.toLocaleString('ja-JP')}\u5186`
+}
+function unitPrice(item: BuyerCartItem) {
+  return Math.round((item.unit_price_yen * (10_000 - item.discount_bps)) / 10_000)
+}
+
+function lineTotal(item: BuyerCartItem) {
+  return unitPrice(item) * item.quantity
+}
+
+function deliveryFee(item: BuyerCartItem) {
+  if (deliveryPrefecture.value === '\u5317\u6d77\u9053') {
+    return item.delivery_fee_hokkaido_yen
+  }
+
+  if (deliveryPrefecture.value === '\u6c96\u7e04\u770c') {
+    return item.delivery_fee_okinawa_yen
+  }
+
+  return item.delivery_fee_honshu_yen
+}
+
+function deliveryFeeItem(items: BuyerCartItem[]) {
+  return items.reduce<BuyerCartItem | undefined>(
+    (selected, item) =>
+      !selected || discountedFee(item) > discountedFee(selected) ? item : selected,
+    undefined,
+  )
+}
+
+function discountedDeliveryFee(items: BuyerCartItem[]) {
+  const item = deliveryFeeItem(items)
+  return item ? discountedFee(item) : 0
+}
+
+function shopSubtotal(items: BuyerCartItem[]) {
+  return items.reduce((total, item) => total + lineTotal(item), 0) + discountedDeliveryFee(items)
+}
+
+function lineAmount(item: BuyerCartItem, items: BuyerCartItem[]) {
+  return (
+    lineTotal(item) + (deliveryFeeItem(items)?.id === item.id ? discountedDeliveryFee(items) : 0)
+  )
+}
+
+function regularLineAmount(item: BuyerCartItem, items: BuyerCartItem[]) {
+  return (
+    item.unit_price_yen * item.quantity +
+    (deliveryFeeItem(items)?.id === item.id ? deliveryFee(item) : 0)
+  )
+}
+
+function discountedFee(item: BuyerCartItem) {
+  return Math.round((deliveryFee(item) * (10_000 - item.discount_bps)) / 10_000)
 }
 </script>
 
@@ -122,108 +182,107 @@ function formatYen(amount: number) {
           >
             <Search :size="21" />
           </button>
-          <span class="relative grid size-9 place-items-center text-[#627469]" aria-label="Cart">
+          <span class="grid size-9 place-items-center text-[#627469]" aria-label="Cart">
             <ShoppingCart :size="21" />
-            <span
-              v-if="cartItemCount"
-              class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-            >
-              {{ cartItemCount }}
-            </span>
           </span>
         </div>
       </header>
 
-      <template v-if="cartEntries.length">
-        <section class="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-[176px]">
+      <template v-if="cartItems.length">
+        <section class="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-[82px]">
+          <p class="mb-2 text-[10px] text-[#708076]">
+            &#x30B7;&#x30E7;&#x30C3;&#x30D7;&#x3054;&#x3068;&#x306B;&#x304A;&#x652F;&#x6255;&#x3044;&#x624B;&#x7D9A;&#x304D;&#x3092;&#x884C;&#x3044;&#x307E;&#x3059;&#x3002;
+          </p>
           <section
             v-for="group in producerGroups"
-            :key="group.producerName"
-            class="mb-3"
-            :aria-label="group.producerName"
+            :key="group.shopName"
+            class="mb-2.5 rounded-[7px] border border-[#dce5dc] bg-white p-2"
+            :aria-label="group.shopName"
           >
-            <p class="mb-1 ml-1 text-[11px] font-bold text-[#237f4b]">{{ group.producerName }}</p>
+            <h2 class="mb-1.5 flex items-center gap-1 text-[12px] font-bold text-[#237f4b]">
+              <Store :size="13" stroke-width="2.25" />
+              {{ group.shopName }}
+            </h2>
             <article
-              v-for="entry in group.entries"
-              :key="`${entry.line.productId}-${entry.line.variantId ?? 'default'}`"
-              class="mb-2 flex gap-2 rounded-[8px] border border-[#dce5dc] bg-white p-2"
+              v-for="(item, index) in group.items"
+              :key="item.id"
+              class="flex gap-2 py-1.5"
+              :class="{ 'border-b border-[#e6ece6]': index < group.items.length - 1 }"
             >
               <img
-                :src="entry.product.imageUrl"
-                :alt="entry.product.name"
-                class="size-[62px] shrink-0 rounded-[5px] object-cover"
+                v-if="item.image_url"
+                :src="item.image_url"
+                :alt="item.product_name"
+                class="size-[52px] shrink-0 rounded-[4px] object-cover"
               />
+              <span v-else class="size-[52px] shrink-0 rounded-[4px] bg-[#e5eee7]" />
               <div class="min-w-0 flex-1">
-                <h2 class="m-0 truncate text-[12px] font-bold">{{ entry.product.name }}</h2>
-                <p class="mt-0.5 mb-0 text-[10px] text-[#66776c]">{{ entry.variant.name }}</p>
+                <h2 class="m-0 truncate text-[12px] font-bold">{{ item.product_name }}</h2>
+                <p class="mt-0.5 mb-0 text-[10px] text-[#66776c]">{{ item.variant_label }}</p>
                 <p class="mt-1 mb-0 text-[12px]">
-                  <span v-if="entry.regularPrice" class="mr-1 text-[#89968e] line-through">
-                    {{ entry.regularPrice.toLocaleString('ja-JP') }}&#x5186;
+                  <span v-if="item.discount_bps" class="mr-1 text-[#89968e] line-through">
+                    {{ formatYen(regularLineAmount(item, group.items)) }}
                   </span>
-                  <strong class="text-[#d94339]">{{ formatYen(entry.unitPrice) }}</strong>
+                  <strong class="text-[#d94339]">
+                    {{ formatYen(lineAmount(item, group.items)) }}
+                  </strong>
                 </p>
-                <div class="mt-1.5 flex items-center gap-2">
-                  <div class="flex h-7 overflow-hidden rounded-[4px] border border-[#dce5de]">
+                <div class="mt-1 flex items-center gap-2">
+                  <div class="flex h-6 overflow-hidden rounded-[3px] border border-[#dce5de]">
                     <button
-                      class="grid w-7 place-items-center border-0 border-r border-[#dce5de] bg-white text-[#547064] disabled:text-[#c2cdc5]"
+                      class="grid w-6 place-items-center border-0 border-r border-[#dce5de] bg-white text-[#547064] disabled:text-[#c2cdc5]"
                       type="button"
-                      :disabled="entry.line.quantity === 1"
+                      :disabled="item.quantity === 1 || updateCartItemMutation.isPending.value"
                       aria-label="Decrease quantity"
-                      @click="decreaseQuantity(entry)"
+                      @click="decreaseQuantity(item)"
                     >
                       -
                     </button>
-                    <span class="grid min-w-7 place-items-center text-[12px] font-bold">
-                      {{ entry.line.quantity }}
+                    <span class="grid min-w-6 place-items-center text-[12px] font-bold">
+                      {{ item.quantity }}
                     </span>
                     <button
-                      class="grid w-7 place-items-center border-0 border-l border-[#dce5de] bg-white text-[#547064] disabled:text-[#c2cdc5]"
+                      class="grid w-6 place-items-center border-0 border-l border-[#dce5de] bg-white text-[#547064] disabled:text-[#c2cdc5]"
                       type="button"
-                      :disabled="entry.line.quantity === entry.variant.stock"
+                      :disabled="
+                        item.quantity === item.stock_quantity ||
+                        updateCartItemMutation.isPending.value
+                      "
                       aria-label="Increase quantity"
-                      @click="increaseQuantity(entry)"
+                      @click="increaseQuantity(item)"
                     >
                       +
                     </button>
                   </div>
-                  <strong class="text-[12px] text-[#33443a]">
-                    {{ formatYen(entry.lineTotal) }}
-                  </strong>
                 </div>
               </div>
               <button
                 class="grid size-8 shrink-0 place-items-center rounded-full border-0 bg-transparent text-[#708076]"
                 type="button"
-                :aria-label="`${entry.product.name}を削除`"
-                @click="removeLine(entry)"
+                :disabled="removeCartItemMutation.isPending.value"
+                :aria-label="item.product_name + '\u3092\u524a\u9664'"
+                @click="removeLine(item)"
               >
                 <Trash2 :size="17" />
               </button>
             </article>
+            <div class="mt-1 flex items-center justify-between text-[11px] text-[#53645a]">
+              <span>
+                &#x30B7;&#x30E7;&#x30C3;&#x30D7;&#x5C0F;&#x8A08;&#xFF08;{{
+                  group.itemCount
+                }}&#x70B9;&#x30FB;&#x7A0E;&#x8FBC;&#xFF09;
+              </span>
+              <strong class="text-[#33443a]">{{ formatYen(group.subtotal) }}</strong>
+            </div>
+            <button
+              class="mt-2 min-h-8 w-full rounded-[4px] border-0 bg-[#237f4b] text-[11px] font-bold text-white"
+              type="button"
+              @click="proceedToOrderConfirmation(group.producerId)"
+            >
+              &#x3053;&#x306E;&#x30B7;&#x30E7;&#x30C3;&#x30D7;&#x306E;&#x5546;&#x54C1;&#x3092;&#x8CFC;&#x5165;&#x3059;&#x308B;
+            </button>
           </section>
         </section>
-
-        <aside
-          class="absolute right-0 bottom-[64px] left-0 border-t border-[#dce5dc] bg-white px-3 py-2.5"
-        >
-          <div class="rounded-[6px] border border-[#dce5dc] px-3 py-2 text-[12px]">
-            <div class="flex justify-between">
-              <span>&#x5546;&#x54C1;&#x5408;&#x8A08;</span>
-              <strong>{{ formatYen(subtotal) }}</strong>
-            </div>
-            <div class="mt-2 flex justify-between border-t border-[#e6ece6] pt-2 text-[14px]">
-              <strong>&#x5408;&#x8A08;</strong>
-              <strong class="text-[#d94339]">{{ formatYen(subtotal) }}</strong>
-            </div>
-          </div>
-          <button
-            class="mt-2 min-h-10 w-full rounded-[5px] border-0 bg-[#237f4b] text-[13px] font-bold text-white"
-            type="button"
-            @click="proceedToOrderConfirmation"
-          >
-            &#x6CE8;&#x6587;&#x5185;&#x5BB9;&#x3092;&#x78BA;&#x8A8D;&#x3059;&#x308B;
-          </button>
-        </aside>
       </template>
 
       <section v-else class="grid min-h-0 flex-1 place-items-center px-6 pb-[82px] text-center">
