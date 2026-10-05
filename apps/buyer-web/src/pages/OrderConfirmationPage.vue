@@ -1,72 +1,144 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { ChevronLeft, Pencil } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { useCart, type CartLine } from '@/lib/cart'
-import { products, type CatalogueProduct, type ProductVariant } from '@/lib/catalog'
-
-type OrderEntry = {
-  line: CartLine
-  product: CatalogueProduct
-  variant: ProductVariant
-  lineTotal: number
-  regularPrice?: number
-}
+import { checkoutDeliveryAddress, initializeCheckoutDeliveryAddress } from '@/lib/checkout'
+import { getBuyerAccountProfile } from '@/services/account/account.api'
+import { useBuyerCartQuery, type BuyerCartItem } from '@/services/cart/cart.query'
 
 const router = useRouter()
-const { cartLines } = useCart()
+const route = useRoute()
+const cartQuery = useBuyerCartQuery()
 
-const orderEntries = computed<OrderEntry[]>(() =>
-  cartLines.value.flatMap((line) => {
-    const product = products.find((item) => item.id === line.productId)
-    const variant = line.variantId
-      ? product?.variants.find((item) => item.id === line.variantId)
-      : product?.variants[0]
+onMounted(async () => {
+  try {
+    const profile = await getBuyerAccountProfile()
 
-    if (!product || !variant) return []
-
-    return [
-      {
-        line,
-        product,
-        variant,
-        lineTotal: variant.price * line.quantity,
-        regularPrice: variant.price === product.price ? product.regularPrice : undefined,
-      },
-    ]
-  }),
-)
+    initializeCheckoutDeliveryAddress({
+      name: profile.name,
+      phone: profile.phone,
+      postalCode: profile.postal_code,
+      prefecture: profile.prefecture,
+      city: profile.city,
+      addressLine: [profile.address_line1, profile.address_line2].filter(Boolean).join(' '),
+    })
+  } catch {
+    await router.replace({ name: 'login', query: { redirect: route.fullPath } })
+  }
+})
 
 const producerGroups = computed(() => {
-  const grouped = new Map<string, OrderEntry[]>()
+  const grouped = new Map<string, BuyerCartItem[]>()
 
-  for (const entry of orderEntries.value) {
-    const entries = grouped.get(entry.product.producerName) ?? []
-    entries.push(entry)
-    grouped.set(entry.product.producerName, entries)
+  for (const item of cartQuery.data.value?.items ?? []) {
+    const items = grouped.get(item.producer_id) ?? []
+    items.push(item)
+    grouped.set(item.producer_id, items)
   }
 
-  return Array.from(grouped, ([producerName, entries]) => ({ producerName, entries }))
+  return Array.from(grouped, ([producerId, items]) => ({
+    producerId,
+    shopName: items[0]?.shop_name ?? '\u30b7\u30e7\u30c3\u30d7',
+    items,
+  }))
+})
+
+const selectedProducerGroup = computed(() => {
+  const selectedProducerId =
+    typeof route.query.producer === 'string' ? route.query.producer : undefined
+
+  return (
+    producerGroups.value.find((group) => group.producerId === selectedProducerId) ??
+    producerGroups.value[0]
+  )
 })
 
 const total = computed(() =>
-  orderEntries.value.reduce((amount, entry) => amount + entry.lineTotal, 0),
+  selectedProducerGroup.value ? shopTotal(selectedProducerGroup.value.items) : 0,
 )
+const canProceedToPayment = computed(() => Boolean(selectedProducerGroup.value && total.value > 0))
 
 function changeAddress() {
-  toast.warning(
-    '\u304a\u5c4a\u3051\u5148\u306e\u5909\u66f4\u306f\u73fe\u5728\u958b\u767a\u4e2d\u3067\u3059',
-  )
+  void router.push({
+    name: 'checkout-address',
+    query:
+      typeof route.query.producer === 'string' ? { producer: route.query.producer } : undefined,
+  })
 }
 
 function proceedToPayment() {
-  toast.warning('\u6c7a\u6e08\u753b\u9762\u306f\u73fe\u5728\u958b\u767a\u4e2d\u3067\u3059')
+  if (!canProceedToPayment.value) {
+    toast.error(
+      '\u30ab\u30fc\u30c8\u306e\u5546\u54c1\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
+    )
+    void router.replace({ name: 'cart' })
+    return
+  }
+
+  void router.push({
+    name: 'buyer-payment',
+    query: { producer: selectedProducerGroup.value?.producerId },
+  })
 }
 
 function formatYen(amount: number) {
   return `${amount.toLocaleString('ja-JP')}\u5186`
+}
+function unitPrice(item: BuyerCartItem) {
+  return Math.round((item.unit_price_yen * (10_000 - item.discount_bps)) / 10_000)
+}
+
+function lineTotal(item: BuyerCartItem) {
+  return unitPrice(item) * item.quantity
+}
+
+function regularLineTotal(item: BuyerCartItem) {
+  return item.unit_price_yen * item.quantity
+}
+
+function deliveryFee(item: BuyerCartItem) {
+  if (checkoutDeliveryAddress.prefecture === '\u5317\u6d77\u9053') {
+    return item.delivery_fee_hokkaido_yen
+  }
+
+  if (checkoutDeliveryAddress.prefecture === '\u6c96\u7e04\u770c') {
+    return item.delivery_fee_okinawa_yen
+  }
+
+  return item.delivery_fee_honshu_yen
+}
+
+function deliveryFeeItem(items: BuyerCartItem[]) {
+  return items.reduce<BuyerCartItem | undefined>(
+    (selected, item) =>
+      !selected || discountedFee(item) > discountedFee(selected) ? item : selected,
+    undefined,
+  )
+}
+
+function discountedDeliveryFee(items: BuyerCartItem[]) {
+  const item = deliveryFeeItem(items)
+  return item ? discountedFee(item) : 0
+}
+
+function shopTotal(items: BuyerCartItem[]) {
+  return items.reduce((total, item) => total + lineTotal(item), 0) + discountedDeliveryFee(items)
+}
+
+function lineAmount(item: BuyerCartItem, items: BuyerCartItem[]) {
+  return (
+    lineTotal(item) + (deliveryFeeItem(items)?.id === item.id ? discountedDeliveryFee(items) : 0)
+  )
+}
+
+function regularLineAmount(item: BuyerCartItem, items: BuyerCartItem[]) {
+  return regularLineTotal(item) + (deliveryFeeItem(items)?.id === item.id ? deliveryFee(item) : 0)
+}
+
+function discountedFee(item: BuyerCartItem) {
+  return Math.round((deliveryFee(item) * (10_000 - item.discount_bps)) / 10_000)
 }
 </script>
 
@@ -95,11 +167,14 @@ function formatYen(amount: number) {
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="m-0 text-[11px] font-bold">&#x304A;&#x5C4A;&#x3051;&#x5148;</p>
-              <p class="mt-1 mb-0 text-[13px] font-bold">&#x7530;&#x4E2D; &#x592A;&#x90CE;</p>
+              <p class="mt-1 mb-0 text-[13px] font-bold">{{ checkoutDeliveryAddress.name }}</p>
               <p class="mt-0.5 mb-0 text-[10px] leading-[1.55] text-[#647468]">
-                &#x3012;150-0002<br />
-                &#x6771;&#x4EAC;&#x90FD;&#x6E0B;&#x8C37;&#x533A;&#x6E0B;&#x8C37;2-1-3<br />
-                090-1234-5678
+                &#x3012;{{ checkoutDeliveryAddress.postalCode }}
+                <br />
+                {{ checkoutDeliveryAddress.prefecture }}{{ checkoutDeliveryAddress.city
+                }}{{ checkoutDeliveryAddress.addressLine }}
+                <br />
+                {{ checkoutDeliveryAddress.phone }}
               </p>
             </div>
             <button
@@ -118,21 +193,25 @@ function formatYen(amount: number) {
           aria-label="Order summary"
         >
           <h2 class="m-0 text-[12px] font-bold">&#x3054;&#x6CE8;&#x6587;&#x5185;&#x5BB9;</h2>
-          <section v-for="group in producerGroups" :key="group.producerName" class="mt-2">
-            <p class="m-0 text-[10px] font-bold text-[#237f4b]">{{ group.producerName }}</p>
+          <section v-if="selectedProducerGroup" class="mt-2">
+            <p class="m-0 text-[10px] font-bold text-[#237f4b]">
+              {{ selectedProducerGroup.shopName }}
+            </p>
             <div
-              v-for="entry in group.entries"
-              :key="`${entry.line.productId}-${entry.line.variantId ?? 'default'}`"
+              v-for="item in selectedProducerGroup.items"
+              :key="item.id"
               class="mt-1 flex items-end justify-between gap-3 text-[11px]"
             >
               <p class="m-0 min-w-0 text-[#526259]">
-                {{ entry.product.name }} {{ entry.variant.name }} &#x00D7; {{ entry.line.quantity }}
+                {{ item.product_name }} {{ item.variant_label }} &#x00D7; {{ item.quantity }}
               </p>
               <p class="m-0 shrink-0 whitespace-nowrap text-right">
-                <span v-if="entry.regularPrice" class="mr-1 text-[#8b978f] line-through">
-                  {{ formatYen(entry.regularPrice * entry.line.quantity) }}
+                <span v-if="item.discount_bps" class="mr-1 text-[#8b978f] line-through">
+                  {{ formatYen(regularLineAmount(item, selectedProducerGroup.items)) }}
                 </span>
-                <strong class="text-[#d94339]">{{ formatYen(entry.lineTotal) }}</strong>
+                <strong class="text-[#d94339]">
+                  {{ formatYen(lineAmount(item, selectedProducerGroup.items)) }}
+                </strong>
               </p>
             </div>
           </section>
@@ -149,8 +228,9 @@ function formatYen(amount: number) {
         </section>
 
         <button
-          class="mt-3 min-h-10 w-full rounded-[5px] border-0 bg-[#237f4b] text-[13px] font-bold text-white"
+          class="mt-3 min-h-10 w-full rounded-[5px] border-0 bg-[#237f4b] text-[13px] font-bold text-white disabled:bg-[#9cbca7]"
           type="button"
+          :disabled="!canProceedToPayment"
           @click="proceedToPayment"
         >
           &#x6C7A;&#x6E08;&#x753B;&#x9762;&#x3078;&#x9032;&#x3080;
