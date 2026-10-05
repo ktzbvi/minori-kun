@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
       <template v-else-if="state === 'success'">
         <CircleCheck class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
         <div role="status" aria-live="polite">
-          <h1 class="text-2xl font-bold text-[#1e3f30]">パスワードを再設定しました</h1>
+          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">パスワードを再設定しました</h1>
           <p class="mt-4 text-sm leading-7 text-[#708278]">5秒後にログイン画面へ移動します。</p>
         </div>
         <UiButton class="mt-6 min-h-12 w-full bg-[#237b4d]" @click="router.replace('/login')">
@@ -185,7 +185,7 @@ onBeforeUnmount(() => {
       <template v-else-if="state === 'sent'">
         <CircleCheck class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
         <div role="status" aria-live="polite">
-          <h1 class="text-2xl font-bold text-[#1e3f30]">メールを送信しました</h1>
+          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">メールを送信しました</h1>
           <p class="mt-4 text-sm leading-7 text-[#708278]">
             該当するアカウントがある場合、パスワード再設定用メールを送信しました。メール内のリンクから再設定してください。
           </p>
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
         </UiButton>
       </template>
       <template v-else-if="state === 'invalid'">
-        <h1 class="text-2xl font-bold text-[#1e3f30]">リンクをご確認ください</h1>
+        <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">リンクをご確認ください</h1>
         <p class="mt-4 text-sm leading-7 text-[#708278]" role="alert">
           再設定用リンクが無効、使用済み、または有効期限切れです。もう一度メールを送信してください。
         </p>
@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
       <template v-else>
         <Mail v-if="state === 'request'" class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
         <LockKeyhole v-else class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
-        <h1 class="text-2xl font-bold text-[#1e3f30]">
+        <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">
           {{ state === 'request' ? 'パスワード再設定' : '新しいパスワードを設定' }}
         </h1>
         <p v-if="state === 'request'" class="mt-3 text-sm leading-7 text-[#708278]">

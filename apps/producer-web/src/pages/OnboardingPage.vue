@@ -10,7 +10,7 @@ const onboardingQuery = useProducerOnboardingQuery()
     <UiCard class="mx-auto w-full max-w-[760px] rounded-2xl border border-[#cfdfd5] bg-white p-4 shadow-sm min-[761px]:p-10">
       <header>
         <p class="text-sm font-semibold text-[#237b4d]">生産者ポータル</p>
-        <h1 class="mt-2 text-2xl font-bold text-[#1e2923]">販売開始の準備</h1>
+        <h1 class="mt-2 text-xl min-[761px]:text-2xl font-bold text-[#1e2923]">販売開始の準備</h1>
       </header>
 
       <div v-if="onboardingQuery.isPending.value" class="mt-7 rounded-xl border border-[#d9e5dd] bg-[#f8fbf9] p-4 min-[761px]:p-5 text-sm text-[#687b70]" role="status">

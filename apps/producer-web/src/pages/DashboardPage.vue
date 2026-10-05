@@ -80,7 +80,7 @@ function fulfillmentLabel(state: string) {
 <template>
   <section>
     <div>
-      <h1 class="text-[28px] leading-tight font-extrabold text-[#17241d] lg:text-4xl">ダッシュボード</h1>
+      <h1 class="text-xl leading-tight font-extrabold text-[#17241d] lg:text-4xl">ダッシュボード</h1>
       <p class="mt-2 text-base font-medium [overflow-wrap:anywhere] text-[#66766e] lg:text-lg">
         {{ producerName }}の販売状況を確認できます。
       </p>
@@ -112,7 +112,7 @@ function fulfillmentLabel(state: string) {
           </span>
           <div class="min-w-0">
             <p class="text-sm font-medium text-[#68766e] lg:text-lg">{{ card.label }}</p>
-            <p class="mt-2 text-[28px] leading-none font-extrabold tracking-normal [overflow-wrap:anywhere] text-[#17241d] lg:text-4xl">
+            <p class="mt-2 text-2xl leading-none font-extrabold tracking-normal [overflow-wrap:anywhere] text-[#17241d] lg:text-4xl">
               {{ dashboardQuery.isLoading.value ? '読み込み中' : card.value }}
             </p>
             <p class="mt-2 text-sm font-medium text-[#68766e] lg:mt-3 lg:text-base">{{ card.meta }}</p>
@@ -189,7 +189,7 @@ function fulfillmentLabel(state: string) {
               <p class="text-sm font-medium text-[#68766e] lg:text-base">
                 {{ dashboard?.payout_alert ? payoutStateLabel(dashboard.payout_alert.state) : '振込予定' }}
               </p>
-              <p class="mt-3 text-[28px] leading-none lg:mt-5 font-extrabold tracking-normal text-[#17241d] lg:text-[32px]">
+              <p class="mt-3 text-2xl leading-none lg:mt-5 font-extrabold tracking-normal text-[#17241d] lg:text-3xl">
                 {{ currencyFormatter.format(dashboard?.payout_alert?.expected_payout_yen ?? 0) }}
               </p>
               <p class="mt-3 text-sm font-medium text-[#68766e] lg:mt-6 lg:text-base">

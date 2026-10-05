@@ -97,8 +97,8 @@ async function submit() {
         <RegistrationBrand />
 
         <header class="mt-8 min-[761px]:mt-0 max-[760px]:mt-5">
-          <h1 class="text-[24px] leading-tight font-bold text-[#173b2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]">生産者登録</h1>
-          <p class="mt-2 text-[16px] leading-[1.7] text-[#687b70] min-[761px]:mt-2.5 min-[761px]:text-base min-[761px]:text-[#87968d]">
+          <h1 class="text-xl leading-tight font-bold text-[#173b2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]">生産者登録</h1>
+          <p class="mt-2 text-base leading-[1.7] text-[#687b70] min-[761px]:mt-2.5 min-[761px]:text-base min-[761px]:text-[#87968d]">
             <span class="min-[761px]:hidden">確認コードをメールでお送りします。</span>
             <span class="hidden min-[761px]:inline">
               登録に使用するメールアドレスを入力してください。<br />
@@ -116,7 +116,7 @@ async function submit() {
         </div>
         <form v-else class="mt-10 grid gap-5 min-[761px]:mt-7 max-[760px]:mt-6" novalidate :aria-busy="isSubmitting" @submit.prevent="submit">
           <div class="grid gap-2.5">
-            <UiFormLabel for="registration-email" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
+            <UiFormLabel for="registration-email" class="text-sm font-bold text-[#173b2c] min-[761px]:font-medium min-[761px]:text-[#687b70]">
               メールアドレス
               <span class="ml-1 rounded bg-[#b74646] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
               <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -143,12 +143,12 @@ async function submit() {
           <p v-if="currentEmailCoolingDown" id="registration-cooldown" class="text-sm leading-relaxed text-[#614c22]" role="status">
             確認コードはあと {{ cooldownText }} 後に再送できます。
           </p>
-          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isSubmitting || currentEmailCoolingDown">
+          <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-base shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isSubmitting || currentEmailCoolingDown">
             {{ isSubmitting ? '送信中…' : '確認コードを送信する' }}
           </UiButton>
         </form>
 
-        <p class="mt-7 text-center text-[15px] text-[#87968d] min-[761px]:mt-6 min-[761px]:text-left min-[761px]:text-sm max-[760px]:mt-5">
+        <p class="mt-7 text-center text-sm text-[#87968d] min-[761px]:mt-6 min-[761px]:text-left min-[761px]:text-sm max-[760px]:mt-5">
           アカウントをお持ちですか？
           <RouterLink to="/login" class="ml-2 font-medium text-[#237f4b] underline underline-offset-4">ログイン</RouterLink>
         </p>
