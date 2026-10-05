@@ -80,7 +80,7 @@ function markProductImageFailed(productId: string) {
   <div>
     <section class="flex flex-col gap-4 lg:gap-6 lg:flex-row lg:items-start lg:justify-between">
       <div>
-        <h1 class="text-2xl leading-tight font-extrabold text-[#17241d] sm:text-3xl lg:text-4xl">商品一覧</h1>
+        <h1 class="text-xl leading-tight font-extrabold text-[#17241d] sm:text-3xl lg:text-4xl">商品一覧</h1>
         <p class="mt-2 text-base font-medium text-[#66766e] sm:text-base lg:text-lg">
           登録した商品を確認・管理できます。
         </p>
@@ -139,7 +139,7 @@ function markProductImageFailed(productId: string) {
 
     <section class="mt-6 lg:mt-10 min-[1280px]:mt-8 min-[1280px]:rounded-[20px] min-[1280px]:border min-[1280px]:border-[#d6e2da] min-[1280px]:bg-white min-[1280px]:p-6 min-[1280px]:shadow-sm" aria-labelledby="products-title">
       <header class="mb-4 lg:mb-6 flex items-center justify-between">
-        <h2 id="products-title" class="text-xl font-extrabold text-[#17241d] lg:text-[30px]">商品</h2>
+        <h2 id="products-title" class="text-lg font-extrabold text-[#17241d] lg:text-3xl">商品</h2>
         <p class="text-sm font-bold text-[#68766e] lg:text-xl">{{ productsQuery.isPending.value ? '確認中' : `${products.length}件` }}</p>
       </header>
 

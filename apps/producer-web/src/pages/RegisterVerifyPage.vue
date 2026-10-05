@@ -131,7 +131,7 @@ onBeforeRouteLeave(() => {
         <div class="mt-7 hidden size-14 place-items-center rounded-full bg-[#e5f1d8] text-[#247d4c] min-[761px]:grid max-[760px]:mt-5">
           <Mail class="size-7" :stroke-width="2" aria-hidden="true" />
         </div>
-        <h1 class="mt-8 text-[24px] font-bold text-[#173b2c] min-[761px]:mt-5 min-[761px]:text-2xl min-[761px]:text-[#1e2923] max-[760px]:mt-5">
+        <h1 class="mt-8 text-xl font-bold text-[#173b2c] min-[761px]:mt-5 min-[761px]:text-2xl min-[761px]:text-[#1e2923] max-[760px]:mt-5">
           <span class="min-[761px]:hidden">メール確認</span>
           <span class="hidden min-[761px]:inline">確認コードを入力</span>
         </h1>
@@ -146,7 +146,7 @@ onBeforeRouteLeave(() => {
           </UiButton>
         </div>
         <template v-else>
-          <p v-if="deliveryStatus === true" class="mt-2 text-[16px] leading-[1.65] text-[#687b70] min-[761px]:mt-4 min-[761px]:text-base min-[761px]:text-[#303a34]">
+          <p v-if="deliveryStatus === true" class="mt-2 text-base leading-[1.65] text-[#687b70] min-[761px]:mt-4 min-[761px]:text-base min-[761px]:text-[#303a34]">
             <strong class="font-bold text-[#303a34]">{{ destinationEmail }}</strong>
             に確認コードを送信しました。<br class="hidden min-[761px]:block" />
             <span class="hidden min-[761px]:inline">メールに記載された6桁のコードを入力してください。</span>
@@ -164,7 +164,7 @@ onBeforeRouteLeave(() => {
 
           <form v-if="mayHaveCode" class="mt-10 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4 max-[760px]:mt-6" novalidate :aria-busy="isBusy" @submit.prevent="submit">
             <div class="grid gap-2">
-              <UiFormLabel for="verification-code" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
+              <UiFormLabel for="verification-code" class="text-sm font-bold text-[#173b2c] min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 確認コード（6桁）
                 <span class="ml-1 rounded bg-[#b74646] px-1 py-0.5 text-xs text-white min-[761px]:hidden">必須</span>
                 <span class="hidden text-[#b74646] min-[761px]:inline"> *</span>
@@ -186,7 +186,7 @@ onBeforeRouteLeave(() => {
               <UiFormMessage v-if="codeError" id="verification-code-error" role="alert">{{ codeError }}</UiFormMessage>
             </div>
 
-            <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isBusy || otpExpired">
+            <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-base shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isBusy || otpExpired">
               {{ registrationActions.isVerifyingCode.value ? '確認中…' : '確認して次へ進む' }}
             </UiButton>
           </form>

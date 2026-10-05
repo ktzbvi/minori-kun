@@ -50,7 +50,7 @@ function submit() {
       class="hidden items-center bg-[#123729] px-[clamp(40px,3.8vw,64px)] py-10 text-[#eaf0dd] min-[761px]:flex"
     >
       <div class="w-full max-w-[700px]">
-        <p class="mb-3 text-[28px] font-extrabold tracking-[.04em] italic max-[760px]:text-2xl">
+        <p class="mb-3 text-2xl font-extrabold tracking-[.04em] italic max-[760px]:text-2xl">
           みのりくん
         </p>
         <h2 class="mb-3 text-lg font-semibold text-[#a8c2ae]">
@@ -109,11 +109,11 @@ function submit() {
           >
             <Leaf class="size-[42px] rounded-full bg-[#20794d] p-[7px] max-[760px]:size-8" :stroke-width="2.2" />
           </span>
-          <span class="text-[29px] font-extrabold tracking-[.08em] text-[#20794d] max-[760px]:text-2xl">みのりくん</span>
+          <span class="text-3xl font-extrabold tracking-[.08em] text-[#20794d] max-[760px]:text-2xl">みのりくん</span>
         </header>
         <section class="mt-7 min-[761px]:mt-0 min-[761px]:mb-5 max-[760px]:mt-5">
           <h1
-            class="text-[22px] leading-[1.4] font-bold text-[#183c2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]"
+            class="text-xl leading-[1.4] font-bold text-[#183c2c] min-[761px]:text-2xl min-[761px]:text-[#1e2923]"
           >
             <span class="hidden min-[761px]:inline">生産者ログイン</span>
             <span class="min-[761px]:hidden">生産者ポータル</span>
@@ -121,7 +121,7 @@ function submit() {
           <p class="mt-2.5 hidden text-base text-[#87968d] min-[761px]:block">
             メールアドレスとパスワードを入力してください。
           </p>
-          <p class="mt-[7px] text-[15px] text-[#687b70] min-[761px]:hidden">
+          <p class="mt-[7px] text-sm text-[#687b70] min-[761px]:hidden">
             生産者アカウントでログインしてください。
           </p>
           <div v-if="recoveryNotice" class="mt-4 rounded-lg bg-[#fff8e8] px-4 py-3 text-sm leading-relaxed text-[#614c22]" role="status">
@@ -138,7 +138,7 @@ function submit() {
           <div class="grid gap-[9px] min-[761px]:gap-2">
             <UiFormLabel
               for="producer-email"
-              class="text-base font-bold text-[#1e3f30] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#87968d]"
+              class="text-sm font-bold text-[#1e3f30] min-[761px]:font-medium min-[761px]:text-[#87968d]"
             >
               メールアドレス
             </UiFormLabel>
@@ -169,7 +169,7 @@ function submit() {
           <div class="grid gap-[9px] min-[761px]:gap-2">
             <UiFormLabel
               for="producer-password"
-              class="text-base font-bold text-[#1e3f30] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#87968d]"
+              class="text-sm font-bold text-[#1e3f30] min-[761px]:font-medium min-[761px]:text-[#87968d]"
             >
               パスワード
             </UiFormLabel>

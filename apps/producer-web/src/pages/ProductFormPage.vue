@@ -228,7 +228,7 @@ onBeforeUnmount(() => {
     <RouterLink to="/products" class="inline-flex items-center gap-1 text-sm font-bold text-[#147b49] hover:underline">
       <ArrowLeft class="size-4" aria-hidden="true" /> 商品一覧へ
     </RouterLink>
-    <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-[#1d2b24] sm:text-3xl">{{ pageTitle }}</h1>
+    <h1 class="mt-3 text-xl sm:text-3xl font-extrabold tracking-tight text-[#1d2b24]">{{ pageTitle }}</h1>
 
     <div v-if="isInitialLoading" class="grid min-h-72 place-items-center" role="status">
       <LoaderCircle class="size-8 animate-spin text-[#147b49]" aria-hidden="true" />
@@ -244,15 +244,15 @@ onBeforeUnmount(() => {
       <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)]">
         <div class="grid gap-5">
           <UiCard class="p-5 sm:p-6">
-            <h2 class="text-xl font-extrabold">基本情報</h2>
+            <h2 class="text-lg sm:text-xl font-extrabold">基本情報</h2>
             <div class="mt-5 grid gap-5">
               <div>
-                <UiFormLabel for="product-name" class="font-bold">商品名 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></UiFormLabel>
+                <UiFormLabel for="product-name" class="font-bold">商品名 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
                 <UiInput id="product-name" v-model="name" class="mt-2 h-12" placeholder="商品名を入力" :aria-invalid="!!errors.name" />
                 <UiFormMessage v-if="errors.name" class="mt-1" role="alert">{{ errors.name }}</UiFormMessage>
               </div>
               <div>
-                <UiFormLabel for="product-category" class="font-bold">カテゴリ <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></UiFormLabel>
+                <UiFormLabel for="product-category" class="font-bold">カテゴリ <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
                 <UiSelect id="product-category" v-model="categoryId" class="mt-2 h-12" :aria-invalid="!!errors.categoryId">
                   <option value="" disabled>カテゴリを選択</option>
                   <option v-for="category in optionsQuery.data.value?.categories ?? []" :key="category.id" :value="category.id">{{ category.name }}</option>
@@ -260,7 +260,7 @@ onBeforeUnmount(() => {
                 <UiFormMessage v-if="errors.categoryId" class="mt-1" role="alert">{{ errors.categoryId }}</UiFormMessage>
               </div>
               <div>
-                <UiFormLabel for="product-description" class="font-bold">商品説明 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></UiFormLabel>
+                <UiFormLabel for="product-description" class="font-bold">商品説明 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
                 <UiTextarea id="product-description" v-model="description" class="mt-2 min-h-36 resize-y" placeholder="商品の特徴や内容を入力" :aria-invalid="!!errors.description" />
                 <UiFormMessage v-if="errors.description" class="mt-1" role="alert">{{ errors.description }}</UiFormMessage>
               </div>
@@ -268,7 +268,7 @@ onBeforeUnmount(() => {
           </UiCard>
 
           <UiCard class="p-5 sm:p-6">
-            <h2 class="text-xl font-extrabold">商品画像 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></h2>
+            <h2 class="text-lg sm:text-xl font-extrabold">商品画像 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></h2>
             <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               <label class="grid aspect-square cursor-pointer place-items-center rounded-xl border-2 border-dashed border-[#319663] bg-[#f7fbf8] text-center text-[#17834f] hover:bg-[#edf7f0]">
                 <span><ImagePlus class="mx-auto size-7" aria-hidden="true" /><span class="mt-2 block text-sm font-bold">画像を追加</span><span class="mt-1 block text-xs text-[#718077]">複数選択可</span></span>
@@ -289,17 +289,17 @@ onBeforeUnmount(() => {
         </div>
 
         <UiCard class="p-5 sm:p-6 lg:sticky lg:top-6">
-          <h2 class="text-xl font-extrabold">販売情報</h2>
+          <h2 class="text-lg sm:text-xl font-extrabold">販売情報</h2>
           <div class="mt-5 grid gap-5">
             <div>
-              <UiFormLabel for="price-yen" class="font-bold">商品価格（税込） <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></UiFormLabel>
+              <UiFormLabel for="price-yen" class="font-bold">商品価格（税込） <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
               <div class="relative mt-2"><UiInput id="price-yen" v-model="priceYen" inputmode="numeric" class="h-12 pr-10" :aria-invalid="!!errors.priceYen" /><span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#718077]">円</span></div>
               <p class="mt-1 text-xs text-[#718077]">送料を除いた商品の価格を入力してください。</p>
               <UiFormMessage v-if="errors.priceYen" class="mt-1" role="alert">{{ errors.priceYen }}</UiFormMessage>
             </div>
 
             <div class="border-t border-[#dce5de] pt-5">
-              <h3 class="font-extrabold">送料設定 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></h3>
+              <h3 class="font-extrabold">送料設定 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></h3>
               <p class="mt-1 text-xs text-[#718077]">配送先ごとの送料を入力してください。</p>
               <div class="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
                 <div>
@@ -331,7 +331,7 @@ onBeforeUnmount(() => {
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               <div>
-                <UiFormLabel for="stock" class="font-bold">在庫数 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-[11px] font-extrabold text-white">必須</span></UiFormLabel>
+                <UiFormLabel for="stock" class="font-bold">在庫数 <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
                 <div class="relative mt-2"><UiInput id="stock" v-model="stockQuantity" inputmode="numeric" class="h-12 pr-10" :aria-invalid="!!errors.stockQuantity" /><span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#718077]">個</span></div>
                 <UiFormMessage v-if="errors.stockQuantity" class="mt-1" role="alert">{{ errors.stockQuantity }}</UiFormMessage>
               </div>
