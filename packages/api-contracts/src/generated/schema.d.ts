@@ -189,7 +189,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_32"];
+        post: operations["portalAuth.login_35"];
         delete?: never;
         options?: never;
         head?: never;
@@ -203,7 +203,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_33"];
+        get: operations["portalAuth.me_36"];
         put?: never;
         post?: never;
         delete?: never;
@@ -221,7 +221,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_34"];
+        post: operations["portalAuth.logout_37"];
         delete?: never;
         options?: never;
         head?: never;
@@ -237,7 +237,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_35"];
+        post: operations["portalAuth.login_38"];
         delete?: never;
         options?: never;
         head?: never;
@@ -251,7 +251,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_36"];
+        get: operations["portalAuth.me_39"];
         put?: never;
         post?: never;
         delete?: never;
@@ -269,7 +269,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_37"];
+        post: operations["portalAuth.logout_40"];
         delete?: never;
         options?: never;
         head?: never;
@@ -285,7 +285,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.login_38"];
+        post: operations["portalAuth.login_41"];
         delete?: never;
         options?: never;
         head?: never;
@@ -299,7 +299,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["portalAuth.me_39"];
+        get: operations["portalAuth.me_42"];
         put?: never;
         post?: never;
         delete?: never;
@@ -317,7 +317,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["portalAuth.logout_40"];
+        post: operations["portalAuth.logout_43"];
         delete?: never;
         options?: never;
         head?: never;
@@ -350,6 +350,54 @@ export interface paths {
         get: operations["producerOnboarding.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/password-reset/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["producerPasswordReset.start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/password-reset/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["producerPasswordReset.validateToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/password-reset/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["producerPasswordReset.complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -625,6 +673,14 @@ export interface components {
             terms_accepted?: "yes" | "on" | "1" | 1 | "true" | true;
             password_confirmation: string;
         };
+        /** CompleteProducerPasswordResetRequest */
+        CompleteProducerPasswordResetRequest: {
+            /** Format: email */
+            email: string;
+            token: string;
+            password: string;
+            password_confirmation: string;
+        };
         /** CompleteProducerRegistrationRequest */
         CompleteProducerRegistrationRequest: {
             email?: string;
@@ -698,6 +754,11 @@ export interface components {
             state: "application_required" | "eligible";
             eligible_to_sell: boolean;
             application_available: boolean;
+        };
+        /** ProducerPasswordResetRequest */
+        ProducerPasswordResetRequest: {
+            /** Format: email */
+            email: string;
         };
         /** ProducerProductListItemResource */
         ProducerProductListItemResource: {
@@ -826,6 +887,12 @@ export interface components {
             lock_version?: number | null;
             image_order: string[];
             new_images?: string[];
+        };
+        /** ValidateProducerPasswordResetRequest */
+        ValidateProducerPasswordResetRequest: {
+            /** Format: email */
+            email: string;
+            token: string;
         };
         /** VerifyBuyerRegistrationOtpRequest */
         VerifyBuyerRegistrationOtpRequest: {
@@ -1268,80 +1335,6 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-    "portalAuth.login_32": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PortalLoginRequest"];
-            };
-        };
-        responses: {
-            /** @description `CurrentSessionResource` */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CurrentSessionResource"];
-                    };
-                };
-            };
-            422: components["responses"]["ValidationException"];
-        };
-    };
-    "portalAuth.me_33": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description `CurrentSessionResource` */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["CurrentSessionResource"];
-                    };
-                };
-            };
-            401: components["responses"]["AuthenticationException"];
-        };
-    };
-    "portalAuth.logout_34": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: {
-                            logged_out: boolean;
-                        };
-                    };
-                };
-            };
-            401: components["responses"]["AuthenticationException"];
-        };
-    };
     "portalAuth.login_35": {
         parameters: {
             query?: never;
@@ -1490,6 +1483,80 @@ export interface operations {
             401: components["responses"]["AuthenticationException"];
         };
     };
+    "portalAuth.login_41": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PortalLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description `CurrentSessionResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CurrentSessionResource"];
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "portalAuth.me_42": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `CurrentSessionResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CurrentSessionResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "portalAuth.logout_43": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            logged_out: boolean;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+        };
+    };
     "producerDashboard.show": {
         parameters: {
             query?: never;
@@ -1534,6 +1601,92 @@ export interface operations {
                 };
             };
             401: components["responses"]["AuthenticationException"];
+        };
+    };
+    "producerPasswordReset.start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProducerPasswordResetRequest"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            message: "該当するアカウントがある場合、パスワード再設定用メールを送信しました。";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "producerPasswordReset.validateToken": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidateProducerPasswordResetRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            valid: boolean;
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "producerPasswordReset.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteProducerPasswordResetRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** @constant */
+                            redirect: "/login";
+                        };
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
         };
     };
     "producerProduct.options": {

@@ -20,7 +20,7 @@ class CompleteProducerRegistrationRequest extends FormRequest
             'phone' => ['required', 'string', 'max:32'],
             'password' => [
                 'required', 'string', 'min:8', 'max:64',
-                'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/',
+                'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[^\p{L}\p{N}\s]/u',
             ],
             'password_confirmation' => ['required', 'string', 'same:password'],
             'photo_id' => ['required', 'string', 'ulid'],

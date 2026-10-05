@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
 use App\Http\Controllers\Api\ProducerDashboardController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
+use App\Http\Controllers\Api\ProducerPasswordResetController;
 use App\Http\Controllers\Api\ProducerProductController;
 use App\Http\Controllers\Api\ProducerRegistrationController;
 use App\Http\Middleware\EnsureProducerRegistrationSession;
@@ -68,6 +69,12 @@ Route::prefix('api/v1')->group(function (): void {
     });
 
     Route::prefix('producer')->group(function (): void {
+        Route::prefix('password-reset')->middleware(['web', 'throttle:6,1'])
+            ->withoutMiddleware(EnsureFrontendRequestsAreStateful::class)->group(function (): void {
+                Route::post('/start', [ProducerPasswordResetController::class, 'start']);
+                Route::post('/validate', [ProducerPasswordResetController::class, 'validateToken']);
+                Route::post('/complete', [ProducerPasswordResetController::class, 'complete']);
+            });
         Route::get('/shop-photos/{id}', [ProducerRegistrationController::class, 'publicPhoto'])
             ->whereUlid('id')
             ->name('producer.shop-photo');

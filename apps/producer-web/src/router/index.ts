@@ -5,6 +5,7 @@ import ProducerPortalLayout from '@/components/layout/ProducerPortalLayout.vue'
 import DashboardPage from '@/pages/DashboardPage.vue'
 import EntryPage from '@/pages/EntryPage.vue'
 import LoginPage from '@/pages/LoginPage.vue'
+import PasswordResetPage from '@/pages/PasswordResetPage.vue'
 import OnboardingPage from '@/pages/OnboardingPage.vue'
 import ProductsPage from '@/pages/ProductsPage.vue'
 import ProductFormPage from '@/pages/ProductFormPage.vue'
@@ -16,6 +17,18 @@ import RegisterDetailsPage from '@/pages/RegisterDetailsPage.vue'
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: '/password-reset',
+      name: 'password-reset',
+      component: PasswordResetPage,
+      meta: { public: true },
+    },
+    {
+      path: '/password-reset/confirm',
+      name: 'password-reset-confirm',
+      component: PasswordResetPage,
+      meta: { public: true },
+    },
     { path: '/login', name: 'login', component: LoginPage, meta: { public: true } },
     { path: '/register', name: 'register', component: RegisterPage, meta: { public: true } },
     {

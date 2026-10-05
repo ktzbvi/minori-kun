@@ -1,8 +1,9 @@
 <?php
 
+use App\Domain\ProducerRegistration\ProducerRegistrationException;
 use App\Http\Middleware\EnsurePortalRole;
 use App\Http\Middleware\EnsureProducerEligible;
-use App\Domain\ProducerRegistration\ProducerRegistrationException;
+use App\Http\Middleware\PreventProducerPasswordResetCaching;
 use App\Http\Support\ProducerRegistrationCookie;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,13 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $middleware->append(PreventProducerPasswordResetCaching::class);
         $middleware->alias([
             'portal.role' => EnsurePortalRole::class,
             'producer.eligible' => EnsureProducerEligible::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['code']);
+        $exceptions->dontFlash(['code', 'token']);
         $exceptions->dontReport([ProducerRegistrationException::class]);
         $exceptions->render(function (ProducerRegistrationException $exception, Request $request) {
             if ($exception->cookieToken !== null) {
@@ -44,8 +47,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ...$exception->context,
             ], $exception->status)->header('Cache-Control', 'no-store, private');
         });
-        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response) {
-            if (request()->is('api/v1/producer/registration*', 'api/v1/producer/terms', 'api/v1/producer/onboarding')) {
+        $exceptions->respond(function (Response $response) {
+            if (request()->is('api/v1/producer/registration*', 'api/v1/producer/password-reset/*', 'api/v1/producer/terms', 'api/v1/producer/onboarding')) {
                 $response->headers->set('Cache-Control', 'no-store, private');
             }
 
