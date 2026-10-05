@@ -253,14 +253,14 @@ class BuyerOrderController extends Controller
             'issuedAt' => now(),
             'paidAt' => $paidAt,
             'issuer' => [
-                'name' => 'みのり農園',
+                'name' => $shopName ?: '生産者',
                 'postal_code' => '370-0000',
                 'address' => '群馬県高崎市みのり町1-2-3',
             ],
         ])->render();
 
         if (! defined('K_PATH_FONTS')) {
-            define('K_PATH_FONTS', resource_path('fonts'));
+            define('K_PATH_FONTS', resource_path('fonts/regular'));
         }
         ini_set('memory_limit', '256M');
         $pdf = new BuyerReceiptPdf('P', 'mm', 'A4', true, 'UTF-8', false);
@@ -270,7 +270,7 @@ class BuyerOrderController extends Controller
         $pdf->SetPrintFooter(false);
         $pdf->SetMargins(18, 16, 18);
         $pdf->SetAutoPageBreak(true, 16);
-        $pdf->SetFont('cid0jp', '', 10);
+        $pdf->SetFont('notosansjp', '', 10);
         $pdf->AddPage();
         $pdf->writeHTML($html, true, false, true, false, '');
 

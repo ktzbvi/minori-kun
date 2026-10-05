@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body { color: #26362c; font-family: cid0jp; font-size: 10pt; }
+        body { color: #26362c; font-family: notosansjp; font-size: 10pt; }
         .brand { color: #237f4b; font-size: 12pt; font-weight: bold; }
         .title { font-size: 25pt; font-weight: bold; text-align: right; }
         .muted { color: #68786e; font-size: 8pt; }
@@ -46,9 +46,9 @@
 </table>
 <br>
 <div class="section-title">ご注文内容</div>
-<table cellpadding="5" cellspacing="0" border="1" bordercolor="#dce5dc" width="100%">
+<table cellpadding="5" cellspacing="0" border="0" width="100%">
     <thead>
-    <tr class="header-cell">
+    <tr class="header-cell" style="border-bottom: 1px solid #dce5dc;">
         <th width="52%">商品</th>
         <th width="10%" class="center">数量</th>
         <th width="19%" class="right">単価（税込）</th>
@@ -57,7 +57,7 @@
     </thead>
     <tbody>
     @foreach ($producerOrder->items as $item)
-        <tr>
+        <tr style="border-bottom: 1px solid #dce5dc;">
             <td width="52%">{{ $item->product_name_snapshot }}</td>
             <td width="10%" class="center">{{ $item->quantity }}</td>
             <td width="19%" class="right">{{ number_format($item->unit_price_yen) }}円</td>
