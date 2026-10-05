@@ -123,15 +123,15 @@ onBeforeRouteLeave(() => {
 <template>
   <RegistrationShell>
     <div class="w-full max-w-[724px] min-[761px]:max-w-[496px]">
-      <RegistrationProgress :current-step="2" class="mb-10 px-1 min-[761px]:mb-5 min-[761px]:px-0" />
+      <RegistrationProgress :current-step="2" class="mb-10 px-1 min-[761px]:mb-5 min-[761px]:px-0 max-[760px]:mb-5" />
 
-      <UiCard class="rounded-[28px] border-0 bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-xl min-[761px]:border min-[761px]:border-[#cfdfd5] min-[761px]:p-8 min-[761px]:shadow-none">
+      <UiCard class="rounded-[28px] border-0 bg-white px-6 py-9 shadow-[0_18px_50px_rgb(37_91_61/10%)] min-[761px]:rounded-xl min-[761px]:border min-[761px]:border-[#cfdfd5] min-[761px]:p-8 min-[761px]:shadow-none max-[760px]:rounded-2xl max-[760px]:px-5 max-[760px]:py-6">
         <RegistrationBrand />
 
-        <div class="mt-7 hidden size-14 place-items-center rounded-full bg-[#e5f1d8] text-[#247d4c] min-[761px]:grid">
+        <div class="mt-7 hidden size-14 place-items-center rounded-full bg-[#e5f1d8] text-[#247d4c] min-[761px]:grid max-[760px]:mt-5">
           <Mail class="size-7" :stroke-width="2" aria-hidden="true" />
         </div>
-        <h1 class="mt-8 text-[24px] font-bold text-[#173b2c] min-[761px]:mt-5 min-[761px]:text-2xl min-[761px]:text-[#1e2923]">
+        <h1 class="mt-8 text-[24px] font-bold text-[#173b2c] min-[761px]:mt-5 min-[761px]:text-2xl min-[761px]:text-[#1e2923] max-[760px]:mt-5">
           <span class="min-[761px]:hidden">メール確認</span>
           <span class="hidden min-[761px]:inline">確認コードを入力</span>
         </h1>
@@ -162,7 +162,7 @@ onBeforeRouteLeave(() => {
             確認コードの有効期限が切れました。新しいコードを再送してください。
           </div>
 
-          <form v-if="mayHaveCode" class="mt-10 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4" novalidate :aria-busy="isBusy" @submit.prevent="submit">
+          <form v-if="mayHaveCode" class="mt-10 grid gap-5 min-[761px]:mt-5 min-[761px]:gap-4 max-[760px]:mt-6" novalidate :aria-busy="isBusy" @submit.prevent="submit">
             <div class="grid gap-2">
               <UiFormLabel for="verification-code" class="text-[16px] font-bold text-[#173b2c] min-[761px]:text-sm min-[761px]:font-medium min-[761px]:text-[#687b70]">
                 確認コード（6桁）
@@ -178,7 +178,7 @@ onBeforeRouteLeave(() => {
                 autocomplete="one-time-code"
                 maxlength="6"
                 required
-                class="h-[58px] rounded-xl px-4 text-base shadow-none min-[761px]:h-12 min-[761px]:text-base"
+                class="h-[58px] rounded-xl px-4 text-base shadow-none min-[761px]:h-12 min-[761px]:text-base max-[760px]:h-12"
                 :disabled="isBusy || otpExpired"
                 :aria-invalid="Boolean(codeError)"
                 :aria-describedby="codeError ? 'verification-code-error' : undefined"
@@ -186,13 +186,13 @@ onBeforeRouteLeave(() => {
               <UiFormMessage v-if="codeError" id="verification-code-error" role="alert">{{ codeError }}</UiFormMessage>
             </div>
 
-            <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none" :disabled="isBusy || otpExpired">
+            <UiButton type="submit" class="min-h-[58px] w-full rounded-xl border-0 bg-linear-to-r from-[#2d965a] to-[#17653d] text-[17px] shadow-[0_10px_20px_rgb(26_98_58/20%)] min-[761px]:min-h-12 min-[761px]:bg-[#237b4d] min-[761px]:bg-none min-[761px]:text-base min-[761px]:shadow-none max-[760px]:min-h-12 max-[760px]:text-base" :disabled="isBusy || otpExpired">
               {{ registrationActions.isVerifyingCode.value ? '確認中…' : '確認して次へ進む' }}
             </UiButton>
           </form>
 
           <p v-if="mayHaveCode" class="mt-6 text-sm leading-relaxed text-[#87968d] min-[761px]:mt-4">メールが届かない場合は、迷惑メールフォルダもご確認ください。</p>
-          <UiButton variant="outline" class="mt-5 min-h-[56px] w-full rounded-xl text-base min-[761px]:mt-4 min-[761px]:min-h-12 min-[761px]:text-base" :disabled="isBusy || resendBlocked" @click="resend">
+          <UiButton variant="outline" class="mt-5 min-h-[56px] w-full rounded-xl text-base min-[761px]:mt-4 min-[761px]:min-h-12 min-[761px]:text-base max-[760px]:min-h-12" :disabled="isBusy || resendBlocked" @click="resend">
             <template v-if="isBusy">送信中…</template>
             <template v-else-if="deliveryFailed && resendBlocked">時間をおいて再送してください</template>
             <template v-else-if="resendBlocked">再送可能まであと {{ formattedResendCountdown }}</template>
@@ -200,7 +200,7 @@ onBeforeRouteLeave(() => {
           </UiButton>
           <p v-if="feedback" class="mt-3 text-sm leading-relaxed text-[#247d4c]" role="status">{{ feedback }}</p>
           <div class="text-center min-[761px]:text-left">
-            <UiButton type="button" variant="ghost" class="mt-7 min-h-0 border-0 p-0 text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:mt-5 min-[761px]:text-base" :disabled="isBusy" @click="changeEmail">
+            <UiButton type="button" variant="ghost" class="mt-7 min-h-0 border-0 p-0 text-sm font-medium text-[#258451] underline underline-offset-4 min-[761px]:mt-5 min-[761px]:text-base max-[760px]:mt-5" :disabled="isBusy" @click="changeEmail">
               メールアドレスを変更する
             </UiButton>
           </div>

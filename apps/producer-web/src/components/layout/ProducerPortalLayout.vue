@@ -52,17 +52,17 @@ const navigationItems = computed(() => [
       </nav>
     </aside>
 
-    <div class="min-w-0 pb-[126px] lg:pb-0">
-      <header class="flex min-h-[110px] items-center justify-between border-b border-[#d8e2da] bg-white px-10 lg:min-h-[clamp(72px,5vw,82px)] lg:px-[clamp(24px,3vw,40px)]">
+    <div class="min-w-0 pb-[calc(88px+env(safe-area-inset-bottom))] lg:pb-0">
+      <header class="flex min-h-18 items-center justify-between gap-3 border-b border-[#d8e2da] bg-white px-4 py-3 sm:px-6 lg:min-h-[clamp(72px,5vw,82px)] lg:px-[clamp(24px,3vw,40px)] lg:py-0">
         <RouterLink
           to="/dashboard"
-          class="flex items-center gap-5 text-[#1b7a49] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] lg:hidden"
+          class="flex shrink-0 items-center gap-2 text-[#1b7a49] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] lg:hidden"
           aria-label="みのりくん ダッシュボード"
         >
-          <span class="grid size-[88px] shrink-0 place-items-center rounded-full bg-[#e8f5ed]" aria-hidden="true">
-            <Leaf class="size-[58px] rounded-full bg-[#1b7a49] p-3 text-white" :stroke-width="2.5" />
+          <span class="grid size-10 shrink-0 place-items-center rounded-full bg-[#e8f5ed]" aria-hidden="true">
+            <Leaf class="size-7 rounded-full bg-[#1b7a49] p-1.5 text-white" :stroke-width="2.5" />
           </span>
-          <span class="text-[40px] font-extrabold">みのりくん</span>
+          <span class="text-xl font-extrabold whitespace-nowrap sm:text-2xl">みのりくん</span>
         </RouterLink>
 
         <div class="hidden lg:block">
@@ -72,34 +72,34 @@ const navigationItems = computed(() => [
 
         <button
           type="button"
-          class="ml-auto flex min-h-[70px] items-center gap-3 rounded-[18px] border border-[#d7e3da] bg-[#f8fbf8] px-6 text-[26px] font-extrabold text-[#1d2b24] shadow-sm transition-colors hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] lg:min-h-[52px] lg:min-w-[230px] lg:rounded-[14px] lg:px-4 lg:text-lg"
+          class="ml-auto flex min-h-11 min-w-0 max-w-[45%] items-center gap-2 rounded-xl border border-[#d7e3da] bg-[#f8fbf8] px-2 text-sm font-extrabold text-[#1d2b24] shadow-sm transition-colors hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] sm:px-3 sm:text-base lg:min-h-[52px] lg:min-w-[230px] lg:max-w-none lg:gap-3 lg:rounded-[14px] lg:px-4 lg:text-lg"
           aria-haspopup="menu"
         >
-          <span class="grid size-[48px] shrink-0 place-items-center rounded-full bg-[#e8f5ed] lg:size-9" aria-hidden="true">
-            <UserRound class="size-8 text-[#1b7a49] lg:size-6" :stroke-width="2.4" />
+          <span class="grid size-7 shrink-0 place-items-center rounded-full bg-[#e8f5ed] lg:size-9" aria-hidden="true">
+            <UserRound class="size-5 text-[#1b7a49] lg:size-6" :stroke-width="2.4" />
           </span>
-          <span class="max-w-[180px] truncate">{{ producerName }}</span>
-          <ChevronDown class="ml-auto size-7 text-[#687a70] lg:size-5" aria-hidden="true" :stroke-width="3" />
+          <span class="min-w-0 max-w-[180px] truncate">{{ producerName }}</span>
+          <ChevronDown class="ml-auto size-4 shrink-0 text-[#687a70] lg:size-5" aria-hidden="true" :stroke-width="3" />
         </button>
       </header>
 
-      <main class="mx-auto w-full max-w-[1440px] px-10 py-12 lg:px-[clamp(24px,3vw,40px)] lg:py-[clamp(24px,2.5vw,32px)]">
+      <main class="mx-auto w-full min-w-0 max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-[clamp(24px,3vw,40px)] lg:py-[clamp(24px,2.5vw,32px)]">
         <slot :producer-name="producerName">
           <RouterView />
         </slot>
       </main>
 
-      <nav class="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-[#cfddd4] bg-white px-4 py-5 lg:hidden" aria-label="生産者ポータル主要ナビゲーション">
+      <nav class="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-[#cfddd4] bg-white px-2 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] lg:hidden" aria-label="生産者ポータル主要ナビゲーション">
         <RouterLink
           v-for="item in navigationItems"
           :key="item.label"
           :to="item.to"
-          class="grid min-h-[86px] place-items-center gap-1 rounded-xl text-[18px] font-bold text-[#68766e] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#237f4b]"
+          class="grid min-h-14 min-w-0 place-items-center gap-1 rounded-xl text-xs font-bold text-[#68766e] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#237f4b]"
           :class="item.active ? 'text-[#137c49]' : ''"
           :aria-current="item.active ? 'page' : undefined"
         >
-          <component :is="item.icon" class="size-8" aria-hidden="true" :stroke-width="2.8" />
-          <span>{{ item.shortLabel }}</span>
+          <component :is="item.icon" class="size-6" aria-hidden="true" :stroke-width="2.4" />
+          <span class="whitespace-nowrap">{{ item.shortLabel }}</span>
         </RouterLink>
       </nav>
     </div>

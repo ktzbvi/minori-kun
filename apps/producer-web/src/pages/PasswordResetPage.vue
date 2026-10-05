@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
 <template>
   <RegistrationShell compact-mobile>
     <UiCard
-      class="w-full max-w-[440px] rounded-2xl border-[#d5e2da] bg-white p-7 shadow-sm min-[761px]:p-8"
+      class="w-full max-w-[440px] rounded-2xl border-[#d5e2da] bg-white p-7 shadow-sm min-[761px]:p-8 max-[760px]:p-5"
     >
       <template v-if="state === 'checking'">
         <LoaderCircle class="mb-5 size-10 animate-spin text-[#237b4d]" aria-hidden="true" />
