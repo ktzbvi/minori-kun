@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
 use App\Http\Controllers\Api\ProducerDashboardController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
+use App\Http\Controllers\Api\ProducerOrderController;
 use App\Http\Controllers\Api\ProducerPasswordResetController;
 use App\Http\Controllers\Api\ProducerProductController;
 use App\Http\Controllers\Api\ProducerRegistrationController;
@@ -105,6 +106,8 @@ Route::prefix('api/v1')->group(function (): void {
 
         Route::middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible'])->group(function (): void {
             Route::get('/dashboard', [ProducerDashboardController::class, 'show']);
+            Route::get('/orders', [ProducerOrderController::class, 'index']);
+            Route::get('/orders/{producerOrder}', [ProducerOrderController::class, 'show'])->whereUlid('producerOrder');
             Route::get('/products/options', [ProducerProductController::class, 'options']);
             Route::get('/products', [ProducerProductController::class, 'index']);
             Route::post('/products', [ProducerProductController::class, 'store']);

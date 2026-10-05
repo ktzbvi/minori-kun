@@ -99,8 +99,13 @@ export const router = createRouter({
         {
           path: 'orders',
           name: 'orders',
-          component: PortalUnavailablePage,
-          props: { title: '注文管理' },
+          component: () => import('@/pages/OrdersPage.vue'),
+          meta: { portalTitle: '注文管理', activeRoute: '/orders' },
+        },
+        {
+          path: 'orders/:id',
+          name: 'order-summary',
+          component: () => import('@/pages/OrderSummaryPage.vue'),
           meta: { portalTitle: '注文管理', activeRoute: '/orders' },
         },
         {

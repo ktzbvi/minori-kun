@@ -628,6 +628,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/producer/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerOrder.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/orders/{producerOrder}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerOrder.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -901,6 +933,24 @@ export interface components {
         /** VerifyProducerRegistrationCodeRequest */
         VerifyProducerRegistrationCodeRequest: {
             code: string;
+        };
+        /** ProducerOrderListItemResource */
+        ProducerOrderListItemResource: {
+            id: string;
+            display_id: string;
+            ordered_at: string;
+            fulfillment_state: string;
+            /** @enum {string} */
+            operational_state: "received" | "confirmed" | "processing" | "shipped" | "cancelled";
+            /** @enum {string} */
+            status_owner: "system" | "producer";
+            order_state: string;
+            refund_state: string;
+            items: {
+                id: string;
+                product_name: string;
+                quantity: number;
+            }[];
         };
     };
     responses: {
@@ -2154,6 +2204,91 @@ export interface operations {
                     };
                 };
             };
+        };
+    };
+    "producerOrder.index": {
+        parameters: {
+            query?: {
+                keyword?: string | null;
+                fulfillment_state?: "all" | "received" | "processing" | "shipped";
+                status?: "all" | "received" | "processing" | "shipped" | "cancelled" | "refunded";
+                period?: "all" | "30d" | "90d" | "12m" | "year" | "custom";
+                year?: number;
+                from?: string;
+                to?: string;
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated set of `ProducerOrderListItemResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerOrderListItemResource"][];
+                        links: {
+                            first: string | null;
+                            last: string | null;
+                            prev: string | null;
+                            next: string | null;
+                        };
+                        meta: {
+                            current_page: number;
+                            from: number | null;
+                            last_page: number;
+                            /** @description Generated paginator links. */
+                            links: {
+                                url: string | null;
+                                label: string;
+                                active: boolean;
+                            }[];
+                            /** @description Base path for paginator generated URLs. */
+                            path: string | null;
+                            /** @description Number of items shown per page. */
+                            per_page: number;
+                            /** @description Number of the last item in the slice. */
+                            to: number | null;
+                            /** @description Total number of items being paginated. */
+                            total: number;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "producerOrder.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                producerOrder: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `ProducerOrderListItemResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerOrderListItemResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
         };
     };
 }
