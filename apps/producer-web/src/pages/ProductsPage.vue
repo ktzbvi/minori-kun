@@ -2,7 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
-import { UiButton } from '@minorikun/ui'
+import { UiButton, UiSkeleton } from '@minorikun/ui'
 import { useProducerProductsQuery } from '@/services/products/product.query'
 import type {
   ProducerProductListFilters,
@@ -143,8 +143,48 @@ function markProductImageFailed(productId: string) {
         <p class="text-sm font-bold text-[#68766e] lg:text-xl">{{ productsQuery.isPending.value ? '確認中' : `${products.length}件` }}</p>
       </header>
 
-      <div v-if="productsQuery.isPending.value" class="rounded-[14px] bg-[#f4f7f4] p-4 text-center lg:p-8" role="status">
-        <p class="text-lg font-bold text-[#68766e]">商品を確認しています...</p>
+      <div v-if="productsQuery.isPending.value" role="status" aria-live="polite">
+        <span class="sr-only">商品を確認しています...</span>
+        <div class="hidden min-[1280px]:block" aria-hidden="true">
+          <div class="grid min-h-14 grid-cols-[90px_minmax(220px,1.5fr)_minmax(120px,.7fr)_minmax(120px,.7fr)_80px_120px_28px] items-center gap-3 rounded-[14px] bg-[#f2f5f3] px-4">
+            <UiSkeleton v-for="column in 6" :key="column" class="h-4 w-16" />
+          </div>
+          <div class="divide-y divide-[#d9e3dc]">
+            <div v-for="row in 5" :key="row" class="grid min-h-[88px] grid-cols-[90px_minmax(220px,1.5fr)_minmax(120px,.7fr)_minmax(120px,.7fr)_80px_120px_28px] items-center gap-3 px-4 py-4">
+              <UiSkeleton class="h-4 w-16" />
+              <div class="flex min-w-0 items-center gap-4">
+                <UiSkeleton class="size-14 shrink-0 rounded-[10px]" />
+                <div class="flex min-w-0 flex-1 flex-col gap-2">
+                  <UiSkeleton class="h-5 w-3/4" />
+                  <UiSkeleton class="h-5 w-16 rounded-full" />
+                </div>
+              </div>
+              <UiSkeleton class="h-4 w-20" />
+              <UiSkeleton class="h-5 w-20" />
+              <UiSkeleton class="h-5 w-10" />
+              <UiSkeleton class="h-10 w-24 rounded-full" />
+              <UiSkeleton class="size-5" />
+            </div>
+          </div>
+        </div>
+        <div class="grid gap-4 min-[600px]:gap-[18px] min-[1280px]:hidden" aria-hidden="true">
+          <div v-for="row in 5" :key="row" class="relative grid min-h-[132px] grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-[16px] border border-[#d9e3dc] bg-white p-3 pr-9 min-[600px]:min-h-[144px] min-[600px]:grid-cols-[80px_minmax(0,1fr)_112px] min-[600px]:gap-4 min-[600px]:rounded-[18px] min-[600px]:p-4 min-[600px]:pr-10 lg:min-h-[164px] lg:grid-cols-[104px_minmax(0,1fr)_132px] lg:gap-5 lg:p-5 lg:pr-12">
+            <UiSkeleton class="row-span-2 size-16 self-center rounded-[12px] min-[600px]:row-span-1 min-[600px]:size-20 min-[600px]:rounded-[14px] lg:size-[104px]" />
+            <div class="flex min-w-0 flex-col justify-center gap-2">
+              <UiSkeleton class="h-5 w-3/4 lg:h-6" />
+              <UiSkeleton class="h-3 w-1/2 lg:h-4" />
+              <div class="mt-1 flex gap-4 lg:mt-2">
+                <UiSkeleton class="h-4 w-16 lg:h-5" />
+                <UiSkeleton class="h-4 w-12 lg:h-5" />
+              </div>
+            </div>
+            <div class="col-start-2 flex flex-wrap items-center gap-2 min-[600px]:col-start-3 min-[600px]:row-start-1 min-[600px]:flex-col min-[600px]:items-end min-[600px]:justify-center min-[600px]:gap-3">
+              <UiSkeleton class="h-6 w-16 rounded-full lg:h-8 lg:w-28" />
+              <UiSkeleton class="h-4 w-12" />
+            </div>
+            <UiSkeleton class="absolute top-1/2 right-2 size-5 -translate-y-1/2 min-[600px]:right-3" />
+          </div>
+        </div>
       </div>
 
       <div v-else-if="productsQuery.isError.value" class="rounded-[14px] border border-[#e4c9c3] bg-white p-4 text-center lg:p-8">
