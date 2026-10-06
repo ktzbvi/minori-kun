@@ -8,6 +8,11 @@ use App\Models\User;
 
 class ProducerOrderPolicy
 {
+    public function viewAny(User $user): bool
+    {
+        return $user->role === UserRole::Producer;
+    }
+
     public function view(User $user, ProducerOrder $producerOrder): bool
     {
         return $user->role === UserRole::Admin
