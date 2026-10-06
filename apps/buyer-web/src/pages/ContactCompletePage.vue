@@ -8,6 +8,7 @@ import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 const route = useRoute()
 const router = useRouter()
 const referenceNumber = computed(() => String(route.query.reference ?? ''))
+const isProducerInquiry = computed(() => route.query.type === 'producer')
 
 function returnToMyPage() {
   void router.replace({ name: 'my-page' })
@@ -41,7 +42,7 @@ function returnToMyPage() {
         <p class="m-0 text-[11px] leading-5 text-[#718075]">
           内容を確認のうえ、担当者よりご連絡いたします。
         </p>
-        <p v-if="referenceNumber" class="mt-3 text-[10px] text-[#718075]">
+        <p v-if="referenceNumber && !isProducerInquiry" class="mt-3 text-[10px] text-[#718075]">
           受付番号: {{ referenceNumber }}
         </p>
         <UiButton

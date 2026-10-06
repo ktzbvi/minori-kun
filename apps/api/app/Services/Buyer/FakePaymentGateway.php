@@ -26,7 +26,7 @@ class FakePaymentGateway
         }
 
         return [
-            'state' => 'refunded',
+            'state' => 'pending',
             'reference' => 'fake_refund_'.substr(hash('sha256', $idempotencyKey), 0, 24),
             'amount_yen' => $amountYen,
         ];

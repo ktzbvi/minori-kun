@@ -17,10 +17,13 @@ use App\Models\ProducerOrder;
 use App\Models\ProductVariant;
 use App\Models\Refund;
 use App\Models\User;
+use App\Services\Buyer\BuyerOrderEmailOutboxDispatcher;
+use App\Services\Buyer\BuyerOrderRefundStatusService;
+use App\Services\Buyer\BuyerReceiptPdf;
 use App\Services\Buyer\FakePaymentGateway;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -250,23 +253,24 @@ class BuyerOrderController extends Controller
             'issuedAt' => now(),
             'paidAt' => $paidAt,
             'issuer' => [
-                'name' => 'みのり農園',
+                'name' => $shopName ?: '生産者',
                 'postal_code' => '370-0000',
                 'address' => '群馬県高崎市みのり町1-2-3',
             ],
         ])->render();
 
         if (! defined('K_PATH_FONTS')) {
-            define('K_PATH_FONTS', resource_path('fonts'));
+            define('K_PATH_FONTS', resource_path('fonts/regular'));
         }
-        $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        ini_set('memory_limit', '256M');
+        $pdf = new BuyerReceiptPdf('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetCreator(config('app.name'));
         $pdf->SetTitle('領収書 '.$record->order_number);
         $pdf->SetPrintHeader(false);
         $pdf->SetPrintFooter(false);
         $pdf->SetMargins(18, 16, 18);
         $pdf->SetAutoPageBreak(true, 16);
-        $pdf->SetFont('cid0jp', '', 10);
+        $pdf->SetFont('notosansjp', '', 10);
         $pdf->AddPage();
         $pdf->writeHTML($html, true, false, true, false, '');
 
@@ -277,15 +281,19 @@ class BuyerOrderController extends Controller
         ]);
     }
 
-    public function cancel(Request $request, string $order, FakePaymentGateway $gateway): JsonResponse
-    {
+    public function cancel(
+        Request $request,
+        string $order,
+        FakePaymentGateway $gateway,
+        BuyerOrderRefundStatusService $refundStatusService,
+    ): JsonResponse {
         abort_unless(app()->environment(['local', 'testing']) && config('buyer_payment.driver') === 'fake', 503, 'Payment gateway is not configured.');
         $request->validate(['idempotency_key' => ['required', 'string', 'max:100']]);
 
-        $record = DB::transaction(function () use ($request, $order, $gateway): Order {
+        [$record, $emailOutboxIds] = DB::transaction(function () use ($request, $order, $gateway, $refundStatusService): array {
             $record = Order::query()->where('buyer_id', $request->user()->id)->whereKey($order)->lockForUpdate()->firstOrFail();
-            if ($record->refund_state === RefundState::Refunded) {
-                return $record;
+            if ($record->order_state === 'cancelled') {
+                return [$record, []];
             }
             if (now()->greaterThanOrEqualTo($record->cancellation_deadline_at)) {
                 throw ValidationException::withMessages(['order' => ['キャンセル期限を過ぎています。']]);
@@ -297,13 +305,28 @@ class BuyerOrderController extends Controller
             $attempt = PaymentAttempt::query()->whereHas('producerOrder', fn ($q) => $q->where('order_id', $record->id))->lockForUpdate()->firstOrFail();
             $key = 'cancel:'.$record->id;
             $refundResult = $gateway->refund($record->total_yen, $key);
+            $refundState = $refundStatusService->mapProviderState($refundResult['state'] ?? '');
+            if (in_array($refundState, [RefundState::Failed, RefundState::Canceled], true)) {
+                throw ValidationException::withMessages(['order' => ['返金処理を開始できませんでした。']]);
+            }
             Refund::query()->firstOrCreate(['idempotency_reference' => $key], [
-                'payment_attempt_id' => $attempt->id, 'amount_yen' => $record->total_yen,
-                'reason' => 'buyer_cancellation', 'state' => $refundResult['state'],
+                'payment_attempt_id' => $attempt->id, 'actor_id' => $request->user()->id,
+                'amount_yen' => $record->total_yen,
+                'reason' => 'buyer_cancellation', 'state' => $refundState->value,
                 'provider_refund_reference' => $refundResult['reference'],
                 'authoritative_updated_at' => now(),
             ]);
-            $attempt->update(['payment_state' => 'refunded', 'authoritative_updated_at' => now()]);
+            if ($refundState === RefundState::Refunded) {
+                $attempt->update(['payment_state' => PaymentState::Refunded, 'authoritative_updated_at' => now()]);
+            }
+            $refund = Refund::query()->where('idempotency_reference', $key)->firstOrFail();
+            $emailOutboxIds = [
+                $refundStatusService->recordEmail($record, $refund, 'order_cancelled')->id,
+            ];
+            if ($refundState === RefundState::Refunded) {
+                $emailOutboxIds[] = $refundStatusService->recordEmail($record, $refund, 'refund_completed')->id;
+            }
+
             $items = OrderItem::query()->whereIn('producer_order_id', ProducerOrder::query()->where('order_id', $record->id)->select('id'))->get();
             foreach ($items as $item) {
                 if (! $item->variant_id) {
@@ -320,14 +343,22 @@ class BuyerOrderController extends Controller
                     'source_id' => $record->id, 'occurred_at' => now(),
                 ]);
             }
-            $record->update(['order_state' => 'cancelled', 'payment_state' => 'refunded', 'refund_state' => 'refunded']);
+            $record->update([
+                'order_state' => 'cancelled',
+                'payment_state' => $refundState === RefundState::Refunded ? PaymentState::Refunded : PaymentState::Succeeded,
+                'refund_state' => $refundState,
+            ]);
             OrderCancellation::query()->firstOrCreate(['order_id' => $record->id], [
                 'requested_by' => $request->user()->id, 'state' => 'completed',
                 'idempotency_reference' => $key, 'requested_at' => now(), 'completed_at' => now(),
             ]);
 
-            return $record->fresh();
+            return [$record->fresh(), $emailOutboxIds];
         }, 3);
+
+        foreach ($emailOutboxIds as $outboxId) {
+            app(BuyerOrderEmailOutboxDispatcher::class)->dispatch($outboxId);
+        }
 
         return response()->json(['data' => $this->orderPayload($record->id)]);
     }
@@ -346,7 +377,9 @@ class BuyerOrderController extends Controller
             'shipping_yen' => $order->shipping_yen,
             'delivery_address' => $order->deliveryAddress,
             'cancellation_deadline_at' => $order->cancellation_deadline_at,
-            'can_cancel' => $order->payment_state === PaymentState::Succeeded && now()->lessThan($order->cancellation_deadline_at),
+            'can_cancel' => $order->order_state === '注文確定'
+                && $order->payment_state === PaymentState::Succeeded
+                && now()->lessThan($order->cancellation_deadline_at),
             'producer_orders' => $order->producerOrders->map(fn (ProducerOrder $producerOrder) => [
                 'producer_id' => $producerOrder->producer_id,
                 'shop_name' => $producerOrder->producer->producerProfile?->farm_name,

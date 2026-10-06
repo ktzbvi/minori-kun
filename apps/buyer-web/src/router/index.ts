@@ -18,6 +18,7 @@ import BuyerPaymentPage from '@/pages/BuyerPaymentPage.vue'
 import BuyerOrderCompletePage from '@/pages/BuyerOrderCompletePage.vue'
 import OrderHistoryPage from '@/pages/OrderHistoryPage.vue'
 import OrderDetailPage from '@/pages/OrderDetailPage.vue'
+import ProducerOrderInquiryPage from '@/pages/ProducerOrderInquiryPage.vue'
 import ProductDetailPage from '@/pages/ProductDetailPage.vue'
 import RegisterEmailPage from '@/pages/RegisterEmailPage.vue'
 import RegisterOtpPage from '@/pages/RegisterOtpPage.vue'
@@ -31,6 +32,11 @@ export const router = createRouter({
     { path: '/my-page', name: 'my-page', component: MyPage },
     { path: '/my-page/orders', name: 'order-history', component: OrderHistoryPage },
     { path: '/my-page/orders/:orderId', name: 'order-detail', component: OrderDetailPage },
+    {
+      path: '/my-page/orders/:orderId/contact',
+      name: 'producer-inquiry',
+      component: ProducerOrderInquiryPage,
+    },
     {
       path: '/my-page/contact',
       name: 'contact',
