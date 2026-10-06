@@ -13,3 +13,4 @@ export interface ProducerOrderFilterValues {
 export type ProducerOrderListResponse = ListOperation['responses'][200]['content']['application/json']
 export type ProducerOrderListItem = components['schemas']['ProducerOrderListItemResource']
 export type ProducerOrderShowResponse = operations['producerOrder.show']['responses'][200]['content']['application/json']
+export type ProducerFulfillmentInput = operations['producerOrder.updateFulfillment']['requestBody']['content']['application/json']

@@ -6,8 +6,8 @@ use App\Http\Controllers\Api\BuyerCartController;
 use App\Http\Controllers\Api\BuyerCatalogController;
 use App\Http\Controllers\Api\BuyerInquiryController;
 use App\Http\Controllers\Api\BuyerOrderController;
-use App\Http\Controllers\Api\BuyerProducerInquiryController;
 use App\Http\Controllers\Api\BuyerPasswordResetController;
+use App\Http\Controllers\Api\BuyerProducerInquiryController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
@@ -110,6 +110,7 @@ Route::prefix('api/v1')->group(function (): void {
             Route::get('/dashboard', [ProducerDashboardController::class, 'show']);
             Route::get('/orders', [ProducerOrderController::class, 'index']);
             Route::get('/orders/{producerOrder}', [ProducerOrderController::class, 'show'])->whereUlid('producerOrder');
+            Route::patch('/orders/{producerOrder}/fulfillment', [ProducerOrderController::class, 'updateFulfillment'])->whereUlid('producerOrder');
             Route::get('/products/options', [ProducerProductController::class, 'options']);
             Route::get('/products', [ProducerProductController::class, 'index']);
             Route::post('/products', [ProducerProductController::class, 'store']);
