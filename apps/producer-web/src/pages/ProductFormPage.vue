@@ -19,6 +19,10 @@ import {
   UiFormMessage,
   UiInput,
   UiSelect,
+  UiSelectTrigger,
+  UiSelectContent,
+  UiSelectItem,
+  UiSelectValue,
   UiTextarea,
 } from '@minorikun/ui'
 import { useProducerProductOptionsQuery, useProducerProductQuery } from '@/services/products/product.query'
@@ -253,9 +257,11 @@ onBeforeUnmount(() => {
               </div>
               <div>
                 <UiFormLabel for="product-category" class="font-bold">カテゴリ <span class="rounded bg-[#d53b36] px-1.5 py-0.5 text-xs font-extrabold text-white">必須</span></UiFormLabel>
-                <UiSelect id="product-category" v-model="categoryId" class="mt-2 h-12" :aria-invalid="!!errors.categoryId">
-                  <option value="" disabled>カテゴリを選択</option>
-                  <option v-for="category in optionsQuery.data.value?.categories ?? []" :key="category.id" :value="category.id">{{ category.name }}</option>
+                <UiSelect v-model="categoryId">
+                  <UiSelectTrigger id="product-category" class="mt-2 h-12" :aria-invalid="!!errors.categoryId"><UiSelectValue placeholder="カテゴリを選択" /></UiSelectTrigger>
+                  <UiSelectContent>
+                    <UiSelectItem v-for="category in optionsQuery.data.value?.categories ?? []" :key="category.id" :value="category.id">{{ category.name }}</UiSelectItem>
+                  </UiSelectContent>
                 </UiSelect>
                 <UiFormMessage v-if="errors.categoryId" class="mt-1" role="alert">{{ errors.categoryId }}</UiFormMessage>
               </div>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
-import { UiButton, UiSkeleton } from '@minorikun/ui'
+import { ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
+import { UiButton, UiSkeleton, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
 import { useProducerProductsQuery } from '@/services/products/product.query'
 import type {
   ProducerProductListFilters,
@@ -107,33 +107,30 @@ function markProductImageFailed(productId: string) {
           />
         </label>
 
-        <label class="relative block">
-          <span class="sr-only">カテゴリ</span>
-          <select v-model="categoryFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option value="all">カテゴリ</option>
-            <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="categoryFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="カテゴリ"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem value="all">カテゴリ</UiSelectItem>
+            <UiSelectItem v-for="category in categories" :key="category" :value="category">{{ category }}</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
 
-        <label class="relative block">
-          <span class="sr-only">公開状態</span>
-          <select v-model="publicationFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option v-for="option in publicationOptions" :key="option.value" :value="option.value">{{ option.value === 'all' ? '公開状態' : option.label }}</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="publicationFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="公開状態"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem v-for="option in publicationOptions" :key="option.value" :value="option.value">{{ option.value === 'all' ? '公開状態' : option.label }}</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
 
-        <label class="relative block">
-          <span class="sr-only">在庫状態</span>
-          <select v-model="stockFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option value="all">在庫状態</option>
-            <option value="in_stock">在庫あり</option>
-            <option value="low_stock">在庫少なめ</option>
-            <option value="out_of_stock">在庫なし</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="stockFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="在庫状態"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem value="all">在庫状態</UiSelectItem>
+            <UiSelectItem value="in_stock">在庫あり</UiSelectItem>
+            <UiSelectItem value="low_stock">在庫少なめ</UiSelectItem>
+            <UiSelectItem value="out_of_stock">在庫なし</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
       </div>
     </section>
 
