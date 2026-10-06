@@ -3,28 +3,14 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { AlertCircle, ChartNoAxesColumn, ChevronRight, Package, ReceiptText, RefreshCw } from 'lucide-vue-next'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { useCurrentSessionQuery } from '@/services/auth/auth.query'
-import { useProducerDashboardQuery } from '@/services/dashboard/dashboard.query'
+import { useProducerDashboard } from '@/composables/useProducerDashboard'
 
-const sessionQuery = useCurrentSessionQuery()
-const dashboardQuery = useProducerDashboardQuery()
-const producerName = computed(() => sessionQuery.data.value?.display_name || '生産者')
-const dashboard = computed(() => dashboardQuery.data.value?.data)
-
-const numberFormatter = new Intl.NumberFormat('ja-JP')
-const currencyFormatter = new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 })
-const dateTimeFormatter = new Intl.DateTimeFormat('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-const dateFormatter = new Intl.DateTimeFormat('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric' })
-
-function formatCount(value: number | string | null | undefined) {
-  return numberFormatter.format(Number(value ?? 0))
-}
+const { producerName, summary, actionOrders, payoutAlert, isLoading, isError, reloadDashboard } = useProducerDashboard()
 
 const summaryCards = computed(() => [
   {
     label: '登録商品',
-    value: `${formatCount(dashboard.value?.products.total)}件`,
-    meta: `公開中 ${formatCount(dashboard.value?.products.published)}件`,
+    ...summary.value.products,
     action: '商品を管理',
     to: '/products',
     icon: Package,
@@ -33,8 +19,7 @@ const summaryCards = computed(() => [
   },
   {
     label: '対応が必要な注文',
-    value: `${formatCount(dashboard.value?.orders.requiring_action)}件`,
-    meta: `受付 ${formatCount(dashboard.value?.orders.received)}件・対応中 ${formatCount(dashboard.value?.orders.processing)}件`,
+    ...summary.value.orders,
     action: '注文を確認',
     to: '/orders',
     icon: ReceiptText,
@@ -43,8 +28,7 @@ const summaryCards = computed(() => [
   },
   {
     label: '今月の売上',
-    value: currencyFormatter.format(dashboard.value?.sales.total_yen ?? 0),
-    meta: dashboard.value?.sales.period_label ?? '',
+    ...summary.value.sales,
     action: '売上・振込を確認',
     to: '/sales',
     icon: ChartNoAxesColumn,
@@ -53,28 +37,10 @@ const summaryCards = computed(() => [
   },
 ])
 
-function formatOrderedAt(value: string | null) {
-  return value ? dateTimeFormatter.format(new Date(value)) : '日時未設定'
-}
-
-function formatDueOn(value: string | null | undefined) {
-  return value ? `振込予定日：${dateFormatter.format(new Date(value))}` : '振込予定日未定'
-}
-
-function payoutStateLabel(state: string) {
-  return { scheduled: '振込予定', carry_forward: '繰越', processing: '処理中', failed: '要確認' }[state] ?? '確認中'
-}
-
 function orderTone(state: string) {
   return state === 'received' ? 'bg-[#ffefd4] text-[#9c5a13]' : 'bg-[#e0f3e7] text-[#137c49]'
 }
 
-function fulfillmentLabel(state: string) {
-  if (state === 'received') return '受付'
-  if (state === 'processing') return '対応中'
-  if (state === 'shipped') return '発送済み'
-  return '確認中'
-}
 </script>
 
 <template>
@@ -86,11 +52,11 @@ function fulfillmentLabel(state: string) {
       </p>
     </div>
 
-    <UiCard v-if="dashboardQuery.isError.value" class="mt-6 lg:mt-9 rounded-[18px] border-[#d9b7aa] bg-[#fff7f3] p-4 lg:p-7 shadow-sm">
+    <UiCard v-if="isError" class="mt-6 lg:mt-9 rounded-[18px] border-[#d9b7aa] bg-[#fff7f3] p-4 lg:p-7 shadow-sm">
       <div class="flex flex-wrap items-center gap-4">
         <AlertCircle class="size-8 text-[#b34d2e]" aria-hidden="true" :stroke-width="2.5" />
         <p class="text-base font-bold text-[#70351f] lg:text-2xl">ダッシュボードを読み込めませんでした。</p>
-        <UiButton class="ml-auto" variant="outline" type="button" @click="dashboardQuery.refetch()">
+        <UiButton class="ml-auto" variant="outline" type="button" @click="reloadDashboard">
           <RefreshCw class="mr-2 size-5" aria-hidden="true" />
           再読み込み
         </UiButton>
@@ -104,7 +70,7 @@ function fulfillmentLabel(state: string) {
         :to="card.to"
         class="group min-w-0 rounded-[20px] border border-[#d6e2da] bg-white p-4 shadow-sm transition-colors hover:border-[#a9c8b6] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] lg:rounded-2xl lg:p-5"
         :class="card.label === '今月の売上' ? 'sm:col-span-2 xl:col-span-1' : ''"
-        :aria-busy="dashboardQuery.isLoading.value"
+        :aria-busy="isLoading"
       >
         <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
           <span class="grid size-10 shrink-0 place-items-center rounded-full lg:size-12" :class="[card.bg, card.accent]" aria-hidden="true">
@@ -113,7 +79,7 @@ function fulfillmentLabel(state: string) {
           <div class="min-w-0">
             <p class="text-sm font-medium text-[#68766e] lg:text-lg">{{ card.label }}</p>
             <p class="mt-2 text-2xl leading-none font-extrabold tracking-normal [overflow-wrap:anywhere] text-[#17241d] lg:text-4xl">
-              {{ dashboardQuery.isLoading.value ? '読み込み中' : card.value }}
+              {{ isLoading ? '読み込み中' : card.value }}
             </p>
             <p class="mt-2 text-sm font-medium text-[#68766e] lg:mt-3 lg:text-base">{{ card.meta }}</p>
             <p class="mt-6 hidden items-center gap-1 text-2xl font-extrabold text-[#137c49] group-hover:text-[#0d6339] lg:mt-4 lg:flex lg:text-lg">
@@ -149,17 +115,17 @@ function fulfillmentLabel(state: string) {
             <span class="sr-only">詳細</span>
           </div>
 
-          <div v-if="dashboardQuery.isLoading.value" class="grid min-h-40 place-items-center text-base font-bold text-[#68766e] lg:min-h-[220px] lg:text-xl">
+          <div v-if="isLoading" class="grid min-h-40 place-items-center text-base font-bold text-[#68766e] lg:min-h-[220px] lg:text-xl">
             読み込み中
           </div>
-          <div v-else-if="!dashboard?.action_orders.length" class="grid min-h-40 place-items-center text-center lg:min-h-[220px]">
+          <div v-else-if="actionOrders.length === 0" class="grid min-h-40 place-items-center text-center lg:min-h-[220px]">
             <div>
               <p class="text-base font-extrabold text-[#17241d] lg:text-xl">対応が必要な注文はありません。</p>
               <p class="mt-2 text-sm font-medium text-[#68766e] lg:mt-3 lg:text-base">受付・対応中の注文が入るとここに表示されます。</p>
             </div>
           </div>
           <ul v-else class="divide-y divide-[#d9e3dc] lg:mt-3" aria-label="対応が必要な注文">
-            <li v-for="order in dashboard.action_orders" :key="order.id">
+            <li v-for="order in actionOrders" :key="order.id">
               <RouterLink
                 :to="`/orders/${order.id}`"
                 class="grid min-h-20 grid-cols-[minmax(0,1fr)_auto_24px] items-center gap-3 py-4 focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-[#237f4b] lg:min-h-[76px] lg:grid-cols-[1fr_.95fr_1.1fr_.7fr_32px] lg:gap-5 lg:py-4"
@@ -168,10 +134,10 @@ function fulfillmentLabel(state: string) {
                   <p class="text-base font-extrabold text-[#1d2b24] lg:text-lg">{{ order.display_id }}</p>
                   <p class="mt-1 truncate text-sm font-medium text-[#68766e] lg:hidden">{{ order.product_summary }}</p>
                 </div>
-                <p class="hidden text-lg font-medium text-[#1d2b24] lg:block">{{ formatOrderedAt(order.ordered_at) }}</p>
+                <p class="hidden text-lg font-medium text-[#1d2b24] lg:block">{{ order.orderedAtLabel }}</p>
                 <p class="hidden truncate text-lg font-medium text-[#1d2b24] lg:block">{{ order.product_summary }}</p>
                 <span class="inline-flex min-w-[64px] items-center justify-center rounded-full px-3 py-1.5 text-sm font-extrabold lg:min-w-[92px] lg:px-4 lg:py-2 lg:text-base" :class="orderTone(order.fulfillment_state)">
-                  {{ fulfillmentLabel(order.fulfillment_state) }}
+                  {{ order.fulfillmentLabel }}
                 </span>
                 <ChevronRight class="size-5 text-[#137c49] lg:size-7" aria-hidden="true" :stroke-width="3.2" />
               </RouterLink>
@@ -187,13 +153,13 @@ function fulfillmentLabel(state: string) {
           <div class="mt-0 grid items-end gap-5 rounded-[14px] bg-[#f1f8f3] p-4 lg:mt-6 lg:block lg:p-6">
             <div>
               <p class="text-sm font-medium text-[#68766e] lg:text-base">
-                {{ dashboard?.payout_alert ? payoutStateLabel(dashboard.payout_alert.state) : '振込予定' }}
+                {{ payoutAlert.stateLabel }}
               </p>
               <p class="mt-3 text-2xl leading-none lg:mt-5 font-extrabold tracking-normal text-[#17241d] lg:text-3xl">
-                {{ currencyFormatter.format(dashboard?.payout_alert?.expected_payout_yen ?? 0) }}
+                {{ payoutAlert.amountLabel }}
               </p>
               <p class="mt-3 text-sm font-medium text-[#68766e] lg:mt-6 lg:text-base">
-                {{ formatDueOn(dashboard?.payout_alert?.due_on) }}
+                {{ payoutAlert.dueOnLabel }}
               </p>
             </div>
             <RouterLink to="/sales" class="inline-flex min-h-11 items-center justify-center rounded-[14px] border border-[#16804d] px-6 text-base font-extrabold text-[#137c49] hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] lg:mt-6 lg:min-h-[54px] lg:w-full lg:text-lg">
