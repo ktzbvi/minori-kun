@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ChevronLeft, ChevronRight, LoaderCircle, Search } from 'lucide-vue-next'
 import { z } from 'zod'
 import { UiButton, UiCard, UiDialog, UiRadioGroup, UiFormControl, UiFormItem, UiFormLabel, UiFormMessage, UiInput, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
 import OrderPeriodFields from '@/components/orders/OrderPeriodFields.vue'
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue'
-import { useProducerOrdersQuery } from '@/services/orders/order.query'
-import type { ProducerOrderListFilters } from '@/types/order'
+import { useProducerOrder } from '@/composables/useProducerOrder'
+
+const {
+  draft, orders, meta, isBusy, isPending, isError, hasAppliedFilters, canPreviousPage, canNextPage,
+  periodOptions, statusOptions, restoreAppliedFilters, resetDraftFilters,
+  applyFilters: applyOrderFilters, resetFilters: resetOrderFilters, changePage, reloadOrders,
+} = useProducerOrder()
 
 // FR-P-008 / P08-02: drafts only affect the API after Apply (or search submission).
 const filterSchema = z.object({
@@ -30,44 +35,13 @@ const filterSchema = z.object({
     }
   }
 })
-const currentYear = new Intl.DateTimeFormat('en', { year: 'numeric', timeZone: 'Asia/Tokyo' }).format(new Date())
-const defaults = () => ({ keyword: '', status: 'all', period: 'all', year: currentYear, from: '', to: '' })
-const draft = reactive(defaults())
 const errors = ref<Record<string, string | undefined>>({})
 const filtersOpen = ref(false)
-const applied = ref<ProducerOrderListFilters>({ period: 'all', status: 'all', page: 1 })
-const ordersQuery = useProducerOrdersQuery(applied)
-const orders = computed(() => ordersQuery.data.value?.data ?? [])
-const meta = computed(() => ordersQuery.data.value?.meta)
-const isBusy = computed(() => ordersQuery.isFetching.value)
-const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
-})
-const hasAppliedFilters = computed(() => Boolean(applied.value.keyword)
-  || applied.value.period !== 'all' || applied.value.status !== 'all')
-const periodOptions = [
-  { value: 'all', label: 'すべての期間' }, { value: '30d', label: '過去30日' },
-  { value: '90d', label: '過去90日' }, { value: '12m', label: '過去12か月' },
-  { value: 'year', label: '年を選択' }, { value: 'custom', label: '期間を指定' },
-]
-
-const statusOptions = [
-  { value: 'all', label: 'すべて' }, { value: 'received', label: '受付' },
-  { value: 'processing', label: '対応中' }, { value: 'shipped', label: '発送済み' },
-  { value: 'cancelled', label: 'キャンセル' }, { value: 'refunded', label: '返金済み' },
-]
 const filterTrigger = ref<{ $el: { focus: () => void } } | null>(null)
-
-function restoreAppliedFilters() {
-  Object.assign(draft, {
-    status: applied.value.status ?? 'all', period: applied.value.period ?? 'all',
-    year: String(applied.value.year ?? currentYear), from: applied.value.from ?? '', to: applied.value.to ?? '',
-  })
-  errors.value = {}
-}
 
 function setFiltersOpen(open: boolean) {
   restoreAppliedFilters()
+  errors.value = {}
   filtersOpen.value = open
 }
 
@@ -77,8 +51,7 @@ function restoreFilterFocus(event: globalThis.Event) {
 }
 
 function resetMobileDraft() {
-  const keyword = draft.keyword
-  Object.assign(draft, defaults(), { keyword })
+  resetDraftFilters()
   errors.value = {}
 }
 
@@ -89,31 +62,13 @@ function applyFilters(closeSheet = false) {
     for (const issue of result.error.issues) errors.value[String(issue.path[0])] ??= issue.message
     return
   }
-  const values = result.data
-  applied.value = {
-    keyword: values.keyword || undefined, status: values.status, period: values.period,
-    year: values.period === 'year' ? Number(values.year) : undefined,
-    from: values.period === 'custom' ? values.from : undefined,
-    to: values.period === 'custom' ? values.to : undefined, page: 1,
-  }
+  applyOrderFilters(result.data)
   if (closeSheet) filtersOpen.value = false
 }
 
 function resetFilters() {
-  Object.assign(draft, defaults())
+  resetOrderFilters()
   errors.value = {}
-  applied.value = { period: 'all', status: 'all', page: 1 }
-}
-
-function changePage(delta: number) {
-  const next = (meta.value?.current_page ?? 1) + delta
-  if (!isBusy.value && next >= 1 && next <= (meta.value?.last_page ?? 1)) {
-    applied.value = { ...applied.value, page: next }
-  }
-}
-
-function orderedAt(value: string | null) {
-  return value ? dateFormatter.format(new Date(value)) : '注文日未設定'
 }
 </script>
 
@@ -204,15 +159,15 @@ function orderedAt(value: string | null) {
     <section class="mt-6 xl:rounded-2xl xl:border xl:border-[#d6e2da] xl:bg-white xl:p-6" aria-labelledby="orders-title" :aria-busy="isBusy">
       <header class="mb-5 flex items-center justify-between gap-3">
         <h2 id="orders-title" class="text-lg font-bold text-[#17241d] xl:text-xl">注文</h2>
-        <p class="text-sm text-[#687a70]" role="status">{{ ordersQuery.isPending.value ? '確認中' : ordersQuery.isError.value ? '取得できません' : `${meta?.total ?? 0}件` }}</p>
+        <p class="text-sm text-[#687a70]" role="status">{{ isPending ? '確認中' : isError ? '取得できません' : `${meta?.total ?? 0}件` }}</p>
       </header>
 
-      <UiCard v-if="ordersQuery.isPending.value" class="grid min-h-48 place-items-center gap-3 p-6 text-sm text-[#687a70]" role="status">
+      <UiCard v-if="isPending" class="grid min-h-48 place-items-center gap-3 p-6 text-sm text-[#687a70]" role="status">
         <div class="grid justify-items-center gap-3"><LoaderCircle class="size-6 animate-spin" aria-hidden="true" />注文を読み込んでいます。</div>
       </UiCard>
-      <UiCard v-else-if="ordersQuery.isError.value" class="grid justify-items-center gap-4 p-6 text-center">
+      <UiCard v-else-if="isError" class="grid justify-items-center gap-4 p-6 text-center">
         <p class="text-sm text-[#7b3329]" role="alert">注文を取得できませんでした。通信状態を確認して再試行してください。</p>
-        <UiButton variant="outline" :disabled="isBusy" @click="ordersQuery.refetch()">再試行</UiButton>
+        <UiButton variant="outline" :disabled="isBusy" @click="reloadOrders">再試行</UiButton>
       </UiCard>
       <UiCard v-else-if="orders.length === 0" class="grid min-h-48 content-center justify-items-center gap-3 p-6 text-center">
         <p class="text-base font-bold">{{ hasAppliedFilters ? '条件に一致する注文はありません。' : '注文はまだありません。' }}</p>
@@ -230,7 +185,7 @@ function orderedAt(value: string | null) {
                   </p>
                   <ChevronRight class="size-5 shrink-0 text-[#687a70]" aria-hidden="true" />
                 </div>
-                <p class="mt-2 text-xs text-[#687a70]">注文日 {{ orderedAt(order.ordered_at) }}</p>
+                <p class="mt-2 text-xs text-[#687a70]">注文日 {{ order.orderedAtLabel }}</p>
                 <ul class="mt-4 grid gap-2 text-sm font-medium text-[#17241d]">
                   <li v-for="item in order.items" :key="item.id" class="flex items-start justify-between gap-4">
                     <span class="min-w-0 break-words">{{ item.product_name }}</span>
@@ -254,7 +209,7 @@ function orderedAt(value: string | null) {
           <tbody class="divide-y divide-[#e0e9e3]">
             <tr v-for="order in orders" :key="order.id" class="hover:bg-[#f8fbf8]">
               <td class="px-3 py-5 align-middle"><RouterLink :to="{ name: 'order-summary', params: { id: order.id } }" class="flex min-w-0 font-bold text-[#17241d] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b]" :title="`#${order.display_id}`"><span class="truncate">#{{ order.display_id.slice(0, -8) }}</span><span class="shrink-0">{{ order.display_id.slice(-8) }}</span></RouterLink></td>
-              <td class="whitespace-nowrap px-3 py-5 align-middle tabular-nums text-[#687a70]">{{ orderedAt(order.ordered_at) }}</td>
+              <td class="whitespace-nowrap px-3 py-5 align-middle tabular-nums text-[#687a70]">{{ order.orderedAtLabel }}</td>
               <td class="px-3 py-5 align-middle"><ul class="grid gap-1"><li v-for="item in order.items" :key="item.id" class="break-words font-medium">{{ item.product_name }}</li></ul></td>
               <td class="px-3 py-5 align-middle tabular-nums"><ul class="grid gap-1"><li v-for="item in order.items" :key="item.id">{{ item.quantity }}</li></ul></td>
               <td class="px-3 py-5 align-middle"><OrderStatusBadge :order="order" /></td>
@@ -266,9 +221,9 @@ function orderedAt(value: string | null) {
         <nav v-if="meta" class="mt-4 flex items-center justify-between gap-3" aria-label="注文一覧のページ切り替え">
           <p class="text-xs text-[#687a70] sm:text-sm">{{ meta.from ?? 0 }}–{{ meta.to ?? 0 }} / {{ meta.total }}件</p>
           <div class="flex items-center gap-2">
-            <UiButton type="button" variant="outline" class="size-11 p-2" aria-label="前のページ" :disabled="isBusy || meta.current_page <= 1" @click="changePage(-1)"><ChevronLeft class="size-5" aria-hidden="true" /></UiButton>
+            <UiButton type="button" variant="outline" class="size-11 p-2" aria-label="前のページ" :disabled="!canPreviousPage" @click="changePage(-1)"><ChevronLeft class="size-5" aria-hidden="true" /></UiButton>
             <span class="sr-only">{{ meta.current_page }} / {{ meta.last_page }}ページ</span>
-            <UiButton type="button" variant="outline" class="size-11 p-2" aria-label="次のページ" :disabled="isBusy || meta.current_page >= meta.last_page" @click="changePage(1)"><ChevronRight class="size-5" aria-hidden="true" /></UiButton>
+            <UiButton type="button" variant="outline" class="size-11 p-2" aria-label="次のページ" :disabled="!canNextPage" @click="changePage(1)"><ChevronRight class="size-5" aria-hidden="true" /></UiButton>
           </div>
         </nav>
       </template>
