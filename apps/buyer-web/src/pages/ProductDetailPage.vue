@@ -71,8 +71,19 @@ function openSearch() {
 function openCart() {
   void router.push({ name: 'cart' })
 }
-function showCheckoutUnavailable() {
-  toast.warning('\u8cfc\u5165\u624b\u7d9a\u304d\u306f\u6e96\u5099\u4e2d\u3067\u3059')
+function buyNow() {
+  if (!canPurchase.value || !selectedVariant.value) return
+
+  addCartItemMutation.mutate(
+    { variantId: selectedVariant.value.id, quantity: quantity.value },
+    {
+      onSuccess: () => router.push({ name: 'cart' }),
+      onError: () =>
+        toast.error(
+          '\u30ab\u30fc\u30c8\u306b\u8ffd\u52a0\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u5728\u5eab\u3068\u30ed\u30b0\u30a4\u30f3\u72b6\u614b\u3092\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044\u3002',
+        ),
+    },
+  )
 }
 function formatYen(amount: number) {
   return `\u7a0e\u8fbc ${amount.toLocaleString('ja-JP')}\u5186`
@@ -217,7 +228,8 @@ function discountedPrice(variant: BuyerCatalogueVariant) {
             <button
               class="min-h-10 rounded-[5px] border border-[#237f4b] bg-white text-[14px] font-bold text-[#237f4b]"
               type="button"
-              @click="showCheckoutUnavailable"
+              :disabled="!canPurchase || addCartItemMutation.isPending.value"
+              @click="buyNow"
             >
               &#x4ECA;&#x3059;&#x3050;&#x8CFC;&#x5165;
             </button>

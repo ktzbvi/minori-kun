@@ -1,43 +1,30 @@
 <script setup lang="ts">
-import {
-  Apple,
-  ChevronLeft,
-  Grid2X2,
-  Package,
-  Search,
-  ShoppingCart,
-  Sprout,
-  Wheat,
-} from 'lucide-vue-next'
+import { ChevronLeft, Grid2X2, Search, ShoppingCart } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { categories, type Category } from '@/lib/catalog'
-import { useCart } from '@/lib/cart'
+import { useBuyerCartQuery } from '@/services/cart/cart.query'
+import { useBuyerCatalogueQuery } from '@/services/catalog/catalog.query'
 
 const router = useRouter()
-const { cartItemCount } = useCart()
+const catalogueQuery = useBuyerCatalogueQuery()
+const cartQuery = useBuyerCartQuery()
+const cartItemCount = computed(
+  () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
+)
+const categoryCards = computed(() => [
+  { id: 'all', label: 'すべて', count: catalogueQuery.data.value?.length ?? 0 },
+  ...Array.from(
+    new Set((catalogueQuery.data.value ?? []).map((product) => product.category).filter(Boolean)),
+  ).map((category) => ({
+    id: category!,
+    label: category!,
+    count:
+      catalogueQuery.data.value?.filter((product) => product.category === category).length ?? 0,
+  })),
+])
 
-const categoryCards: {
-  id: Category
-  description: string
-  icon: typeof Grid2X2
-}[] = [
-  { id: 'all', description: '\u304a\u3059\u3059\u3081\u5546\u54c1', icon: Grid2X2 },
-  { id: 'vegetables', description: '\u65b0\u9bae\u306a\u91ce\u83dc', icon: Sprout },
-  { id: 'fruit', description: '\u65ec\u306e\u679c\u7269', icon: Apple },
-  {
-    id: 'sets',
-    description: '\u30ae\u30d5\u30c8\u30fb\u8a70\u3081\u5408\u308f\u305b',
-    icon: Package,
-  },
-  { id: 'grains', description: '\u767d\u7c73\u30fb\u7384\u7c73', icon: Wheat },
-]
-
-function categoryLabel(categoryId: Category) {
-  return categories.find((category) => category.id === categoryId)?.label ?? ''
-}
-
-function openCategory(categoryId: Category) {
+function openCategory(categoryId: string) {
   void router.push({ name: 'category-products', params: { categoryId } })
 }
 
@@ -107,11 +94,25 @@ function openCart() {
             type="button"
             @click="openCategory(category.id)"
           >
-            <component :is="category.icon" :size="23" class="text-[#237f4b]" stroke-width="1.9" />
-            <strong class="mt-1 block text-[13px]">{{ categoryLabel(category.id) }}</strong>
-            <span class="mt-0.5 block text-[10px] text-[#75847a]">{{ category.description }}</span>
+            <Grid2X2 :size="23" class="text-[#237f4b]" stroke-width="1.9" />
+            <strong class="mt-1 block text-[13px]">{{ category.label }}</strong>
+            <span class="mt-0.5 block text-[10px] text-[#75847a]">
+              {{ category.count }}件の商品
+            </span>
           </button>
         </div>
+        <p
+          v-if="catalogueQuery.isPending.value"
+          class="mt-6 text-center text-[12px] text-[#718075]"
+        >
+          商品を読み込んでいます。
+        </p>
+        <p
+          v-else-if="catalogueQuery.isError.value"
+          class="mt-6 text-center text-[12px] text-[#718075]"
+        >
+          商品を読み込めませんでした。
+        </p>
       </section>
 
       <BuyerBottomNavigation active="category" />

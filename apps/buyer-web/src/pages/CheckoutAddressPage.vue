@@ -15,6 +15,7 @@ import { getBuyerAccountProfile, updateBuyerAccountProfile } from '@/services/ac
 type AddressField = {
   key: keyof CheckoutDeliveryAddress
   label: string
+  required?: boolean
   autocomplete?: string
   inputmode?: 'numeric' | 'tel'
   type?: 'tel' | 'text'
@@ -33,7 +34,8 @@ const fields: AddressField[] = [
   { key: 'postalCode', label: '郵便番号', autocomplete: 'postal-code', inputmode: 'numeric' },
   { key: 'prefecture', label: '都道府県', autocomplete: 'address-level1' },
   { key: 'city', label: '市区町村', autocomplete: 'address-level2' },
-  { key: 'addressLine', label: '番地・建物名', autocomplete: 'street-address' },
+  { key: 'addressLine1', label: '番地・町名', autocomplete: 'address-line1' },
+  { key: 'addressLine2', label: '建物名・部屋番号', autocomplete: 'address-line2', required: false },
 ]
 
 onMounted(async () => {
@@ -46,7 +48,8 @@ onMounted(async () => {
       postalCode: profile.postal_code,
       prefecture: profile.prefecture,
       city: profile.city,
-      addressLine: [profile.address_line1, profile.address_line2].filter(Boolean).join(' '),
+      addressLine1: profile.address_line1,
+      addressLine2: profile.address_line2,
     })
     Object.assign(form, checkoutDeliveryAddress)
   } catch {
@@ -69,7 +72,7 @@ function validate() {
   )
 
   for (const field of fields) {
-    if (!form[field.key].trim()) {
+    if (field.required !== false && !form[field.key].trim()) {
       fieldErrors[field.key] = `${field.label}を入力してください。`
     }
   }
@@ -97,7 +100,8 @@ function applyServerErrors(error: unknown) {
     postal_code: 'postalCode',
     prefecture: 'prefecture',
     city: 'city',
-    address_line1: 'addressLine',
+    address_line1: 'addressLine1',
+    address_line2: 'addressLine2',
   }
 
   Object.entries(errors).forEach(([field, messages]) => {
@@ -121,8 +125,8 @@ async function saveDefaultAddress() {
     postal_code: form.postalCode,
     prefecture: form.prefecture,
     city: form.city,
-    address_line1: form.addressLine,
-    address_line2: '',
+    address_line1: form.addressLine1,
+    address_line2: form.addressLine2,
   })
 }
 
@@ -175,7 +179,7 @@ function cancel() {
           <div v-for="field in fields" :key="field.key" class="mb-3 last:mb-0">
             <label class="mb-1 block text-[11px] font-bold" :for="`checkout-${field.key}`">
               {{ field.label }}
-              <span class="required">必須</span>
+              <span v-if="field.required !== false" class="required">必須</span>
             </label>
             <input
               :id="`checkout-${field.key}`"

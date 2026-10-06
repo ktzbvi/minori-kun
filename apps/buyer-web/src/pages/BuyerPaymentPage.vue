@@ -35,7 +35,8 @@ onMounted(async () => {
       postalCode: profile.postal_code,
       prefecture: profile.prefecture,
       city: profile.city,
-      addressLine: [profile.address_line1, profile.address_line2].filter(Boolean).join(' '),
+      addressLine1: profile.address_line1,
+      addressLine2: profile.address_line2,
     })
   } catch {
     await router.replace({ name: 'login', query: { redirect: route.fullPath } })
@@ -75,7 +76,8 @@ async function completeFakePayment() {
         postal_code: checkoutDeliveryAddress.postalCode,
         prefecture: checkoutDeliveryAddress.prefecture,
         city: checkoutDeliveryAddress.city,
-        address_line1: checkoutDeliveryAddress.addressLine,
+        address_line1: checkoutDeliveryAddress.addressLine1,
+        address_line2: checkoutDeliveryAddress.addressLine2,
       },
     })
     await queryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })

@@ -163,6 +163,7 @@ function fulfillmentLabel(value?: string) {
           {{ order.data.value.delivery_address.prefecture
           }}{{ order.data.value.delivery_address.city
           }}{{ order.data.value.delivery_address.address_line1 }}
+          {{ order.data.value.delivery_address.address_line2 }}
           <br />
           {{ order.data.value.delivery_address.phone }}
         </p>
