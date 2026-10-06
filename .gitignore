@@ -18,6 +18,7 @@ apps/api/storage/framework/sessions/*
 apps/api/storage/framework/views/*
 
 # Local environment and credentials
+.vscode/
 .env
 .env.*
 !.env.example

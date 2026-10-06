@@ -1,56 +1,16 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { RouterLink } from 'vue-router'
-import { ChevronDown, ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
-import { UiButton, UiSkeleton } from '@minorikun/ui'
-import { useProducerProductsQuery } from '@/services/products/product.query'
-import type {
-  ProducerProductListFilters,
-  ProducerProductListItem,
-  ProducerProductPublicationState,
-  ProducerProductStockState,
-} from '@/types/product'
-import { getApiErrorMessage } from '@/lib/api-error'
+import { ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
+import { UiButton, UiSkeleton, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
+import { useProducerProduct } from '@/composables/useProducerProduct'
+import type { ProducerProductListItem } from '@/types/product'
 
-const keyword = ref('')
-const categoryFilter = ref('all')
-const publicationFilter = ref<'all' | ProducerProductPublicationState>('all')
-const stockFilter = ref<ProducerProductStockState>('all')
+const {
+  keyword, categoryFilter, publicationFilter, stockFilter, publicationOptions,
+  products, categories, errorMessage, isPending, isError, isFetching, resetFilters, reloadProducts,
+} = useProducerProduct()
 const failedProductImages = reactive(new Set<string>())
-
-const productFilters = computed<ProducerProductListFilters>(() => ({
-  keyword: keyword.value.trim(),
-  category: categoryFilter.value,
-  publication_state: publicationFilter.value,
-  stock_state: stockFilter.value,
-}))
-
-const productsQuery = useProducerProductsQuery(productFilters)
-const products = computed(() => productsQuery.data.value?.data ?? [])
-const categories = computed(() => productsQuery.data.value?.meta.categories ?? [])
-
-const publicationOptions = [
-  { value: 'all', label: 'すべての公開状態' },
-  { value: 'published', label: '公開中' },
-  { value: 'unpublished', label: '非公開' },
-  { value: 'draft', label: '下書き' },
-] as const
-
-function priceLabel(price: number | null, hasMultiplePrices: boolean) {
-  if (price === null) return '未設定'
-  return `¥${price.toLocaleString('ja-JP')}${hasMultiplePrices ? '〜' : ''}`
-}
-
-function discountLabel(discountBps: number) {
-  if (discountBps <= 0) return ''
-  return `${Math.round(discountBps / 100)}%OFF`
-}
-
-function publicationLabel(state: ProducerProductListItem['publication_state']) {
-  if (state === 'published') return '公開中'
-  if (state === 'unpublished') return '非公開'
-  return '下書き'
-}
 
 function publicationClass(state: ProducerProductListItem['publication_state']) {
   if (state === 'published') return 'bg-[#ddf2e6] text-[#16804d]'
@@ -62,13 +22,6 @@ function publicationDotClass(state: ProducerProductListItem['publication_state']
   if (state === 'published') return 'bg-[#16804d]'
   if (state === 'unpublished') return 'bg-[#97a59c]'
   return 'bg-[#c77a1a]'
-}
-
-function resetFilters() {
-  keyword.value = ''
-  categoryFilter.value = 'all'
-  publicationFilter.value = 'all'
-  stockFilter.value = 'all'
 }
 
 function markProductImageFailed(productId: string) {
@@ -107,43 +60,40 @@ function markProductImageFailed(productId: string) {
           />
         </label>
 
-        <label class="relative block">
-          <span class="sr-only">カテゴリ</span>
-          <select v-model="categoryFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option value="all">カテゴリ</option>
-            <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="categoryFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="カテゴリ"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem value="all">カテゴリ</UiSelectItem>
+            <UiSelectItem v-for="category in categories" :key="category" :value="category">{{ category }}</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
 
-        <label class="relative block">
-          <span class="sr-only">公開状態</span>
-          <select v-model="publicationFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option v-for="option in publicationOptions" :key="option.value" :value="option.value">{{ option.value === 'all' ? '公開状態' : option.label }}</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="publicationFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="公開状態"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem v-for="option in publicationOptions" :key="option.value" :value="option.value">{{ option.value === 'all' ? '公開状態' : option.label }}</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
 
-        <label class="relative block">
-          <span class="sr-only">在庫状態</span>
-          <select v-model="stockFilter" class="h-11 w-full appearance-none rounded-xl border border-[#cfded5] bg-white px-3.5 pr-10 text-base font-medium text-[#68766e] outline-none transition-colors focus:border-[#237f4b] focus:ring-3 focus:ring-[#237f4b]/15 min-[761px]:h-12 min-[761px]:text-base lg:h-14 lg:text-base">
-            <option value="all">在庫状態</option>
-            <option value="in_stock">在庫あり</option>
-            <option value="low_stock">在庫少なめ</option>
-            <option value="out_of_stock">在庫なし</option>
-          </select>
-          <ChevronDown class="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-[#68766e]" :stroke-width="3" aria-hidden="true" />
-        </label>
+        <UiSelect v-model="stockFilter">
+          <UiSelectTrigger class="h-11 rounded-xl px-3.5 text-base font-medium text-[#68766e] min-[761px]:h-12 lg:h-14 lg:text-base" aria-label="在庫状態"><UiSelectValue /></UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem value="all">在庫状態</UiSelectItem>
+            <UiSelectItem value="in_stock">在庫あり</UiSelectItem>
+            <UiSelectItem value="low_stock">在庫少なめ</UiSelectItem>
+            <UiSelectItem value="out_of_stock">在庫なし</UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
       </div>
     </section>
 
     <section class="mt-6 lg:mt-10 min-[1280px]:mt-8 min-[1280px]:rounded-[20px] min-[1280px]:border min-[1280px]:border-[#d6e2da] min-[1280px]:bg-white min-[1280px]:p-6 min-[1280px]:shadow-sm" aria-labelledby="products-title">
       <header class="mb-4 lg:mb-6 flex items-center justify-between">
         <h2 id="products-title" class="text-lg font-extrabold text-[#17241d] lg:text-3xl">商品</h2>
-        <p class="text-sm font-bold text-[#68766e] lg:text-xl">{{ productsQuery.isPending.value ? '確認中' : `${products.length}件` }}</p>
+        <p class="text-sm font-bold text-[#68766e] lg:text-xl">{{ isPending ? '確認中' : `${products.length}件` }}</p>
       </header>
 
-      <div v-if="productsQuery.isPending.value" role="status" aria-live="polite">
+      <div v-if="isPending" role="status" aria-live="polite">
         <span class="sr-only">商品を確認しています...</span>
         <div class="hidden min-[1280px]:block" aria-hidden="true">
           <div class="grid min-h-14 grid-cols-[90px_minmax(220px,1.5fr)_minmax(120px,.7fr)_minmax(120px,.7fr)_80px_120px_28px] items-center gap-3 rounded-[14px] bg-[#f2f5f3] px-4">
@@ -187,10 +137,10 @@ function markProductImageFailed(productId: string) {
         </div>
       </div>
 
-      <div v-else-if="productsQuery.isError.value" class="rounded-[14px] border border-[#e4c9c3] bg-white p-4 text-center lg:p-8">
-        <p class="text-base font-bold text-[#7b3329]" role="alert">{{ getApiErrorMessage(productsQuery.error.value) || '商品を取得できませんでした。' }}</p>
-        <UiButton class="mt-5" variant="outline" :disabled="productsQuery.isFetching.value" @click="productsQuery.refetch()">
-          {{ productsQuery.isFetching.value ? '確認中...' : '再試行' }}
+      <div v-else-if="isError" class="rounded-[14px] border border-[#e4c9c3] bg-white p-4 text-center lg:p-8">
+        <p class="text-base font-bold text-[#7b3329]" role="alert">{{ errorMessage }}</p>
+        <UiButton class="mt-5" variant="outline" :disabled="isFetching" @click="reloadProducts">
+          {{ isFetching ? '確認中...' : '再試行' }}
         </UiButton>
       </div>
 
@@ -231,17 +181,17 @@ function markProductImageFailed(productId: string) {
                 </span>
                 <span class="min-w-0">
                   <span class="block truncate text-lg font-extrabold text-[#1d2b24]">{{ product.name }}</span>
-                  <span v-if="discountLabel(product.discount_bps)" class="mt-1 inline-flex rounded-full bg-[#fde3df] px-3 py-1 text-sm font-extrabold text-[#d14a38]">
-                    {{ discountLabel(product.discount_bps) }}
+                  <span v-if="product.discountLabel" class="mt-1 inline-flex rounded-full bg-[#fde3df] px-3 py-1 text-sm font-extrabold text-[#d14a38]">
+                    {{ product.discountLabel }}
                   </span>
                 </span>
               </span>
-              <span class="truncate text-base font-medium text-[#1d2b24]">{{ product.category || '未設定' }}</span>
-              <span class="text-lg font-extrabold text-[#1d2b24]">{{ priceLabel(product.price_yen, product.has_multiple_prices) }}</span>
+              <span class="truncate text-base font-medium text-[#1d2b24]">{{ product.categoryLabel }}</span>
+              <span class="text-lg font-extrabold text-[#1d2b24]">{{ product.priceLabel }}</span>
               <span class="text-lg font-medium text-[#1d2b24]">{{ product.stock_quantity }}</span>
               <span class="inline-flex w-fit min-w-[104px] items-center justify-center gap-2 rounded-full px-3 py-2 text-base font-extrabold" :class="publicationClass(product.publication_state)">
                 <span class="size-3 rounded-full" :class="publicationDotClass(product.publication_state)" aria-hidden="true" />
-                {{ publicationLabel(product.publication_state) }}
+                {{ product.publicationLabel }}
               </span>
               <ChevronRight class="size-6 text-[#16804d]" :stroke-width="3" aria-hidden="true" />
             </RouterLink>
@@ -249,7 +199,7 @@ function markProductImageFailed(productId: string) {
         </ul>
       </div>
 
-      <ul v-if="!productsQuery.isPending.value && !productsQuery.isError.value && products.length > 0" class="grid gap-4 min-[600px]:gap-[18px] min-[1280px]:hidden" aria-label="商品一覧">
+      <ul v-if="!isPending && !isError && products.length > 0" class="grid gap-4 min-[600px]:gap-[18px] min-[1280px]:hidden" aria-label="商品一覧">
         <li v-for="product in products" :key="product.id">
           <RouterLink
             :to="`/products/${product.id}`"
@@ -268,20 +218,20 @@ function markProductImageFailed(productId: string) {
             <span class="flex min-w-0 flex-col justify-center">
               <span class="block truncate text-base font-extrabold text-[#1d2b24] min-[600px]:text-lg lg:text-xl">{{ product.name }}</span>
               <span class="mt-1 block truncate text-xs font-medium text-[#68766e] min-[600px]:text-sm lg:text-base">
-                {{ product.display_id }} · {{ product.category || '未設定' }}
+                {{ product.display_id }} · {{ product.categoryLabel }}
               </span>
               <span class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm font-extrabold text-[#1d2b24] min-[600px]:mt-3 min-[600px]:text-base lg:mt-4 lg:text-lg">
-                <span>{{ priceLabel(product.price_yen, product.has_multiple_prices) }}</span>
+                <span>{{ product.priceLabel }}</span>
                 <span>在庫 {{ product.stock_quantity }}</span>
               </span>
             </span>
             <span class="col-start-2 flex flex-wrap items-center gap-2 min-[600px]:col-start-3 min-[600px]:row-start-1 min-[600px]:flex-col min-[600px]:items-end min-[600px]:justify-center min-[600px]:gap-3">
               <span class="inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-2.5 py-1 text-xs font-extrabold min-[600px]:min-w-0 min-[600px]:text-sm lg:min-w-[124px] lg:text-base" :class="publicationClass(product.publication_state)">
                 <span class="size-2 rounded-full min-[600px]:size-2.5" :class="publicationDotClass(product.publication_state)" aria-hidden="true" />
-                {{ publicationLabel(product.publication_state) }}
+                {{ product.publicationLabel }}
               </span>
-              <span v-if="discountLabel(product.discount_bps)" class="inline-flex px-1 text-sm font-extrabold text-[#cf302d] min-[600px]:text-sm lg:text-base">
-                {{ discountLabel(product.discount_bps) }}
+              <span v-if="product.discountLabel" class="inline-flex px-1 text-sm font-extrabold text-[#cf302d] min-[600px]:text-sm lg:text-base">
+                {{ product.discountLabel }}
               </span>
             </span>
             <ChevronRight class="absolute top-1/2 right-2 size-5 -translate-y-1/2 text-[#68766e] min-[600px]:right-3" :stroke-width="3" aria-hidden="true" />

@@ -28,7 +28,7 @@ const refundLabel = computed(() => {
 </script>
 
 <template>
-  <div class="grid justify-items-center gap-2">
+  <div class="grid justify-items-start gap-1.5">
     <span class="inline-flex min-h-7 items-center justify-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold sm:text-sm" :class="presentation.tone">
       <Circle class="size-2.5 shrink-0 fill-current" aria-hidden="true" />
       {{ presentation.label }}

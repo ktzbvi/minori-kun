@@ -79,5 +79,6 @@ class DatabaseSeeder extends Seeder
         });
 
         $this->call(ProductSampleSeeder::class);
+        $this->call(OrderSampleSeeder::class);
     }
 }
