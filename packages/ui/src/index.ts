@@ -1,3 +1,4 @@
+export { default as UiBadge } from './components/Badge.vue'
 export { default as UiButton } from './components/Button.vue'
 export { default as UiCard } from './components/Card.vue'
 export { default as UiCheckbox } from './components/Checkbox.vue'

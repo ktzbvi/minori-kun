@@ -838,6 +838,8 @@ These decisions supersede conflicting Producer-specific numeric-policy and deliv
 - **Main entry:** Producer Order List (P08)
 - **Summary:** Producer Order Detail displays only the Producer's purchase-time item snapshots and the recipient information required for delivery; the Producer is responsible for shipment and manually updates the allowed fulfillment state.
 
+- **[CONFIRMED; user visual references, 2026-10-07; P09-01/02/03, AT-P-009] Detail presentation:** Stack items, delivery information and fulfillment controls on mobile. At desktop widths, place items and delivery in the main column with fulfillment controls in a right-side card; align product, discounted unit-price, quantity and snapshot subtotal columns. Show the original unit price struck through when a promotion applies, and calculate the single-unit display from the snapshot base price minus its rounded Producer discount; keep the line total authoritative. Use shared Badge primitives for promotion and fulfillment labels. Show delivery row dividers on desktop and preserve the confirmed `O-000456` order-number label rather than the historical sub-order label in the references.
+
 | Element ID | Element (EN / JP) | Display or input | Japanese display/input | User action | Processing / destination |
 |---|---|---|---|---|---|
 | `P09-01` | Owned order lines / `自分の注文明細` | Show purchase-time product, quantity, unit price, and promotion for the Producer's lines only. | 自分の明細だけについて購入時の商品、数量、単価、プロモーションを表示する。 | Review the items. | Use immutable OrderItem snapshots and hide other Producers' items and internal payment/commission data. |
