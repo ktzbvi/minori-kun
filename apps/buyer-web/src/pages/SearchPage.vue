@@ -3,13 +3,22 @@ import { computed, ref, watch } from 'vue'
 import { ChevronLeft, Search, ShoppingCart } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
-import { products } from '@/lib/catalog'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { useCart } from '@/lib/cart'
+import { useAddBuyerCartItemMutation } from '@/services/cart/cart.mutation'
+import { useBuyerCartQuery } from '@/services/cart/cart.query'
+import {
+  useBuyerCatalogueQuery,
+  type BuyerCatalogueProduct,
+} from '@/services/catalog/catalog.query'
 
 const route = useRoute()
 const router = useRouter()
-const { addItem, cartItemCount } = useCart()
+const catalogueQuery = useBuyerCatalogueQuery()
+const cartQuery = useBuyerCartQuery()
+const addCartItemMutation = useAddBuyerCartItemMutation()
+const cartItemCount = computed(
+  () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
+)
 const searchInput = ref(readQuery())
 const query = ref(searchInput.value.trim())
 
@@ -18,9 +27,9 @@ const results = computed(() => {
 
   if (!normalizedQuery) return []
 
-  return products.filter((product) =>
-    [product.name, ...(product.searchTerms ?? [])].some((term) =>
-      term.toLocaleLowerCase().startsWith(normalizedQuery),
+  return (catalogueQuery.data.value ?? []).filter((product) =>
+    [product.name, product.description, product.category ?? '', product.shop_name ?? ''].some(
+      (term) => term.toLocaleLowerCase().includes(normalizedQuery),
     ),
   )
 })
@@ -51,9 +60,17 @@ function openProduct(productId: string) {
   void router.push({ name: 'product-detail', params: { productId } })
 }
 
-function addToCart(productId: string) {
-  addItem(productId)
-  toast.success('\u30ab\u30fc\u30c8\u306b\u8ffd\u52a0\u3057\u307e\u3057\u305f')
+function addToCart(product: BuyerCatalogueProduct) {
+  const variant = product.variants[0]
+  if (!variant || variant.stock_quantity < 1) return
+
+  addCartItemMutation.mutate(
+    { variantId: variant.id, quantity: 1 },
+    {
+      onSuccess: () => toast.success('カートに追加しました'),
+      onError: () => toast.error('カートに追加できませんでした。ログイン状態を確認してください。'),
+    },
+  )
 }
 
 function openCart() {
@@ -61,7 +78,12 @@ function openCart() {
 }
 
 function formatYen(amount: number) {
-  return `\u7a0e\u8fbc ${amount.toLocaleString('ja-JP')}\u5186`
+  return `税込 ${amount.toLocaleString('ja-JP')}円`
+}
+
+function productPrice(product: BuyerCatalogueProduct) {
+  const variant = product.variants[0]
+  return variant ? Math.round((variant.price_yen * (10_000 - variant.discount_bps)) / 10_000) : 0
 }
 </script>
 
@@ -150,12 +172,17 @@ function formatYen(amount: number) {
               @click="openProduct(product.id)"
             >
               <div class="relative aspect-[1.35] overflow-hidden bg-[#e7eee8]">
-                <img :src="product.imageUrl" :alt="product.name" class="size-full object-cover" />
+                <img
+                  v-if="product.image_url"
+                  :src="product.image_url"
+                  :alt="product.name"
+                  class="size-full object-cover"
+                />
                 <span
-                  v-if="product.discountRate"
+                  v-if="product.variants[0]?.discount_bps"
                   class="absolute top-0 right-0 bg-[#df483f] px-2 py-1 text-[11px] font-extrabold text-white"
                 >
-                  {{ product.discountRate }}%
+                  {{ product.variants[0].discount_bps / 100 }}%
                 </span>
               </div>
               <div class="px-2.5 pt-2">
@@ -163,7 +190,7 @@ function formatYen(amount: number) {
                   {{ product.name }}
                 </h2>
                 <p class="mt-1 mb-0 min-h-[18px] text-[11px] leading-[1.35]">
-                  <strong class="text-[#d94339]">{{ formatYen(product.price) }}</strong>
+                  <strong class="text-[#d94339]">{{ formatYen(productPrice(product)) }}</strong>
                 </p>
               </div>
             </button>
@@ -171,7 +198,12 @@ function formatYen(amount: number) {
               <button
                 class="mt-2 min-h-7 w-full rounded-[5px] border-0 bg-[#237f4b] px-1 text-[12px] font-bold text-white"
                 type="button"
-                @click="addToCart(product.id)"
+                :disabled="
+                  !product.variants[0] ||
+                  product.variants[0].stock_quantity < 1 ||
+                  addCartItemMutation.isPending.value
+                "
+                @click="addToCart(product)"
               >
                 &#x30AB;&#x30FC;&#x30C8;&#x306B;&#x8FFD;&#x52A0;
               </button>

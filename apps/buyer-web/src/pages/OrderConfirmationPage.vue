@@ -22,7 +22,8 @@ onMounted(async () => {
       postalCode: profile.postal_code,
       prefecture: profile.prefecture,
       city: profile.city,
-      addressLine: [profile.address_line1, profile.address_line2].filter(Boolean).join(' '),
+      addressLine1: profile.address_line1,
+      addressLine2: profile.address_line2,
     })
   } catch {
     await router.replace({ name: 'login', query: { redirect: route.fullPath } })
@@ -186,7 +187,8 @@ function discountedFee(item: BuyerCartItem) {
                 &#x3012;{{ checkoutDeliveryAddress.postalCode }}
                 <br />
                 {{ checkoutDeliveryAddress.prefecture }}{{ checkoutDeliveryAddress.city
-                }}{{ checkoutDeliveryAddress.addressLine }}
+                }}{{ checkoutDeliveryAddress.addressLine1 }}
+                {{ checkoutDeliveryAddress.addressLine2 }}
                 <br />
                 {{ checkoutDeliveryAddress.phone }}
               </p>
