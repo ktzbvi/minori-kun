@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { ChevronDown, ChevronLeft, ChevronRight, LoaderCircle, Search } from 'lucide-vue-next'
+import { ChevronDown, ChevronLeft, ChevronRight, Search } from 'lucide-vue-next'
 import { z } from 'zod'
-import { UiButton, UiCard, UiDialog, UiRadioGroup, UiFormControl, UiFormItem, UiFormLabel, UiFormMessage, UiInput, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
+import { UiButton, UiSkeleton, UiCard, UiDialog, UiRadioGroup, UiFormControl, UiFormItem, UiFormLabel, UiFormMessage, UiInput, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
 import OrderPeriodFields from '@/components/orders/OrderPeriodFields.vue'
 import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue'
 import { useProducerOrder } from '@/composables/useProducerOrder'
@@ -162,9 +162,49 @@ function resetFilters() {
         <p class="text-sm text-[#687a70]" role="status">{{ isPending ? '確認中' : isError ? '取得できません' : `${meta?.total ?? 0}件` }}</p>
       </header>
 
-      <UiCard v-if="isPending" class="grid min-h-48 place-items-center gap-3 p-6 text-sm text-[#687a70]" role="status">
-        <div class="grid justify-items-center gap-3"><LoaderCircle class="size-6 animate-spin" aria-hidden="true" />注文を読み込んでいます。</div>
-      </UiCard>
+      <!-- FR-P-008 / P08-01 / AT-P-008: match the mobile cards and desktop table while loading. -->
+      <div v-if="isPending" role="status" aria-live="polite">
+        <span class="sr-only">注文を読み込んでいます。</span>
+        <div class="grid gap-3 xl:hidden" aria-hidden="true">
+          <div v-for="row in 5" :key="row" class="grid min-w-0 gap-4 rounded-xl border border-[#d6e2da] bg-white p-4">
+            <div class="grid gap-3">
+              <div class="flex items-center justify-between gap-3">
+                <UiSkeleton class="h-4 w-24" />
+                <UiSkeleton class="size-4" />
+              </div>
+              <UiSkeleton class="h-3 w-36" />
+              <div class="flex items-center justify-between gap-3">
+                <UiSkeleton class="h-4 w-1/2" />
+                <UiSkeleton class="h-4 w-8" />
+              </div>
+            </div>
+            <div class="grid gap-2 border-t border-[#e0e9e3] pt-3">
+              <UiSkeleton class="h-6 w-20 rounded-full" />
+              <UiSkeleton class="h-3 w-16" />
+            </div>
+          </div>
+        </div>
+        <table class="hidden w-full table-fixed text-left text-sm xl:table" aria-hidden="true">
+          <colgroup><col class="w-1/4" /><col class="w-44" /><col /><col class="w-16" /><col class="w-40" /><col class="w-12" /></colgroup>
+          <thead class="bg-[#f3f6f3]">
+            <tr>
+              <th v-for="column in 6" :key="column" class="px-3 py-3 first:rounded-l-xl last:rounded-r-xl">
+                <UiSkeleton :class="column === 6 ? 'size-4' : 'h-4 w-3/4'" />
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e0e9e3]">
+            <tr v-for="row in 5" :key="row">
+              <td class="px-3 py-5"><UiSkeleton class="h-4 w-24" /></td>
+              <td class="px-3 py-5"><UiSkeleton class="h-4 w-32" /></td>
+              <td class="px-3 py-5"><UiSkeleton class="h-4 w-3/4" /></td>
+              <td class="px-3 py-5"><UiSkeleton class="h-4 w-6" /></td>
+              <td class="px-3 py-5"><div class="grid gap-2"><UiSkeleton class="h-6 w-20 rounded-full" /><UiSkeleton class="h-3 w-16" /></div></td>
+              <td class="py-5"><UiSkeleton class="mx-auto size-4" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <UiCard v-else-if="isError" class="grid justify-items-center gap-4 p-6 text-center">
         <p class="text-sm text-[#7b3329]" role="alert">注文を取得できませんでした。通信状態を確認して再試行してください。</p>
         <UiButton variant="outline" :disabled="isBusy" @click="reloadOrders">再試行</UiButton>
@@ -204,7 +244,7 @@ function resetFilters() {
           <caption class="sr-only">生産者の注文一覧</caption>
           <colgroup><col class="w-1/4" /><col class="w-44" /><col /><col class="w-16" /><col class="w-40" /><col class="w-12" /></colgroup>
           <thead class="bg-[#f3f6f3] text-[#687a70]">
-            <tr><th scope="col" class="rounded-l-xl px-3 py-3 font-medium">サブ注文番号</th><th scope="col" class="px-3 py-3 font-medium">注文日</th><th scope="col" class="px-3 py-3 font-medium">商品</th><th scope="col" class="px-3 py-3 font-medium">数量</th><th scope="col" class="px-3 py-3 font-medium">配送対応状態</th><th scope="col" class="rounded-r-xl"><span class="sr-only">詳細</span></th></tr>
+            <tr><th scope="col" class="rounded-l-xl px-3 py-3 font-medium">注文番号</th><th scope="col" class="px-3 py-3 font-medium">注文日</th><th scope="col" class="px-3 py-3 font-medium">商品</th><th scope="col" class="px-3 py-3 font-medium">数量</th><th scope="col" class="px-3 py-3 font-medium">配送対応状態</th><th scope="col" class="rounded-r-xl"><span class="sr-only">詳細</span></th></tr>
           </thead>
           <tbody class="divide-y divide-[#e0e9e3]">
             <tr v-for="order in orders" :key="order.id" class="hover:bg-[#f8fbf8]">
