@@ -19,6 +19,8 @@ const ownerLabel = computed(() => props.order.status_owner === 'producer'
 const refundLabel = computed(() => {
   switch (props.order.refund_state) {
     case 'pending': return '返金：処理中'
+    case 'requires_action': return '返金：確認が必要です'
+    case 'canceled': return '返金：取消済み'
     case 'partial': return '返金：一部返金済み'
     case 'refunded': return '返金：返金済み'
     case 'failed': return '返金：確認が必要です'

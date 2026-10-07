@@ -2381,14 +2381,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "`ProducerOrderListItemResource`",
+                        "description": "`ProducerOrderDetailResource`",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/ProducerOrderListItemResource"
+                                            "$ref": "#/components/schemas/ProducerOrderDetailResource"
                                         }
                                     },
                                     "required": [
@@ -2403,6 +2403,63 @@
                     },
                     "403": {
                         "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/orders/{producerOrder}/fulfillment": {
+            "patch": {
+                "operationId": "producerOrder.updateFulfillment",
+                "tags": [
+                    "ProducerOrder"
+                ],
+                "parameters": [
+                    {
+                        "name": "producerOrder",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProducerFulfillmentRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerOrderDetailResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerOrderDetailResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -3454,6 +3511,177 @@
                     "code"
                 ],
                 "title": "VerifyProducerRegistrationCodeRequest"
+            },
+            "ProducerOrderDetailResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "display_id": {
+                        "type": "string"
+                    },
+                    "ordered_at": {
+                        "type": "string"
+                    },
+                    "fulfillment_state": {
+                        "type": "string",
+                        "enum": [
+                            "received",
+                            "processing",
+                            "shipped"
+                        ]
+                    },
+                    "operational_state": {
+                        "type": "string",
+                        "enum": [
+                            "received",
+                            "confirmed",
+                            "processing",
+                            "shipped",
+                            "cancelled"
+                        ]
+                    },
+                    "status_owner": {
+                        "type": "string",
+                        "enum": [
+                            "producer",
+                            "system"
+                        ]
+                    },
+                    "order_state": {
+                        "type": "string"
+                    },
+                    "refund_state": {
+                        "type": "string",
+                        "enum": [
+                            "none",
+                            "pending",
+                            "partial",
+                            "refunded",
+                            "failed",
+                            "requires_action",
+                            "canceled"
+                        ]
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "product_name": {
+                                    "type": "string"
+                                },
+                                "image_url": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "quantity": {
+                                    "type": "integer"
+                                },
+                                "unit_price_yen": {
+                                    "type": "integer"
+                                },
+                                "discount_bps": {
+                                    "type": "integer"
+                                },
+                                "line_total_yen": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "product_name",
+                                "image_url",
+                                "quantity",
+                                "unit_price_yen",
+                                "discount_bps",
+                                "line_total_yen"
+                            ]
+                        }
+                    },
+                    "can_update_fulfillment": {
+                        "type": "boolean"
+                    },
+                    "delivery_address": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "recipient_name": {
+                                "type": "string"
+                            },
+                            "postal_code": {
+                                "type": "string"
+                            },
+                            "address": {
+                                "type": "string"
+                            },
+                            "address_line2": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "phone": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "recipient_name",
+                            "postal_code",
+                            "address",
+                            "address_line2",
+                            "phone"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "display_id",
+                    "ordered_at",
+                    "fulfillment_state",
+                    "operational_state",
+                    "status_owner",
+                    "order_state",
+                    "refund_state",
+                    "items",
+                    "can_update_fulfillment",
+                    "delivery_address"
+                ],
+                "title": "ProducerOrderDetailResource"
+            },
+            "UpdateProducerFulfillmentRequest": {
+                "type": "object",
+                "properties": {
+                    "fulfillment_state": {
+                        "type": "string",
+                        "enum": [
+                            "received",
+                            "processing",
+                            "shipped"
+                        ]
+                    },
+                    "expected_state": {
+                        "type": "string",
+                        "enum": [
+                            "received",
+                            "processing",
+                            "shipped"
+                        ]
+                    }
+                },
+                "required": [
+                    "fulfillment_state",
+                    "expected_state"
+                ],
+                "title": "UpdateProducerFulfillmentRequest"
             },
             "ProducerOrderListItemResource": {
                 "type": "object",

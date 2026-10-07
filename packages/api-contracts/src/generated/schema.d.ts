@@ -660,6 +660,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/producer/orders/{producerOrder}/fulfillment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["producerOrder.updateFulfillment"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -933,6 +949,45 @@ export interface components {
         /** VerifyProducerRegistrationCodeRequest */
         VerifyProducerRegistrationCodeRequest: {
             code: string;
+        };
+        /** ProducerOrderDetailResource */
+        ProducerOrderDetailResource: {
+            id: string;
+            display_id: string;
+            ordered_at: string;
+            /** @enum {string} */
+            fulfillment_state: "received" | "processing" | "shipped";
+            /** @enum {string} */
+            operational_state: "received" | "confirmed" | "processing" | "shipped" | "cancelled";
+            /** @enum {string} */
+            status_owner: "producer" | "system";
+            order_state: string;
+            /** @enum {string} */
+            refund_state: "none" | "pending" | "partial" | "refunded" | "failed" | "requires_action" | "canceled";
+            items: {
+                id: string;
+                product_name: string;
+                image_url: string | null;
+                quantity: number;
+                unit_price_yen: number;
+                discount_bps: number;
+                line_total_yen: number;
+            }[];
+            can_update_fulfillment: boolean;
+            delivery_address: {
+                recipient_name: string;
+                postal_code: string;
+                address: string;
+                address_line2: string | null;
+                phone: string;
+            } | null;
+        };
+        /** UpdateProducerFulfillmentRequest */
+        UpdateProducerFulfillmentRequest: {
+            /** @enum {string} */
+            fulfillment_state: "received" | "processing" | "shipped";
+            /** @enum {string} */
+            expected_state: "received" | "processing" | "shipped";
         };
         /** ProducerOrderListItemResource */
         ProducerOrderListItemResource: {
@@ -2276,19 +2331,50 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description `ProducerOrderListItemResource` */
+            /** @description `ProducerOrderDetailResource` */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["ProducerOrderListItemResource"];
+                        data: components["schemas"]["ProducerOrderDetailResource"];
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "producerOrder.updateFulfillment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                producerOrder: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProducerFulfillmentRequest"];
+            };
+        };
+        responses: {
+            /** @description `ProducerOrderDetailResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerOrderDetailResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
         };
     };
 }
