@@ -20,3 +20,14 @@ export function useProducerLoginMutation() {
     },
   })
 }
+
+export function useProducerLogoutMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => { await api.post('/api/v1/producer/auth/logout') },
+    onSuccess: async () => {
+      await queryClient.cancelQueries()
+      queryClient.clear()
+    },
+  })
+}

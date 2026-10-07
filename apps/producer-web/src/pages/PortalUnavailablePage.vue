@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { Clock3 } from 'lucide-vue-next'
+import { UiButton } from '@minorikun/ui'
 
-defineProps<{ title: string }>()
+withDefaults(defineProps<{ title: string; returnTo?: string; returnLabel?: string }>(), { returnTo: '/dashboard', returnLabel: 'ダッシュボードへ戻る' })
 </script>
 
 <template>
@@ -20,12 +21,9 @@ defineProps<{ title: string }>()
         <p class="mt-2 text-base leading-relaxed text-[#68766e]">
           利用可能になるまで、ダッシュボードまたは商品管理をご利用ください。
         </p>
-        <RouterLink
-          to="/dashboard"
-          class="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#24884f] px-6 text-base font-bold text-white hover:bg-[#176b3e] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b]"
-        >
-          ダッシュボードへ戻る
-        </RouterLink>
+        <UiButton as-child class="mt-6 min-h-11">
+          <RouterLink :to="returnTo">{{ returnLabel }}</RouterLink>
+        </UiButton>
       </div>
     </div>
   </section>

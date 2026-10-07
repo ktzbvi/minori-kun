@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\BuyerProducerInquiryController;
 use App\Http\Controllers\Api\BuyerRegistrationController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\PortalAuthController;
+use App\Http\Controllers\Api\ProducerAccountController;
 use App\Http\Controllers\Api\ProducerDashboardController;
 use App\Http\Controllers\Api\ProducerOnboardingController;
 use App\Http\Controllers\Api\ProducerOrderController;
@@ -107,6 +108,8 @@ Route::prefix('api/v1')->group(function (): void {
             });
 
         Route::middleware(['auth:sanctum', 'portal.role:producer', 'producer.eligible'])->group(function (): void {
+            Route::get('/account', [ProducerAccountController::class, 'show']);
+            Route::post('/account/photo', [ProducerAccountController::class, 'updatePhoto']);
             Route::get('/dashboard', [ProducerDashboardController::class, 'show']);
             Route::get('/orders', [ProducerOrderController::class, 'index']);
             Route::get('/orders/{producerOrder}', [ProducerOrderController::class, 'show'])->whereUlid('producerOrder');

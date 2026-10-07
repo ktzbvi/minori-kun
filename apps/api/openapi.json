@@ -2463,6 +2463,106 @@
                     }
                 }
             }
+        },
+        "/v1/producer/account": {
+            "get": {
+                "operationId": "producerAccount.show",
+                "tags": [
+                    "ProducerAccount"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ProducerAccountResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerAccountResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    }
+                }
+            }
+        },
+        "/v1/producer/account/photo": {
+            "post": {
+                "operationId": "producerAccount.updatePhoto",
+                "tags": [
+                    "ProducerAccount"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProducerShopPhotoRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ProducerAccountResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProducerAccountResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -3756,6 +3856,58 @@
                     "items"
                 ],
                 "title": "ProducerOrderListItemResource"
+            },
+            "ProducerAccountResource": {
+                "type": "object",
+                "properties": {
+                    "farm_name": {
+                        "type": "string"
+                    },
+                    "masked_email": {
+                        "type": "string"
+                    },
+                    "shop_photo_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "shop_photo_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "farm_name",
+                    "masked_email",
+                    "shop_photo_id",
+                    "shop_photo_url"
+                ],
+                "title": "ProducerAccountResource"
+            },
+            "UpdateProducerShopPhotoRequest": {
+                "type": "object",
+                "properties": {
+                    "photo": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Maximum file size: 5120 kilobytes."
+                    },
+                    "expected_photo_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "photo",
+                    "expected_photo_id"
+                ],
+                "title": "UpdateProducerShopPhotoRequest"
             }
         },
         "responses": {

@@ -73,6 +73,15 @@ export const router = createRouter({
       },
       children: [
         {
+          path: 'account', name: 'account-settings', component: () => import('@/pages/AccountSettingsPage.vue'),
+          meta: { portalTitle: 'アカウント設定', activeRoute: '/account' },
+        },
+        ...[
+          { path: 'account/profile', name: 'account-profile', title: '生産者アカウント情報' },
+          { path: 'account/bank', name: 'account-bank', title: '振込口座情報' },
+          { path: 'account/password', name: 'account-password', title: 'パスワード変更' },
+        ].map(({ title, ...route }) => ({ ...route, component: PortalUnavailablePage, props: { title, returnTo: '/account', returnLabel: 'アカウント設定へ戻る' }, meta: { portalTitle: title, activeRoute: '/account' } })),
+        {
           path: 'dashboard',
           name: 'dashboard',
           component: DashboardPage,
