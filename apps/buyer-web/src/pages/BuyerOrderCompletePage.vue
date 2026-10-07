@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from 'vue-router'
 import { Check } from 'lucide-vue-next'
 import BuyerPageShell from '@/components/BuyerPageShell.vue'
-import { useBuyerOrderQuery } from '@/services/orders/orders.query'
-
-const route = useRoute()
-const router = useRouter()
-const orderId = String(route.params.orderId ?? '')
-const order = useBuyerOrderQuery(orderId)
+import { useBuyerOrderComplete } from '@/composables/useBuyerOrderComplete'
+const { route, router, orderId, order } = useBuyerOrderComplete()
 </script>
 
 <template>

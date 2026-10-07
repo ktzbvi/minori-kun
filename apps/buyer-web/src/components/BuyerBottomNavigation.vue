@@ -48,7 +48,7 @@ function navigate(item: BuyerNavigationItem) {
     >
       <House :size="19" />
       <span class="text-[10px]" :class="{ 'font-bold': active === 'home' }">
-        &#x30DB;&#x30FC;&#x30E0;
+        ホーム
       </span>
     </button>
     <button
@@ -60,7 +60,7 @@ function navigate(item: BuyerNavigationItem) {
     >
       <Grid2X2 :size="18" />
       <span class="text-[10px]" :class="{ 'font-bold': active === 'category' }">
-        &#x30AB;&#x30C6;&#x30B4;&#x30EA;
+        カテゴリ
       </span>
     </button>
     <button
@@ -72,7 +72,7 @@ function navigate(item: BuyerNavigationItem) {
     >
       <ShoppingCart :size="18" />
       <span class="text-[10px]" :class="{ 'font-bold': active === 'cart' }">
-        &#x30AB;&#x30FC;&#x30C8;
+        カート
       </span>
     </button>
     <button
@@ -84,7 +84,7 @@ function navigate(item: BuyerNavigationItem) {
     >
       <UserRound :size="18" />
       <span class="text-[10px]" :class="{ 'font-bold': active === 'profile' }">
-        &#x30DE;&#x30A4;&#x30DA;&#x30FC;&#x30B8;
+        マイページ
       </span>
     </button>
   </nav>

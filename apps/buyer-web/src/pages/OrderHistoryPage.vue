@@ -1,60 +1,28 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { ChevronDown, ChevronLeft, ChevronRight, Search, ShoppingCart, X } from 'lucide-vue-next'
 import BuyerPageShell from '@/components/BuyerPageShell.vue'
-import { useBuyerOrdersQuery } from '@/services/orders/orders.query'
-import { orderStatusLabel, paymentStatusLabel, refundStatusLabel } from '@/services/orders/orders.status'
-
-const router = useRouter()
-const filterOpen = ref(false)
-const filters = reactive({
-  period: 'all',
-  from: '',
-  to: '',
-  year: String(new Date().getFullYear()),
-})
-const applied = reactive({ ...filters })
-const queryFilters = computed(() =>
-  Object.fromEntries(Object.entries(applied).filter(([, value]) => value)),
-)
-const orders = useBuyerOrdersQuery(queryFilters)
-
-function applyFilters() {
-  if (filters.period === 'custom' && (!filters.from || !filters.to || filters.from > filters.to))
-    return
-  Object.assign(applied, filters)
-  filterOpen.value = false
-}
-function openFilters() {
-  Object.assign(filters, applied)
-  filterOpen.value = true
-}
-function closeFilters() {
-  Object.assign(filters, applied)
-  filterOpen.value = false
-}
-function resetFilters() {
-  Object.assign(filters, {
-    period: 'all',
-    from: '',
-    to: '',
-    year: String(new Date().getFullYear()),
-  })
-}
-function openSearch() {
-  void router.push({ name: 'search' })
-}
-function openCart() {
-  void router.push({ name: 'cart' })
-}
-
-function yen(value: number) {
-  return `${value.toLocaleString('ja-JP')}円`
-}
-function date(value: string) {
-  return new Date(value).toLocaleString('ja-JP', { dateStyle: 'medium' })
-}
+import {
+  orderStatusLabel,
+  paymentStatusLabel,
+  refundStatusLabel,
+} from '@/services/orders/orders.status'
+import { useBuyerOrderHistory } from '@/composables/useBuyerOrderHistory'
+const {
+  router,
+  filterOpen,
+  filters,
+  applied,
+  queryFilters,
+  orders,
+  applyFilters,
+  openFilters,
+  closeFilters,
+  resetFilters,
+  openSearch,
+  openCart,
+  yen,
+  date,
+} = useBuyerOrderHistory()
 </script>
 
 <template>
@@ -267,7 +235,10 @@ function date(value: string) {
             <button
               class="min-h-[38px] rounded-lg border-0 bg-[#237f4b] text-xs font-bold text-white disabled:opacity-50"
               type="submit"
-              :disabled="filters.period === 'custom' && (!filters.from || !filters.to || filters.from > filters.to)"
+              :disabled="
+                filters.period === 'custom' &&
+                (!filters.from || !filters.to || filters.from > filters.to)
+              "
             >
               適用する
             </button>

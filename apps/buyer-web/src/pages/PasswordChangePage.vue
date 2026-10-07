@@ -1,59 +1,9 @@
 <script setup lang="ts">
-import axios from 'axios'
 import { ChevronLeft } from 'lucide-vue-next'
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { toast, UiButton } from '@minorikun/ui'
-import { changeBuyerPassword } from '@/services/account/account.api'
-
-const router = useRouter()
-const submitting = ref(false)
-const fieldErrors = reactive<Record<string, string>>({})
-const form = reactive({ current_password: '', password: '', password_confirmation: '' })
-const passwordPolicy =
-  'パスワードは8〜64文字で、大文字・小文字・数字・記号をそれぞれ1文字以上含めてください。'
-
-function validatePassword() {
-  delete fieldErrors.password
-  delete fieldErrors.password_confirmation
-  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,64}$/.test(form.password)) {
-    fieldErrors.password = passwordPolicy
-  }
-  if (form.password && form.password_confirmation && form.password !== form.password_confirmation) {
-    fieldErrors.password_confirmation = '新しいパスワードと確認用パスワードが一致しません。'
-  }
-}
-
-async function submit() {
-  Object.keys(fieldErrors).forEach((key) => delete fieldErrors[key])
-  validatePassword()
-  if (Object.keys(fieldErrors).length) return
-
-  submitting.value = true
-  try {
-    await changeBuyerPassword(form)
-    form.current_password = ''
-    form.password = ''
-    form.password_confirmation = ''
-    toast.success('パスワードを変更しました。')
-    await router.replace({ name: 'my-page' })
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 422) {
-      const errors = error.response.data?.errors
-      if (errors && typeof errors === 'object') {
-        Object.entries(errors).forEach(([field, messages]) => {
-          if (Array.isArray(messages) && typeof messages[0] === 'string') {
-            fieldErrors[field] = messages[0]
-          }
-        })
-      }
-      return
-    }
-    toast.error('パスワードを変更できませんでした。')
-  } finally {
-    submitting.value = false
-  }
-}
+import { UiButton } from '@minorikun/ui'
+import { useBuyerPasswordChange } from '@/composables/useBuyerPasswordChange'
+const { router, submitting, fieldErrors, form, passwordPolicy, validatePassword, submit } =
+  useBuyerPasswordChange()
 </script>
 
 <template>
@@ -69,12 +19,12 @@ async function submit() {
           <ChevronLeft :size="22" :stroke-width="2.5" />
         </button>
         <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">
-          &#12497;&#12473;&#12527;&#12540;&#12489;&#12398;&#22793;&#26356;
+          パスワードの変更
         </h1>
       </header>
 
       <p class="px-5 pt-3 text-[10px] text-[#718075]">
-        &#12525;&#12464;&#12452;&#12531;&#12497;&#12473;&#12527;&#12540;&#12489;&#12434;&#22793;&#26356;&#12375;&#12414;&#12377;&#12290;
+        ログインパスワードを変更します。
       </p>
       <form
         class="mx-5 mt-3 rounded-[8px] border border-[#dce5dc] bg-white p-3"
@@ -83,8 +33,8 @@ async function submit() {
       >
         <div class="field">
           <label for="current-password">
-            &#29694;&#22312;&#12398;&#12497;&#12473;&#12527;&#12540;&#12489;
-            <span class="required">&#24517;&#38920;</span>
+            現在のパスワード
+            <span class="required">必須</span>
           </label>
           <input
             id="current-password"
@@ -99,8 +49,8 @@ async function submit() {
         </div>
         <div class="field">
           <label for="password">
-            &#26032;&#12375;&#12356;&#12497;&#12473;&#12527;&#12540;&#12489;
-            <span class="required">&#24517;&#38920;</span>
+            新しいパスワード
+            <span class="required">必須</span>
           </label>
           <input
             id="password"
@@ -116,9 +66,9 @@ async function submit() {
         </div>
         <div class="field">
           <label for="password-confirmation">
-            &#26032;&#12375;&#12356;&#12497;&#12473;&#12527;&#12540;&#12489;
-            &#65288;&#30906;&#35469;&#65289;
-            <span class="required">&#24517;&#38920;</span>
+            新しいパスワード
+            （確認）
+            <span class="required">必須</span>
           </label>
           <input
             id="password-confirmation"
@@ -133,8 +83,8 @@ async function submit() {
           </p>
         </div>
         <UiButton class="!mt-1 !w-full" type="submit" :disabled="submitting">
-          <span v-if="submitting">&#20445;&#23384;&#20013;...</span>
-          <span v-else>&#22793;&#26356;&#20869;&#23481;&#12434;&#20445;&#23384;</span>
+          <span v-if="submitting">保存中...</span>
+          <span v-else>変更内容を保存</span>
         </UiButton>
       </form>
 
@@ -142,7 +92,7 @@ async function submit() {
         class="mx-auto mt-4 block w-fit text-[11px] font-medium text-[#6e7e74] underline underline-offset-2"
         :to="{ name: 'password-reset' }"
       >
-        &#12497;&#12473;&#12527;&#12540;&#12489;&#12434;&#12362;&#24536;&#12428;&#12391;&#12377;&#12363;&#65311;
+        パスワードをお忘れですか？
       </RouterLink>
     </section>
   </main>

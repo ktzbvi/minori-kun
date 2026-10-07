@@ -1,89 +1,28 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
-import axios from 'axios'
 import { ChevronLeft, Leaf } from 'lucide-vue-next'
-import { ref } from 'vue'
-import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { useForm } from 'vee-validate'
-import { z } from 'zod'
-import { toast, UiButton, UiCard } from '@minorikun/ui'
-import { queryClient } from '@/lib/query'
-import { loginBuyer } from '@/services/auth/auth.mutation'
-import { buyerAuthKeys } from '@/services/auth/auth.key'
-
-const errorMessage = ref('')
-const route = useRoute()
-const router = useRouter()
-
-const authenticationError = 'メールアドレスまたはパスワードを確認してください。'
-const rateLimitError = '試行回数が多すぎます。しばらくしてからもう一度お試しください。'
-const serviceError = '現在ログインできません。時間をおいてからもう一度お試しください。'
-
-const loginSchema = toTypedSchema(
-  z.object({
-    email: z
-      .string()
-      .trim()
-      .min(1, 'メールアドレスを入力してください。')
-      .email('正しいメールアドレスを入力してください。')
-      .max(255, 'メールアドレスは255文字以内で入力してください。'),
-    password: z
-      .string()
-      .min(1, 'パスワードを入力してください。')
-      .max(4096, 'パスワードは4096文字以内で入力してください。'),
-  }),
-)
-
-const { defineField, errors, handleSubmit, isSubmitting, setFieldValue } = useForm({
-  validationSchema: loginSchema,
-  initialValues: { email: '', password: '' },
-})
-
-const [email, emailAttrs] = defineField('email', (state) => ({
-  validateOnBlur: false,
-  validateOnChange: false,
-  validateOnInput: false,
-  validateOnModelUpdate: state.errors.length > 0,
-}))
-const [password, passwordAttrs] = defineField('password', (state) => ({
-  validateOnBlur: false,
-  validateOnChange: false,
-  validateOnInput: false,
-  validateOnModelUpdate: state.errors.length > 0,
-}))
-
-const submit = handleSubmit(
-  async (values) => {
-    errorMessage.value = ''
-    try {
-      await loginBuyer(values)
-      await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
-
-      const redirect =
-        typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
-          ? route.query.redirect
-          : '/'
-      await router.replace(redirect)
-      toast.success('成功')
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.status === 429) {
-        errorMessage.value = rateLimitError
-      } else if (axios.isAxiosError(error) && error.response?.status !== 422) {
-        errorMessage.value = serviceError
-      } else {
-        errorMessage.value = authenticationError
-      }
-      setFieldValue('password', '', false)
-    }
-  },
-  () => {
-    errorMessage.value = ''
-  },
-)
-
-function goBack() {
-  router.back()
-}
+import { RouterLink } from 'vue-router'
+import { UiButton, UiCard } from '@minorikun/ui'
+import { useBuyerLogin } from '@/composables/useBuyerLogin'
+const {
+  errorMessage,
+  route,
+  router,
+  authenticationError,
+  rateLimitError,
+  serviceError,
+  loginSchema,
+  defineField,
+  errors,
+  handleSubmit,
+  isSubmitting,
+  setFieldValue,
+  email,
+  emailAttrs,
+  password,
+  passwordAttrs,
+  submit,
+  goBack,
+} = useBuyerLogin()
 </script>
 
 <template>
