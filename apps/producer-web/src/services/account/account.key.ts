@@ -1,0 +1,1 @@
+export const producerAccountKeys = { summary: () => ['producer', 'account'] as const }

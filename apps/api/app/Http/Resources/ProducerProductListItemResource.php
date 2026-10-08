@@ -25,7 +25,7 @@ class ProducerProductListItemResource extends JsonResource
 
         return [
             'id' => (string) $this->id,
-            'display_id' => 'P-'.strtoupper(substr((string) $this->id, -6)),
+            'display_id' => (string) $this->product_code,
             'name' => (string) $this->name,
             'category' => $this->category?->name,
             'price_yen' => $prices->isEmpty() ? null : (int) $prices->min(),

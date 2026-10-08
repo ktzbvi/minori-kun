@@ -1,3 +1,4 @@
+export { default as UiBadge } from './components/Badge.vue'
 export { default as UiButton } from './components/Button.vue'
 export { default as UiCard } from './components/Card.vue'
 export { default as UiCheckbox } from './components/Checkbox.vue'
@@ -19,3 +20,8 @@ export { default as UiToaster } from './components/Sonner.vue'
 export { toast } from 'vue-sonner'
 export { cn } from './lib/utils'
 import './styles/tokens.css'
+
+export { default as UiDropdownMenu } from './components/DropdownMenu.vue'
+export { DropdownMenuTrigger as UiDropdownMenuTrigger } from 'reka-ui'
+export { default as UiDropdownMenuContent } from './components/DropdownMenuContent.vue'
+export { default as UiDropdownMenuItem } from './components/DropdownMenuItem.vue'

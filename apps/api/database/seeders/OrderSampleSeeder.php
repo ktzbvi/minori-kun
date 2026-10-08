@@ -48,9 +48,11 @@ class OrderSampleSeeder extends Seeder
                 ['received', 5], ['received', 60], ['processing', 1440], ['shipped', 4320],
             ];
             foreach ($samples as $index => [$fulfillment, $minutesAgo]) {
-                $number = 'SAMPLE-'.$producer->id.'-'.($index + 1);
-                // Preserve snapshots, timestamps and any manual changes on repeated runs.
-                if (Order::query()->where('order_number', $number)->exists()) {
+                // Preserve the four fixture records even when their references change.
+                $seeded = AuditEvent::query()->where('action', 'sample_order.seeded')
+                    ->whereIn('target_id', Order::query()->whereHas('producerOrders', fn ($query) => $query->where('producer_id', $producer->id))->select('id'))
+                    ->count();
+                if ($index < $seeded) {
                     continue;
                 }
                 $variant = $variants[$index % $variants->count()];
@@ -61,7 +63,7 @@ class OrderSampleSeeder extends Seeder
                 $net = $variant->price_yen - $discount;
                 $placedAt = now()->subMinutes($minutesAgo);
                 $order = Order::query()->create([
-                    'buyer_id' => $buyer->id, 'order_number' => $number,
+                    'buyer_id' => $buyer->id,
                     'order_state' => $minutesAgo < 30 ? '注文確定' : '完了',
                     'payment_state' => 'succeeded', 'refund_state' => 'none',
                     'subtotal_yen' => $variant->price_yen, 'discount_yen' => $discount,
@@ -70,7 +72,7 @@ class OrderSampleSeeder extends Seeder
                 ]);
                 $record = ProducerOrder::query()->create([
                     'order_id' => $order->id, 'producer_id' => $producer->id,
-                    'sub_order_number' => $number.'-01', 'shop_name_snapshot' => $producer->producerProfile->farm_name,
+                    'sub_order_number' => $order->order_number, 'shop_name_snapshot' => $producer->producerProfile->farm_name,
                     'fulfillment_state' => $fulfillment, 'subtotal_yen' => $net,
                     'producer_discount_yen' => $discount, 'company_commission_bps' => 1000,
                     'company_commission_yen' => (int) round($net * .1), 'total_yen' => $order->total_yen,

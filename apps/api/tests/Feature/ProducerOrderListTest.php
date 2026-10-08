@@ -1,7 +1,9 @@
 <?php
 
+use App\Domain\Identity\NextPublicReference;
 use App\Enums\ProducerOperationalState;
 use App\Enums\ScreeningState;
+use App\Models\AuditEvent;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\PayjpScreening;
@@ -10,6 +12,7 @@ use App\Models\ProducerOrder;
 use App\Models\ProducerProfile;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\DB;
 
 function orderListProducer(): User
 {
@@ -202,3 +205,55 @@ it('rejects invalid filters and unavailable manual states', function (array $fil
     [['period' => 'custom', 'from' => '2026-02-30', 'to' => '2026-03-01']],
     [['period' => 'year']], [['period' => 'year', 'year' => 1999]], [['page' => 0]], [['keyword' => str_repeat('a', 256)]],
 ]);
+
+it('shortens legacy sample references once and searches the stored displayed number', function (): void {
+    $producer = orderListProducer();
+    $record = orderListRecord($producer, ['order_number' => 'SAMPLE-'.$producer->id.'-1']);
+    $real = orderListRecord($producer, ['order_number' => 'EC-20261007-A7K3M9']);
+    $migration = require database_path('migrations/2026_10_07_000200_shorten_sample_order_numbers.php');
+    $migration->up();
+    $number = 'SAMPLE-'.strtoupper(substr(hash('sha256', $producer->id), 0, 10)).'-1';
+    expect($record->fresh()->sub_order_number)->toBe($number.'-01');
+    expect($real->order->fresh()->order_number)->toBe('EC-20261007-A7K3M9');
+    $migration->up();
+    expect(AuditEvent::query()->where('action', 'sample_order.reference_shortened')->count())->toBe(1);
+    $this->actingAs($producer);
+    foreach ([$number, '#'.$number.'-01'] as $keyword) {
+        $this->getJson('/api/v1/producer/orders?'.http_build_query(['keyword' => $keyword]))
+            ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.display_id', $number.'-01');
+    }
+});
+
+// DATA-004/006 / AT-P-006/008: allocation is independent, transactional and never wraps.
+it('allocates independent sequential product and order references', function (): void {
+    $allocator = app(NextPublicReference::class);
+    expect($allocator->next('product'))->toBe('P-000001');
+    expect($allocator->next('order'))->toBe('O-000001');
+    expect($allocator->next('product'))->toBe('P-000002');
+    DB::beginTransaction();
+    expect($allocator->next('order'))->toBe('O-000002');
+    DB::rollBack();
+    expect($allocator->next('order'))->toBe('O-000002');
+    DB::table('public_reference_sequences')->where('kind', 'order')->update(['next_value' => 999999]);
+    expect($allocator->next('order'))->toBe('O-999999');
+    expect($allocator->next('order'))->toBe('O-1000000');
+});
+
+it('assigns readable order numbers on creation and searches historical references within ownership', function (): void {
+    $producer = orderListProducer();
+    $record = orderListRecord($producer);
+    $attributes = $record->order->getAttributes();
+    unset($attributes['id'], $attributes['order_number'], $attributes['created_at'], $attributes['updated_at']);
+    $order = Order::query()->create($attributes);
+    expect($order->order_number)->toBe('O-000001');
+    $record->update(['order_id' => $order->id, 'sub_order_number' => $order->order_number, 'legacy_sub_order_number' => 'OLD-OWN-01']);
+    $order->update(['legacy_order_number' => 'OLD-OWN']);
+    $other = orderListRecord(orderListProducer());
+    $other->update(['legacy_sub_order_number' => 'OLD-OTHER']);
+    $this->actingAs($producer);
+    foreach (['O-000001', '#O-000001', 'OLD-OWN', 'OLD-OWN-01'] as $keyword) {
+        $this->getJson('/api/v1/producer/orders?'.http_build_query(['keyword' => $keyword]))
+            ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.display_id', 'O-000001');
+    }
+    $this->getJson('/api/v1/producer/orders?keyword=OLD-OTHER')->assertOk()->assertJsonPath('meta.total', 0);
+});

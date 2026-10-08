@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { ChevronDown, ClipboardList, Home, Leaf, Menu, UserRound, WalletCards } from 'lucide-vue-next'
+import { UiButton, UiDropdownMenu, UiDropdownMenuTrigger, UiDropdownMenuContent, UiDropdownMenuItem } from '@minorikun/ui'
 import { useCurrentSessionQuery } from '@/services/auth/auth.query'
 
 const props = defineProps<{
-  activeRoute?: '/dashboard' | '/products' | '/orders' | '/sales'
+  activeRoute?: '/dashboard' | '/products' | '/orders' | '/sales' | '/account'
   title?: string
 }>()
 
 const route = useRoute()
+const router = useRouter()
 const sessionQuery = useCurrentSessionQuery()
 const producerName = computed(() => sessionQuery.data.value?.display_name || '生産者')
 const activeRoute = computed(() => props.activeRoute ?? route.meta.activeRoute ?? '/dashboard')
@@ -70,17 +72,25 @@ const navigationItems = computed(() => [
           <p class="mt-0.5 text-xl font-extrabold text-[#1d2b24]">{{ title }}</p>
         </div>
 
-        <button
+        <UiDropdownMenu>
+          <UiDropdownMenuTrigger as-child>
+        <UiButton
           type="button"
           class="ml-auto flex min-h-11 min-w-0 max-w-[45%] items-center gap-2 rounded-xl border border-[#d7e3da] bg-[#f8fbf8] px-2 text-sm font-extrabold text-[#1d2b24] shadow-sm transition-colors hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#237f4b] sm:px-3 sm:text-base lg:min-h-[52px] lg:min-w-[230px] lg:max-w-none lg:gap-3 lg:rounded-[14px] lg:px-4 lg:text-lg"
-          aria-haspopup="menu"
+          aria-label="アカウントメニュー" variant="outline"
         >
           <span class="grid size-7 shrink-0 place-items-center rounded-full bg-[#e8f5ed] lg:size-9" aria-hidden="true">
             <UserRound class="size-5 text-[#1b7a49] lg:size-6" :stroke-width="2.4" />
           </span>
           <span class="min-w-0 max-w-[180px] truncate">{{ producerName }}</span>
           <ChevronDown class="ml-auto size-4 shrink-0 text-[#687a70] lg:size-5" aria-hidden="true" :stroke-width="3" />
-        </button>
+        </UiButton>
+          </UiDropdownMenuTrigger>
+          <UiDropdownMenuContent>
+            <UiDropdownMenuItem @select="router.push({ name: 'account-settings' })"><UserRound class="size-4" aria-hidden="true" />アカウント設定</UiDropdownMenuItem>
+          </UiDropdownMenuContent>
+        </UiDropdownMenu>
+
       </header>
 
       <main class="mx-auto w-full min-w-0 max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-[clamp(24px,3vw,40px)] lg:py-[clamp(24px,2.5vw,32px)]">

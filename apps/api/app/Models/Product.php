@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Identity\NextPublicReference;
 use App\Enums\ProductPublicationState;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends DomainModel
 {
     use SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (Product $product): void {
+            $product->product_code = app(NextPublicReference::class)->next('product');
+        });
+    }
 
     public function producer(): BelongsTo
     {

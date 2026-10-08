@@ -27,7 +27,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class BuyerOrderController extends Controller
@@ -107,10 +106,10 @@ class BuyerOrderController extends Controller
 
             $shipping = max($feeCandidates ?: [0]);
             $total = $subtotal - $discountTotal + $shipping;
-            $orderNumber = 'EC-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
+
             $order = Order::query()->create([
                 'buyer_id' => $buyer->id,
-                'order_number' => $orderNumber,
+
                 'checkout_key' => $data['idempotency_key'],
                 'order_state' => '注文確定',
                 'payment_state' => 'pending',
@@ -135,7 +134,7 @@ class BuyerOrderController extends Controller
                 'order_id' => $order->id,
                 'producer_id' => $producer->id,
                 'shop_name_snapshot' => $producer->producerProfile?->farm_name,
-                'sub_order_number' => $orderNumber.'-01',
+                'sub_order_number' => $order->order_number,
                 'fulfillment_state' => 'received',
                 'subtotal_yen' => $subtotal - $discountTotal,
                 'producer_discount_yen' => $discountTotal,

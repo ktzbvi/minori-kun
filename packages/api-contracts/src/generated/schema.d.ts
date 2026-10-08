@@ -660,6 +660,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/producer/orders/{producerOrder}/fulfillment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["producerOrder.updateFulfillment"];
+        trace?: never;
+    };
+
+    "/v1/producer/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["producerAccount.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/producer/account/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["producerAccount.updatePhoto"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -934,6 +983,45 @@ export interface components {
         VerifyProducerRegistrationCodeRequest: {
             code: string;
         };
+        /** ProducerOrderDetailResource */
+        ProducerOrderDetailResource: {
+            id: string;
+            display_id: string;
+            ordered_at: string;
+            /** @enum {string} */
+            fulfillment_state: "received" | "processing" | "shipped";
+            /** @enum {string} */
+            operational_state: "received" | "confirmed" | "processing" | "shipped" | "cancelled";
+            /** @enum {string} */
+            status_owner: "producer" | "system";
+            order_state: string;
+            /** @enum {string} */
+            refund_state: "none" | "pending" | "partial" | "refunded" | "failed" | "requires_action" | "canceled";
+            items: {
+                id: string;
+                product_name: string;
+                image_url: string | null;
+                quantity: number;
+                unit_price_yen: number;
+                discount_bps: number;
+                line_total_yen: number;
+            }[];
+            can_update_fulfillment: boolean;
+            delivery_address: {
+                recipient_name: string;
+                postal_code: string;
+                address: string;
+                address_line2: string | null;
+                phone: string;
+            } | null;
+        };
+        /** UpdateProducerFulfillmentRequest */
+        UpdateProducerFulfillmentRequest: {
+            /** @enum {string} */
+            fulfillment_state: "received" | "processing" | "shipped";
+            /** @enum {string} */
+            expected_state: "received" | "processing" | "shipped";
+        };
         /** ProducerOrderListItemResource */
         ProducerOrderListItemResource: {
             id: string;
@@ -951,6 +1039,22 @@ export interface components {
                 product_name: string;
                 quantity: number;
             }[];
+        };
+        /** ProducerAccountResource */
+        ProducerAccountResource: {
+            farm_name: string;
+            masked_email: string;
+            shop_photo_id: string | null;
+            shop_photo_url: string | null;
+        };
+        /** UpdateProducerShopPhotoRequest */
+        UpdateProducerShopPhotoRequest: {
+            /**
+             * Format: binary
+             * @description Maximum file size: 5120 kilobytes.
+             */
+            photo: string;
+            expected_photo_id: string | null;
         };
     };
     responses: {
@@ -2276,19 +2380,116 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description `ProducerOrderListItemResource` */
+            /** @description `ProducerOrderDetailResource` */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["ProducerOrderListItemResource"];
+                        data: components["schemas"]["ProducerOrderDetailResource"];
                     };
                 };
             };
             401: components["responses"]["AuthenticationException"];
             403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "producerOrder.updateFulfillment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                producerOrder: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProducerFulfillmentRequest"];
+            };
+        };
+        responses: {
+            /** @description `ProducerOrderDetailResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerOrderDetailResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            422: components["responses"]["ValidationException"];
+        };
+    };
+
+    "producerAccount.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `ProducerAccountResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerAccountResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+        };
+    };
+    "producerAccount.updatePhoto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["UpdateProducerShopPhotoRequest"];
+            };
+        };
+        responses: {
+            /** @description `ProducerAccountResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProducerAccountResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
+            403: components["responses"]["AuthorizationException"];
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Error overview. */
+                        message: string;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
         };
     };
 }

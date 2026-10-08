@@ -49,17 +49,12 @@ class ProducerProductController extends Controller
             ->latest('updated_at');
 
         if (is_string($keyword) && $keyword !== '') {
-            $like = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $keyword).'%';
-            $displayIdLike = null;
-            if (preg_match('/^p-?([0-9a-z]+)$/i', $keyword, $matches) === 1) {
-                $displayIdLike = '%'.str_replace(['%', '_'], ['\\%', '\\_'], strtolower($matches[1])).'%';
-            }
-
-            $query->where(function ($query) use ($like, $displayIdLike): void {
-                $query->where('name', 'like', $like)->orWhere('id', 'like', $like);
-                if ($displayIdLike !== null) {
-                    $query->orWhere('id', 'like', $displayIdLike);
-                }
+            $keyword = ltrim($keyword, '#');
+            $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $keyword).'%';
+            $query->where(function ($query) use ($like): void {
+                $query->whereRaw("name LIKE ? ESCAPE '!'", [$like])
+                    ->orWhereRaw("id LIKE ? ESCAPE '!'", [$like])
+                    ->orWhereRaw("product_code LIKE ? ESCAPE '!'", [$like]);
             });
         }
 

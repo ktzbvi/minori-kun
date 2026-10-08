@@ -37,7 +37,8 @@ class ListProducerOrders
             $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $keyword).'%';
             $query->where(function (Builder $query) use ($like, $producerId): void {
                 $query->whereRaw("sub_order_number LIKE ? ESCAPE '!'", [$like])
-                    ->orWhereHas('order', fn (Builder $query) => $query->whereRaw("order_number LIKE ? ESCAPE '!'", [$like]))
+                    ->orWhereRaw("legacy_sub_order_number LIKE ? ESCAPE '!'", [$like])
+                    ->orWhereHas('order', fn (Builder $query) => $query->whereRaw("order_number LIKE ? ESCAPE '!'", [$like])->orWhereRaw("legacy_order_number LIKE ? ESCAPE '!'", [$like]))
                     ->orWhereHas('items', fn (Builder $query) => $query->where('producer_id', $producerId)
                         ->whereRaw("product_name_snapshot LIKE ? ESCAPE '!'", [$like]));
             });

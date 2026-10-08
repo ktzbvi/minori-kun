@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\ProductPublicationState;
 use App\Enums\ProducerOperationalState;
+use App\Enums\ProductPublicationState;
 use App\Enums\ScreeningState;
 use App\Models\Category;
 use App\Models\PayjpScreening;
@@ -10,6 +10,8 @@ use App\Models\ProducerProfile;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 function eligibleProducer(array $attributes = []): User
 {
@@ -94,7 +96,7 @@ it('filters Producer products by keyword category publication and stock state', 
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $tomato->id);
 
-    $this->getJson('/api/v1/producer/products?keyword='.urlencode('P-'.strtoupper(substr($tomato->id, -6))))
+    $this->getJson('/api/v1/producer/products?keyword='.urlencode($tomato->product_code))
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $tomato->id);
@@ -103,4 +105,22 @@ it('filters Producer products by keyword category publication and stock state', 
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $gift->id);
+});
+
+it('stores stable unique product codes and scopes code searches to the owner', function (): void {
+    $producer = eligibleProducer();
+    $own = Product::factory()->create(['producer_id' => $producer->id]);
+    $foreign = Product::factory()->create(['producer_id' => eligibleProducer()->id]);
+    $code = $own->product_code;
+    expect($code)->toMatch('/^P-[0-9]{6}$/')->not->toBe($foreign->product_code);
+    $own->update(['name' => 'Updated product']);
+    expect($own->fresh()->product_code)->toBe($code);
+    $this->actingAs($producer);
+    foreach ([$code, '#'.$code, strtolower($code)] as $keyword) {
+        $this->getJson('/api/v1/producer/products?'.http_build_query(['keyword' => $keyword]))
+            ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.display_id', $code);
+    }
+    $this->getJson('/api/v1/producer/products?keyword='.$foreign->product_code)->assertOk()->assertJsonCount(0, 'data');
+    expect(fn () => DB::table('products')->where('id', $foreign->id)
+        ->update(['product_code' => $code]))->toThrow(QueryException::class);
 });

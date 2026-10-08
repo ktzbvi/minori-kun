@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { RouterLink } from 'vue-router'
-import { ChevronRight, Image as ImageIcon, Plus, Search } from 'lucide-vue-next'
+import { ChevronRight, Image as ImageIcon, Plus, Search, X } from 'lucide-vue-next'
 import { UiButton, UiSkeleton, UiSelect, UiSelectTrigger, UiSelectContent, UiSelectItem, UiSelectValue } from '@minorikun/ui'
 import { useProducerProduct } from '@/composables/useProducerProduct'
 import type { ProducerProductListItem } from '@/types/product'
 
 const {
   keyword, categoryFilter, publicationFilter, stockFilter, publicationOptions,
+  activeFilters, clearFilter,
   products, categories, errorMessage, isPending, isError, isFetching, resetFilters, reloadProducts,
 } = useProducerProduct()
 const failedProductImages = reactive(new Set<string>())
@@ -84,6 +85,24 @@ function markProductImageFailed(productId: string) {
             <UiSelectItem value="out_of_stock">在庫なし</UiSelectItem>
           </UiSelectContent>
         </UiSelect>
+      </div>
+      <div v-if="activeFilters.length > 0" class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#d6e2da] pt-4">
+        <div class="flex min-w-0 flex-1 flex-wrap gap-2" role="group" aria-label="適用中の絞り込み">
+          <UiButton
+            v-for="filter in activeFilters"
+            :key="filter.key"
+            type="button"
+            variant="outline"
+            class="max-w-full rounded-full border-[#d6e2da] bg-[#edf5ef] px-3 text-sm font-medium text-[#237f4b]"
+            :aria-label="`${filter.label} の絞り込みを解除`"
+            :title="filter.label"
+            @click="clearFilter(filter.key)"
+          >
+            <span class="min-w-0 truncate">{{ filter.label }}</span>
+            <X class="size-4 shrink-0" aria-hidden="true" />
+          </UiButton>
+        </div>
+        <UiButton type="button" variant="ghost" class="ml-auto shrink-0 px-3 text-sm" @click="resetFilters">すべてクリア</UiButton>
       </div>
     </section>
 
