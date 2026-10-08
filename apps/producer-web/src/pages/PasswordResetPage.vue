@@ -85,8 +85,7 @@ async function initialize() {
   }
   const fragment = new globalThis.URLSearchParams(globalThis.location.hash.slice(1))
   credentials = { email: fragment.get('email') ?? '', token: fragment.get('token') ?? '' }
-  // Credentials remain in memory; reopen the email link after a reload.
-  globalThis.history.replaceState(globalThis.history.state, '', globalThis.location.pathname)
+  // Keep the fragment until completion so reloads can revalidate the same one-use link.
   if (
     !resetEmailSchema.safeParse(credentials.email).success ||
     !/^[A-Za-z0-9]{64}$/.test(credentials.token)
@@ -139,6 +138,7 @@ async function submit() {
       credentials = { email: '', token: '' }
       queryClient.clear()
       if (current === generation) {
+        globalThis.history.replaceState(globalThis.history.state, '', globalThis.location.pathname)
         state.value = 'success'
         redirectTimer = globalThis.setTimeout(() => {
           if (current === generation) void router.replace('/login')
@@ -302,6 +302,12 @@ onBeforeUnmount(() => {
         </p>
         <p v-else id="password-guidance" class="mt-3 text-xs leading-6 text-[#708278]">
           8〜64文字で、大文字・小文字・数字・記号をそれぞれ1文字以上含めてください。
+        </p>
+        <p
+          v-if="state === 'form'"
+          class="mt-4 rounded-xl bg-[#f6faf8] px-4 py-3 text-xs leading-6 text-[#687b70]"
+        >
+          このリンクを他の人に共有しないでください。リンクを持っている人はパスワードを再設定できます。
         </p>
         <form class="mt-8 grid gap-4" :aria-busy="pending" novalidate @submit.prevent="submit">
           <div v-if="state === 'request'" class="grid gap-2">
