@@ -9,6 +9,7 @@ import { startBuyerPasswordReset } from '@/services/password-reset/password-rese
 export function useBuyerPasswordReset() {
   const router = useRouter()
   const requestMessage = ref('')
+  const requestSent = ref(false)
   const serviceError = ref('')
   const schema = toTypedSchema(
     z.object({
@@ -20,7 +21,7 @@ export function useBuyerPasswordReset() {
         .max(255, 'メールアドレスは255文字以内で入力してください。'),
     }),
   )
-  const { defineField, errors, handleSubmit, isSubmitting } = useForm({
+  const { defineField, errors, handleSubmit, isSubmitting, setErrors } = useForm({
     validationSchema: schema,
     initialValues: { email: '' },
   })
@@ -38,6 +39,7 @@ export function useBuyerPasswordReset() {
       try {
         const data = await startBuyerPasswordReset(values.email)
         requestMessage.value = data.message
+        requestSent.value = true
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 422) {
           return
@@ -48,9 +50,17 @@ export function useBuyerPasswordReset() {
     },
     () => undefined,
   )
+  function requestAnotherLink() {
+    requestSent.value = false
+    requestMessage.value = ''
+    serviceError.value = ''
+    setErrors({})
+  }
   return {
     router,
     requestMessage,
+    requestSent,
+    requestAnotherLink,
     serviceError,
     schema,
     defineField,

@@ -589,6 +589,8 @@ These decisions supersede conflicting Producer-specific numeric-policy and deliv
 - **Actor:** Guest / Buyer
 - **Purpose:** Reset a password without revealing account existence.
 - **Main entry:** Login (B13)
+- **User-requested Buyer reset request desktop presentation (2026-10-08; FR-B-016, B16-01, AT-B-016):** At 1024px and above, match the Buyer login brand/illustration panel and request form, with email guidance, send loading/disabled state, neutral receipt, service error/retry, and a Login link. Preserve the mobile screen structure and existing backend request behavior. The emailed new-password page is outside this change.
+- **User-requested Buyer sent state (2026-10-08; FR-B-016, B16-01, AT-B-016):** Only after a successful reset-request API response, replace the email form with a neutral email-check state on the same B16 route. Show mailbox/spam guidance, request-another-link action returning to email entry, and Login. Do not expose account existence or open new-password entry without the emailed valid token. Failed requests remain in the request form with recoverable error feedback.
 - **Summary:** Password Reset accepts a neutral email request and, for a valid one-time token, saves a new password without revealing whether an account exists, then returns to Login.
 
 | Element ID | Element (EN / JP) | Display or input | Japanese display/input | User action | Processing / destination |
