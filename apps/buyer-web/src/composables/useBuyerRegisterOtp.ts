@@ -15,6 +15,7 @@ export function useBuyerRegisterOtp() {
   const router = useRouter()
   const route = useRoute()
   const email = ref('')
+  const isResending = ref(false)
   const resendAvailableAt = ref<Date | null>(null)
   const now = ref(Date.now())
   let timer: ReturnType<typeof setInterval> | undefined
@@ -59,6 +60,7 @@ export function useBuyerRegisterOtp() {
   }
   const submit = handleSubmit(
     async (values) => {
+      if (isResending.value) return
       try {
         await verifyBuyerRegistrationOtp(values.code)
       } catch (error: unknown) {
@@ -83,7 +85,8 @@ export function useBuyerRegisterOtp() {
     () => undefined,
   )
   async function resend() {
-    if (!canResend.value) return
+    if (!canResend.value || isResending.value || isSubmitting.value) return
+    isResending.value = true
 
     try {
       setStatus(await resendBuyerRegistrationOtp())
@@ -97,6 +100,8 @@ export function useBuyerRegisterOtp() {
       }
 
       toast.error('認証コードの再送に失敗しました。')
+    } finally {
+      isResending.value = false
     }
   }
   function changeEmail() {
@@ -123,6 +128,7 @@ export function useBuyerRegisterOtp() {
     router,
     route,
     email,
+    isResending,
     resendAvailableAt,
     now,
     timer,
