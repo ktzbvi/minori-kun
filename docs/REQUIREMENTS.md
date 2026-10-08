@@ -533,6 +533,8 @@ These decisions supersede conflicting Producer-specific numeric-policy and deliv
 - **Actor:** Guest
 - **Purpose:** Sign in to a Buyer account.
 - **Main entry:** Checkout / My Page / direct access
+- **User-requested desktop implementation (2026-10-08; FR-B-013, B13-01/02, AT-B-013):** At desktop widths (1024px and above), use a two-column Buyer brand/illustration panel and login form. Retain the mobile single-column layout and existing credential validation, cookie/CSRF authentication, destination handling, registration/reset links, and absence of bottom navigation. Desktop decoration does not introduce new business behavior.
+
 - **Summary:** Login authenticates a Buyer and returns to the intended destination or Home, with links to registration and password reset; this screen has no bottom navigation.
 
 | Element ID | Element (EN / JP) | Display or input | Japanese display/input | User action | Processing / destination |
