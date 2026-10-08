@@ -25,7 +25,7 @@ const {
     class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-[375px] bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -94,13 +94,44 @@ const {
             <ChevronLeft class="size-5" :stroke-width="2.5" aria-hidden="true" />
             <span class="hidden lg:inline">戻る</span>
           </UiButton>
-          <h1 class="text-base font-bold text-[#227644] lg:hidden">メール確認</h1>
+          <span class="text-sm font-semibold text-[#227644] lg:hidden">メール確認</span>
         </header>
-        <div
-          class="px-[33px] pt-3 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10"
-        >
+        <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
+          <div class="mb-7 lg:hidden">
+            <div class="mb-7 flex items-center gap-2">
+              <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
+                <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
+              </span>
+              <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+            </div>
+            <h1 class="text-2xl leading-snug font-bold text-[#24372b]">メールをご確認ください</h1>
+            <p class="mt-3 text-sm leading-7 text-[#687a70]">
+              メールに届いた6桁の認証コードを入力すると、
+              <br />
+              お客様情報の入力へ進めます。
+            </p>
+          </div>
+          <div class="lg:hidden" aria-label="会員登録の進捗">
+            <div class="mb-3 flex items-center justify-between text-sm">
+              <span class="font-semibold text-[#237f4b]">ステップ 2 / 3</span>
+              <span class="text-[#687a70]">メール確認</span>
+            </div>
+            <div
+              class="flex gap-2"
+              role="progressbar"
+              aria-label="会員登録の進捗"
+              aria-valuemin="1"
+              aria-valuemax="3"
+              aria-valuenow="2"
+              aria-valuetext="ステップ 2 / 3：メール確認"
+            >
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#dce8df]"></span>
+            </div>
+          </div>
           <ol
-            class="flex list-none items-center justify-between gap-1 text-xs text-[#8a978e] lg:mb-8 lg:gap-2"
+            class="hidden list-none items-center justify-between gap-1 text-xs text-[#8a978e] lg:mb-8 lg:flex lg:gap-2"
             aria-label="会員登録の進捗"
           >
             <li class="font-bold text-[#237f4b]">
@@ -153,11 +184,9 @@ const {
               確認が完了すると、お客様情報の入力へ進みます。
             </p>
           </div>
-          <UiCard
-            class="mt-3 rounded-[11px] border-[#dbe5dc] bg-white p-4.5 shadow-none lg:mt-0 lg:rounded-none lg:border-0 lg:p-0"
-          >
-            <div class="text-center lg:rounded-xl lg:bg-[#f3f6f3] lg:p-4 lg:text-left">
-              <p class="text-xs leading-5 text-[#69776e] lg:text-sm">
+          <UiCard class="mt-8 rounded-none border-0 bg-transparent p-0 shadow-none lg:mt-0">
+            <div class="rounded-xl bg-[#edf4ef] p-4 text-left lg:bg-[#f3f6f3]">
+              <p class="text-sm leading-6 text-[#69776e]">
                 <span class="break-all font-semibold text-[#24372b]">{{ email }}</span>
                 <br />
                 に確認コードを送信しました。
@@ -181,7 +210,7 @@ const {
                   id="registration-otp"
                   v-model="code"
                   v-bind="codeAttrs"
-                  class="h-10 rounded-md border-[#dce5dc] px-2.5 text-base lg:h-14 lg:px-4 lg:text-center lg:text-xl lg:tracking-widest placeholder:tracking-normal lg:placeholder:text-base"
+                  class="h-14 rounded-xl border-[#dce5dc] px-4 text-center text-xl tracking-widest md:text-xl lg:rounded-md lg:text-xl placeholder:tracking-normal lg:placeholder:text-base"
                   type="text"
                   name="code"
                   inputmode="numeric"
@@ -200,15 +229,12 @@ const {
                 <UiFormMessage v-if="errors.code" id="registration-otp-error" role="alert">
                   {{ errors.code }}
                 </UiFormMessage>
-                <p
-                  id="registration-otp-guidance"
-                  class="hidden text-xs leading-6 text-[#687a70] lg:block"
-                >
+                <p id="registration-otp-guidance" class="text-xs leading-6 text-[#687a70]">
                   コードの有効期限は発行から3分です。
                 </p>
               </div>
               <UiButton
-                class="min-h-10 rounded-md text-sm lg:min-h-12 lg:text-base"
+                class="min-h-13 rounded-xl text-base lg:min-h-12 lg:rounded-md"
                 type="submit"
                 :disabled="isSubmitting || isResending"
               >
@@ -220,12 +246,12 @@ const {
           <div
             class="mt-5 grid justify-items-center gap-3 text-xs lg:mt-6 lg:gap-4 lg:border-t lg:border-[#e1e8e1] lg:pt-6 lg:text-sm"
           >
-            <p class="hidden text-center text-xs leading-6 text-[#687a70] lg:block">
+            <p class="text-center text-sm leading-6 text-[#687a70] lg:text-xs">
               メールが届かない場合は、迷惑メールフォルダをご確認ください。
             </p>
             <UiButton
               variant="ghost"
-              class="min-h-9 h-auto whitespace-normal p-0 text-xs font-bold text-[#237f4b] underline underline-offset-2 disabled:text-[#87958c] lg:min-h-11 lg:text-sm"
+              class="min-h-11 h-auto whitespace-normal p-0 text-sm font-bold text-[#237f4b] underline underline-offset-2 disabled:text-[#87958c] lg:min-h-11 lg:text-sm"
               :disabled="!canResend || isSubmitting || isResending"
               :aria-busy="isResending"
               @click="resend"
@@ -235,7 +261,7 @@ const {
             </UiButton>
             <UiButton
               variant="ghost"
-              class="min-h-9 h-auto p-0 text-xs font-medium text-[#6e7e74] underline underline-offset-2 lg:text-sm"
+              class="min-h-11 h-auto p-0 text-sm font-medium text-[#6e7e74] underline underline-offset-2 lg:text-sm"
               :disabled="isSubmitting || isResending"
               @click="changeEmail"
             >

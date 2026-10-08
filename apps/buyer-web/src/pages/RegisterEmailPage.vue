@@ -12,7 +12,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
     class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-[375px] bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -81,13 +81,44 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
             <ChevronLeft class="size-5" :stroke-width="2.5" aria-hidden="true" />
             <span class="hidden lg:inline">戻る</span>
           </UiButton>
-          <h1 class="text-base font-bold text-[#227644] lg:hidden">新規会員登録</h1>
+          <span class="text-sm font-semibold text-[#227644] lg:hidden">新規会員登録</span>
         </header>
-        <div
-          class="px-[33px] pt-3 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10"
-        >
+        <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
+          <div class="mb-7 lg:hidden">
+            <div class="mb-7 flex items-center gap-2">
+              <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
+                <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
+              </span>
+              <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+            </div>
+            <h1 class="text-2xl leading-snug font-bold text-[#24372b]">新規会員登録</h1>
+            <p class="mt-3 text-sm leading-7 text-[#687a70]">
+              メールアドレスを入力してください。
+              <br />
+              6桁の認証コードをお送りします。
+            </p>
+          </div>
+          <div class="lg:hidden" aria-label="会員登録の進捗">
+            <div class="mb-3 flex items-center justify-between text-sm">
+              <span class="font-semibold text-[#237f4b]">ステップ 1 / 3</span>
+              <span class="text-[#687a70]">メール入力</span>
+            </div>
+            <div
+              class="flex gap-2"
+              role="progressbar"
+              aria-label="会員登録の進捗"
+              aria-valuemin="1"
+              aria-valuemax="3"
+              aria-valuenow="1"
+              aria-valuetext="ステップ 1 / 3：メール入力"
+            >
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#dce8df]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#dce8df]"></span>
+            </div>
+          </div>
           <ol
-            class="flex list-none items-center justify-between gap-1 text-xs text-[#8a978e] lg:mb-8 lg:gap-2"
+            class="hidden list-none items-center justify-between gap-1 text-xs text-[#8a978e] lg:mb-8 lg:flex lg:gap-2"
             aria-label="会員登録の進捗"
           >
             <li class="font-bold text-[#237f4b]" aria-current="step">
@@ -135,18 +166,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
               メールで6桁の認証コードをお送りします。
             </p>
           </div>
-          <UiCard
-            class="mt-3 rounded-[11px] border-[#dbe5dc] bg-white p-4.5 shadow-none lg:mt-0 lg:rounded-none lg:border-0 lg:p-0"
-          >
-            <div class="mb-6 flex items-center justify-center gap-2.5 lg:hidden">
-              <span
-                class="grid size-9 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
-                aria-hidden="true"
-              >
-                <Leaf class="size-5" :stroke-width="2.5" />
-              </span>
-              <p class="text-xl font-extrabold tracking-[0.06em] text-[#217848]">みのりくん</p>
-            </div>
+          <UiCard class="mt-8 rounded-none border-0 bg-transparent p-0 shadow-none lg:mt-0">
             <form
               class="grid gap-4 lg:gap-5"
               novalidate
@@ -165,7 +185,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
                   id="registration-email"
                   v-model="email"
                   v-bind="emailAttrs"
-                  class="h-10 rounded-md border-[#dce5dc] px-2.5 text-sm lg:h-12 lg:px-4 lg:text-base"
+                  class="h-12 rounded-xl border-[#dce5dc] px-4 text-base md:text-base lg:rounded-md"
                   type="email"
                   name="email"
                   autocomplete="email"
@@ -181,7 +201,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
                 </UiFormMessage>
               </div>
               <UiButton
-                class="min-h-10 rounded-md text-sm lg:min-h-12 lg:text-base"
+                class="min-h-13 rounded-xl text-base lg:min-h-12 lg:rounded-md"
                 type="submit"
                 :disabled="isSubmitting"
               >
@@ -189,7 +209,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
                 {{ isSubmitting ? '送信中...' : '認証コードを送信' }}
               </UiButton>
             </form>
-            <div class="mt-5 hidden items-start gap-3 rounded-xl bg-[#f3f6f3] p-4 lg:flex">
+            <div class="mt-5 flex items-start gap-3 rounded-xl bg-[#f3f6f3] p-4 lg:flex">
               <Mail class="mt-0.5 size-5 shrink-0 text-[#237f4b]" aria-hidden="true" />
               <p class="text-xs leading-6 text-[#687a70]">
                 メール確認後、お客様情報の入力へ進みます。
@@ -199,7 +219,7 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
             </div>
           </UiCard>
           <p
-            class="mt-5 text-center text-xs text-[#78867d] lg:mt-8 lg:border-t lg:border-[#e1e8e1] lg:pt-6 lg:text-sm"
+            class="mt-8 text-center text-sm text-[#78867d] lg:mt-8 lg:border-t lg:border-[#e1e8e1] lg:pt-6 lg:text-sm"
           >
             すでにアカウントをお持ちの方
             <RouterLink

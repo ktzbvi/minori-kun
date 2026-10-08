@@ -21,7 +21,7 @@ const {
     class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="flex h-dvh w-full max-w-[375px] flex-col overflow-hidden bg-[#fbfcfa] sm:h-[728px] sm:shadow-sm lg:h-auto lg:max-w-5xl lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="flex h-dvh w-full max-w-md flex-col overflow-hidden bg-[#fbfcfa] sm:h-[728px] sm:shadow-sm lg:h-auto lg:max-w-5xl lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <div class="flex min-h-0 min-w-0 flex-1 flex-col lg:block">
         <header
@@ -42,13 +42,34 @@ const {
             aria-label="戻る"
             @click="router.back()"
           >
-            <ChevronLeft class="size-5" aria-hidden="true" />
+            <ChevronLeft class="size-5" :stroke-width="2.5" aria-hidden="true" />
             <span class="hidden lg:inline">戻る</span>
           </UiButton>
-          <h1 class="text-base font-bold text-[#227644] lg:hidden">新規会員登録</h1>
+          <span class="text-sm font-semibold text-[#227644] lg:hidden">新規会員登録</span>
         </header>
+        <div class="shrink-0 px-6 py-4 lg:hidden">
+          <div class="lg:hidden">
+            <div class="mb-3 flex items-center justify-between text-sm">
+              <span class="font-semibold text-[#237f4b]">ステップ 3 / 3</span>
+              <span class="text-[#687a70]">情報入力</span>
+            </div>
+            <div
+              class="flex gap-2"
+              role="progressbar"
+              aria-label="会員登録の進捗"
+              aria-valuemin="1"
+              aria-valuemax="3"
+              aria-valuenow="3"
+              aria-valuetext="ステップ 3 / 3：情報入力"
+            >
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+              <span class="h-1 flex-1 rounded-full bg-[#237f4b]"></span>
+            </div>
+          </div>
+        </div>
         <ol
-          class="flex shrink-0 items-center justify-between gap-1 border-b border-[#e1e8e1] px-4 py-3 text-xs text-[#8a978e] lg:mx-auto lg:w-full lg:max-w-lg lg:border-0 lg:px-8 lg:pt-6 lg:pb-0"
+          class="hidden shrink-0 items-center justify-between gap-1 border-b border-[#e1e8e1] px-4 py-3 text-xs text-[#8a978e] lg:mx-auto lg:flex lg:w-full lg:max-w-lg lg:border-0 lg:px-8 lg:pt-6 lg:pb-0"
           aria-label="会員登録の進捗"
         >
           <li class="flex items-center gap-1 text-[#237f4b] lg:gap-2">
@@ -80,30 +101,19 @@ const {
           </li>
         </ol>
         <div
-          class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 scroll-pb-5 lg:overflow-visible lg:px-8 lg:pt-6 lg:pb-0"
+          class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5 scroll-pb-5 lg:overflow-visible lg:px-8 lg:pt-6 lg:pb-0"
         >
-          <div class="mb-6 hidden lg:block">
-            <p class="text-sm font-medium text-[#237f4b]">STEP 3 / 3</p>
+          <div class="mb-6">
+            <p class="hidden text-sm font-medium text-[#237f4b] lg:block">STEP 3 / 3</p>
             <h1 class="mt-2 text-2xl font-bold text-[#1f2a24]">お客様情報の入力</h1>
             <p class="mt-3 text-sm leading-6 text-[#687a70]">
               お客様情報とお届け先を入力して、会員登録を完了してください。
             </p>
           </div>
-          <UiCard
-            class="rounded-[11px] border-[#dbe5dc] bg-white p-3 shadow-none lg:rounded-none lg:border-0 lg:p-0"
-          >
-            <div class="mb-4 flex items-center justify-center gap-2 lg:hidden">
-              <span
-                class="grid size-8 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
-                aria-hidden="true"
-              >
-                <Leaf class="size-5" />
-              </span>
-              <strong class="text-lg text-[#217848]">みのりくん</strong>
-            </div>
+          <UiCard class="rounded-none border-0 bg-transparent p-0 shadow-none">
             <form
               id="buyer-registration-details"
-              class="grid gap-2 lg:grid-cols-2 lg:items-start lg:gap-x-8 lg:gap-y-6"
+              class="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-x-8 lg:gap-y-6"
               :aria-busy="submitting"
               @submit.prevent="submit"
             >
@@ -131,21 +141,21 @@ const {
                   :key="group.title"
                   class="min-w-0 lg:rounded-xl lg:border lg:border-[#e1e8e1] lg:p-5"
                 >
-                  <legend class="hidden text-base font-bold text-[#24372b] lg:block lg:px-1">
+                  <legend class="sr-only text-base font-bold text-[#24372b] lg:not-sr-only lg:px-1">
                     {{ group.title }}
                   </legend>
-                  <div class="grid items-start gap-2 lg:grid-cols-2 lg:gap-x-4 lg:gap-y-4">
+                  <div class="grid items-start gap-4 lg:grid-cols-2 lg:gap-x-4 lg:gap-y-4">
                     <div
                       v-for="field in group.fields"
                       :key="field.name"
-                      class="grid min-w-0 content-start gap-1 lg:gap-2"
+                      class="grid min-w-0 content-start gap-2"
                       :class="{
                         'lg:col-span-2':
                           field.name === 'address_line1' || field.name === 'address_line2',
                       }"
                     >
                       <UiFormLabel
-                        class="text-xs leading-normal font-bold lg:text-sm"
+                        class="text-sm leading-normal font-bold"
                         :for="`registration-${field.name}`"
                       >
                         {{ field.label }}
@@ -159,7 +169,7 @@ const {
                       <UiInput
                         :id="`registration-${field.name}`"
                         v-model="form[field.name]"
-                        class="h-8 rounded-md border-[#dce5dc] px-2 text-xs lg:h-12 lg:px-3 lg:text-base"
+                        class="h-12 rounded-xl border-[#dce5dc] px-3 text-base md:text-base lg:rounded-md"
                         :name="
                           field.name === 'name_phonetic' ? 'registration-name-phonetic' : field.name
                         "
@@ -190,20 +200,20 @@ const {
           </UiCard>
         </div>
         <footer
-          class="shrink-0 border-t border-[#e1e8e1] bg-white px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:mx-8 lg:mt-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-x-8 lg:gap-y-3 lg:px-0 lg:pt-5 lg:pb-6"
+          class="shrink-0 border-t border-[#e1e8e1] bg-white px-6 pt-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:mx-8 lg:mt-6 lg:grid lg:grid-cols-2 lg:items-center lg:gap-x-8 lg:gap-y-3 lg:px-0 lg:pt-5 lg:pb-6"
         >
           <div class="flex items-center gap-2">
             <UiCheckbox
               id="registration-terms"
               v-model="form.terms_accepted"
-              class="size-4 lg:size-5"
+              class="size-5"
               :disabled="submitting"
               :aria-invalid="Boolean(fieldErrors.terms_accepted)"
               :aria-describedby="
                 fieldErrors.terms_accepted ? 'registration-terms-error' : undefined
               "
             />
-            <UiFormLabel for="registration-terms" class="text-xs leading-6 lg:text-sm">
+            <UiFormLabel for="registration-terms" class="text-sm leading-6">
               利用規約に同意する
             </UiFormLabel>
           </div>
@@ -216,14 +226,14 @@ const {
           </UiFormMessage>
           <UiButton
             form="buyer-registration-details"
-            class="mt-2 min-h-11 w-full lg:col-start-2 lg:row-start-1 lg:mt-0 lg:min-h-12 lg:text-base"
+            class="mt-3 min-h-13 w-full rounded-xl text-base lg:rounded-lg lg:col-start-2 lg:row-start-1 lg:mt-0 lg:min-h-12 lg:text-base"
             type="submit"
             :disabled="!canSubmit"
           >
             <LoaderCircle v-if="submitting" class="size-4 animate-spin" aria-hidden="true" />
             {{ submitting ? '登録中...' : '登録する' }}
           </UiButton>
-          <p class="mt-2 text-center text-xs text-[#78867d] lg:col-span-2 lg:mt-0 lg:text-sm">
+          <p class="mt-3 text-center text-sm text-[#78867d] lg:col-span-2 lg:mt-0 lg:text-sm">
             すでにアカウントをお持ちの方
             <RouterLink
               to="/login"
