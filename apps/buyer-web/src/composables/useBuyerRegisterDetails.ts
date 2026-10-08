@@ -24,6 +24,8 @@ export function useBuyerRegisterDetails() {
     label: string
     placeholder: string
     required: boolean
+    autocomplete?: string
+    inputmode?: 'text' | 'tel' | 'numeric'
   }
   const router = useRouter()
   const route = useRoute()
@@ -46,65 +48,100 @@ export function useBuyerRegisterDetails() {
   const fields: FieldDefinition[] = [
     {
       name: 'name',
+      autocomplete: 'section-registration name',
+      inputmode: 'text',
       label: 'お名前',
       placeholder: '山田 太郎',
       required: true,
     },
     {
       name: 'name_phonetic',
+      autocomplete: 'off',
+      inputmode: 'text',
       label: 'フリガナ',
       placeholder: 'ヤマダ タロウ',
       required: true,
     },
     {
       name: 'password',
+      autocomplete: 'new-password',
+      inputmode: 'text',
       label: 'パスワード',
       placeholder: '半角英数字8文字以上',
       required: true,
     },
     {
       name: 'password_confirmation',
+      autocomplete: 'new-password',
+      inputmode: 'text',
       label: 'パスワード確認',
       placeholder: 'もう一度入力してください',
       required: true,
     },
     {
       name: 'phone',
+      autocomplete: 'section-registration shipping tel',
+      inputmode: 'tel',
       label: '電話番号',
       placeholder: '090-0000-0000',
       required: true,
     },
     {
       name: 'postal_code',
+      autocomplete: 'section-registration shipping postal-code',
+      inputmode: 'numeric',
       label: '郵便番号',
       placeholder: '123-4567',
       required: true,
     },
     {
       name: 'prefecture',
+      autocomplete: 'section-registration shipping address-level1',
+      inputmode: 'text',
       label: '都道府県',
       placeholder: '東京都',
       required: true,
     },
     {
       name: 'city',
+      autocomplete: 'section-registration shipping address-level2',
+      inputmode: 'text',
       label: '市区町村',
       placeholder: '新宿区',
       required: true,
     },
     {
       name: 'address_line1',
+      autocomplete: 'section-registration shipping address-line1',
+      inputmode: 'text',
       label: '住所',
       placeholder: '西新宿1-2-3',
       required: true,
     },
     {
       name: 'address_line2',
+      autocomplete: 'section-registration shipping address-line2',
+      inputmode: 'text',
       label: '建物名・部屋番号',
       placeholder: 'サンプルビル101',
       required: false,
     },
   ]
+  const fieldGroups = [
+    {
+      title: 'お客様情報',
+      fields: fields.filter((field) => ['name', 'name_phonetic'].includes(field.name)),
+    },
+    { title: 'パスワード', fields: fields.filter((field) => field.name.includes('password')) },
+    {
+      title: 'お届け先',
+      fields: fields.filter(
+        (field) =>
+          !['name', 'name_phonetic'].includes(field.name) && !field.name.includes('password'),
+      ),
+    },
+  ]
+  const fieldColumns = [fieldGroups.slice(0, 2), fieldGroups.slice(2)]
   const canSubmit = computed(() => form.terms_accepted && !submitting.value)
   onMounted(async () => {
     try {
@@ -171,6 +208,8 @@ export function useBuyerRegisterDetails() {
     fieldErrors,
     form,
     fields,
+    fieldGroups,
+    fieldColumns,
     canSubmit,
     validatePhonetic,
     submit,
