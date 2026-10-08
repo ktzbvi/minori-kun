@@ -6,6 +6,8 @@ import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toast } from '@minorikun/ui'
 import { queryClient } from '@/lib/query'
+import { buyerCartKeys } from '@/services/cart/cart.key'
+import { mergeGuestCartAfterAuthentication } from '@/services/cart/cart.mutation'
 import { loginBuyer } from '@/services/auth/auth.mutation'
 import { buyerAuthKeys } from '@/services/auth/auth.key'
 
@@ -52,13 +54,26 @@ export function useBuyerLogin() {
       try {
         await loginBuyer(values)
         await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
+        let guestCartMergeFailed = false
+        try {
+          const result = await mergeGuestCartAfterAuthentication()
+          guestCartMergeFailed = result.failedCount > 0
+          queryClient.setQueryData(buyerCartKeys.current(), result.cart)
+        } catch {
+          guestCartMergeFailed = true
+        }
+        await queryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })
 
         const redirect =
           typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
             ? route.query.redirect
             : '/'
         await router.replace(redirect)
-        toast.success('成功')
+        if (guestCartMergeFailed) {
+          toast.warning('一部の商品をカートに反映できませんでした。商品と在庫をご確認ください。')
+        } else {
+          toast.success('ログインしました。')
+        }
       } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 429) {
           errorMessage.value = rateLimitError
