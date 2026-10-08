@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronLeft, Leaf, LoaderCircle, ArrowRight, Mail, MailCheck } from 'lucide-vue-next'
+import { ChevronLeft, Leaf, LoaderCircle, ArrowRight, Mail } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
 import { useBuyerPasswordReset } from '@/composables/useBuyerPasswordReset'
@@ -21,7 +21,7 @@ const {
     class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-[375px] bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -91,20 +91,21 @@ const {
             <ChevronLeft class="size-5" :stroke-width="2.5" aria-hidden="true" />
             <span class="hidden lg:inline">戻る</span>
           </UiButton>
-          <h1 class="text-base font-bold text-[#227644] lg:hidden">パスワードの再設定</h1>
+          <span class="text-sm font-semibold text-[#227644] lg:hidden">パスワードの再設定</span>
         </header>
 
-        <div class="px-5 pt-3 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
+        <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
+          <div class="mb-7 flex items-center gap-2 lg:hidden">
+            <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
+              <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
+            </span>
+            <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+          </div>
           <section v-if="requestSent" aria-labelledby="reset-sent-title">
             <div role="status" aria-live="polite">
-              <div
-                class="mb-5 grid size-14 place-items-center rounded-full bg-[#e8f2eb] text-[#237f4b]"
-              >
-                <MailCheck class="size-7" aria-hidden="true" />
-              </div>
-              <h2 id="reset-sent-title" class="text-xl font-bold text-[#1f2a24] lg:text-2xl">
+              <h1 id="reset-sent-title" class="text-xl font-bold text-[#1f2a24] lg:text-2xl">
                 メールをご確認ください
-              </h2>
+              </h1>
               <p class="mt-4 text-sm leading-7 text-[#687a70]">
                 該当するアカウントがある場合、パスワード再設定用メールを送信しました。メール内のリンクから新しいパスワードを設定してください。
               </p>
@@ -114,16 +115,16 @@ const {
             </p>
             <UiButton
               variant="outline"
-              class="mt-6 min-h-12 w-full rounded-lg text-sm lg:text-base"
+              class="mt-6 min-h-13 w-full whitespace-normal rounded-xl px-4 py-3 text-sm lg:min-h-12 lg:rounded-lg lg:text-base"
               @click="requestAnotherLink"
             >
               再設定リンクをもう一度リクエスト
             </UiButton>
           </section>
           <template v-else>
-            <div class="mb-8 hidden lg:block">
+            <div class="mb-8">
               <div
-                class="mb-5 grid size-12 place-items-center rounded-full bg-[#e8f2eb] text-[#237f4b]"
+                class="mb-5 hidden size-12 lg:grid place-items-center rounded-full bg-[#e8f2eb] text-[#237f4b]"
               >
                 <Mail class="size-6" aria-hidden="true" />
               </div>
@@ -134,27 +135,16 @@ const {
                 パスワード再設定用リンクをお送りします。
               </p>
             </div>
-            <UiCard
-              class="rounded-lg border-[#dbe5dc] bg-white p-3 shadow-none lg:rounded-none lg:border-0 lg:p-0"
-            >
-              <div class="mb-4 flex items-center justify-center gap-2 lg:hidden">
-                <span
-                  class="grid size-8 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
-                >
-                  <Leaf :size="19" :stroke-width="2.5" aria-hidden="true" />
-                </span>
-                <strong class="text-base text-[#217848]">みのりくん</strong>
-              </div>
-
+            <UiCard class="rounded-none border-0 bg-transparent p-0 shadow-none">
               <form
-                class="grid gap-3 lg:gap-5"
+                class="grid gap-4 lg:gap-5"
                 :aria-busy="isSubmitting"
                 novalidate
                 @submit.prevent="submit"
               >
                 <div class="grid gap-1.5">
                   <UiFormLabel
-                    class="text-xs leading-normal font-bold text-[#24372b] lg:text-sm"
+                    class="text-sm leading-normal font-bold text-[#24372b]"
                     for="password-reset-email"
                   >
                     メールアドレス
@@ -164,7 +154,7 @@ const {
                     id="password-reset-email"
                     v-model="email"
                     v-bind="emailAttrs"
-                    class="h-9 rounded-md border-[#dce5dc] px-2.5 text-xs lg:h-12 lg:px-4 lg:text-base"
+                    class="h-12 rounded-xl border-[#dce5dc] px-4 text-base md:text-base lg:rounded-md"
                     type="email"
                     name="email"
                     :disabled="isSubmitting"
@@ -180,7 +170,7 @@ const {
                 </div>
 
                 <UiButton
-                  class="w-full min-h-9 rounded-md text-xs lg:min-h-12 lg:text-base"
+                  class="w-full min-h-13 rounded-xl text-base lg:min-h-12 lg:rounded-md"
                   type="submit"
                   :disabled="isSubmitting"
                 >
@@ -195,14 +185,12 @@ const {
               </form>
             </UiCard>
 
-            <p
-              class="mt-4 text-center text-xs leading-5 text-[#78867d] lg:rounded-xl lg:bg-[#f3f6f3] lg:p-4 lg:text-left lg:text-sm lg:leading-7"
-            >
+            <p class="mt-5 rounded-xl bg-[#f3f6f3] p-4 text-sm leading-7 text-[#78867d] lg:mt-4">
               該当するアカウントがある場合、入力したメールアドレスに再設定用リンクを送信します。
             </p>
             <p
               v-if="serviceError"
-              class="mt-2 text-center text-xs font-medium text-[#b33a2b] lg:text-left lg:text-sm lg:leading-6"
+              class="mt-3 text-sm font-medium leading-6 text-[#b33a2b] lg:mt-2"
               role="alert"
             >
               {{ serviceError }}
