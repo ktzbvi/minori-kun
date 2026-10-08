@@ -2,7 +2,17 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { z } from 'zod'
-import { CircleCheck, Eye, EyeOff, LockKeyhole, LoaderCircle, Mail } from 'lucide-vue-next'
+import {
+  ChevronLeft,
+  CircleCheck,
+  CircleAlert,
+  MailCheck,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  LoaderCircle,
+  Mail,
+} from 'lucide-vue-next'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
 import RegistrationShell from '@/components/registration/RegistrationShell.vue'
 import {
@@ -164,99 +174,182 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <RegistrationShell compact-mobile>
+  <RegistrationShell compact-mobile scenic>
     <UiCard
-      class="w-full max-w-[440px] rounded-2xl border-[#d5e2da] bg-white p-7 shadow-sm min-[761px]:p-8 max-[760px]:p-5"
+      class="w-full max-w-[560px] rounded-3xl border-0 bg-white px-6 py-8 shadow-[0_20px_50px_rgb(33_75_54/12%)] min-[761px]:p-10"
     >
+      <header class="mb-6 flex items-center gap-3">
+        <svg class="size-12 shrink-0" viewBox="0 0 88 88" aria-hidden="true">
+          <circle cx="44" cy="44" r="44" fill="#e8f4ed" />
+          <path
+            d="M44 17c-15 0-26 15-26 32 0 15 10 25 26 25s26-10 26-25c0-17-11-32-26-32Z"
+            fill="#20794d"
+          />
+          <path d="M51 23c1-10 9-16 17-15-2 8-8 15-17 15Z" fill="#68ae7b" />
+          <path
+            d="M44 20c-5 15-5 32 0 48"
+            fill="none"
+            stroke="#acd1b5"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+          <g fill="white">
+            <circle cx="36" cy="46" r="3.5" />
+            <circle cx="54" cy="46" r="3.5" />
+          </g>
+          <path
+            d="M38 58q6 8 12 0"
+            fill="none"
+            stroke="white"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+        </svg>
+        <span class="text-2xl font-extrabold tracking-widest text-[#20794d]">みのりくん</span>
+      </header>
       <template v-if="state === 'checking'">
-        <LoaderCircle class="mb-5 size-10 animate-spin text-[#237b4d]" aria-hidden="true" />
-        <p role="status">再設定用リンクを確認しています…</p>
+        <div class="mb-5 grid size-14 place-items-center rounded-full bg-[#e8f4ed] text-[#237b4d]">
+          <LoaderCircle class="size-7 animate-spin" aria-hidden="true" />
+        </div>
+        <div role="status" aria-live="polite">
+          <h1 class="text-xl font-bold text-[#1e3f30] min-[761px]:text-2xl">
+            リンクを確認しています
+          </h1>
+          <p class="mt-3 text-sm leading-7 text-[#708278]">
+            確認が完了するまで、しばらくお待ちください。
+          </p>
+        </div>
       </template>
       <template v-else-if="state === 'success'">
-        <CircleCheck class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
+        <div class="mb-5 grid size-14 place-items-center rounded-full bg-[#e8f4ed] text-[#237b4d]">
+          <CircleCheck class="size-7" aria-hidden="true" />
+        </div>
         <div role="status" aria-live="polite">
-          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">パスワードを再設定しました</h1>
+          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">
+            パスワードを再設定しました
+          </h1>
           <p class="mt-4 text-sm leading-7 text-[#708278]">5秒後にログイン画面へ移動します。</p>
         </div>
-        <UiButton class="mt-6 min-h-12 w-full bg-[#237b4d]" @click="router.replace('/login')">
+        <UiButton
+          class="mt-6 min-h-14 w-full rounded-xl border-0 bg-linear-to-r from-[#2b8c57] to-[#17623e] text-base font-bold text-white shadow-lg"
+          @click="router.replace('/login')"
+        >
           ログインする
         </UiButton>
       </template>
       <template v-else-if="state === 'sent'">
-        <CircleCheck class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
+        <div class="mb-5 grid size-14 place-items-center rounded-full bg-[#e8f4ed] text-[#237b4d]">
+          <MailCheck class="size-7" aria-hidden="true" />
+        </div>
         <div role="status" aria-live="polite">
-          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">メールを送信しました</h1>
+          <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">
+            メールを送信しました
+          </h1>
           <p class="mt-4 text-sm leading-7 text-[#708278]">
             該当するアカウントがある場合、パスワード再設定用メールを送信しました。メール内のリンクから再設定してください。
           </p>
-          <p class="mt-3 text-sm leading-7 text-[#708278]">
+          <p class="mt-5 rounded-xl bg-[#f6faf8] px-4 py-4 text-sm leading-6 text-[#687b70]">
             届かない場合は、迷惑メールフォルダと入力したメールアドレスをご確認ください。
           </p>
         </div>
-        <UiButton variant="outline" class="mt-6 w-full" @click="state = 'request'">
+        <UiButton
+          class="mt-6 min-h-14 w-full rounded-xl border-0 bg-linear-to-r from-[#2b8c57] to-[#17623e] text-base font-bold text-white shadow-lg"
+          @click="state = 'request'"
+        >
           もう一度メールを送信する
         </UiButton>
       </template>
       <template v-else-if="state === 'invalid'">
-        <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">リンクをご確認ください</h1>
+        <div class="mb-5 grid size-14 place-items-center rounded-full bg-amber-50 text-amber-700">
+          <CircleAlert class="size-7" aria-hidden="true" />
+        </div>
+        <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">
+          リンクをご確認ください
+        </h1>
         <p class="mt-4 text-sm leading-7 text-[#708278]" role="alert">
           再設定用リンクが無効、使用済み、または有効期限切れです。もう一度メールを送信してください。
         </p>
         <UiButton
-          class="mt-6 min-h-12 w-full bg-[#237b4d]"
+          class="mt-6 min-h-14 w-full rounded-xl border-0 bg-linear-to-r from-[#2b8c57] to-[#17623e] text-base font-bold text-white shadow-lg"
           @click="router.replace('/password-reset')"
         >
           再設定リンクを再送する
         </UiButton>
       </template>
       <template v-else-if="state === 'error'">
-        <p role="alert">リンクを確認できませんでした。時間をおいてもう一度お試しください。</p>
-        <UiButton class="mt-6 w-full" @click="check()">もう一度試す</UiButton>
+        <div class="mb-5 grid size-14 place-items-center rounded-full bg-amber-50 text-amber-700">
+          <CircleAlert class="size-7" aria-hidden="true" />
+        </div>
+        <h1 class="text-xl font-bold text-[#1e3f30] min-[761px]:text-2xl">
+          リンクを確認できませんでした
+        </h1>
+        <p class="mt-3 text-sm leading-7 text-[#708278]" role="alert">
+          時間をおいてもう一度お試しください。
+        </p>
+        <UiButton
+          class="mt-6 min-h-14 w-full rounded-xl border-0 bg-linear-to-r from-[#2b8c57] to-[#17623e] text-base font-bold text-white shadow-lg"
+          @click="check()"
+        >
+          もう一度試す
+        </UiButton>
       </template>
       <template v-else>
-        <Mail v-if="state === 'request'" class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
-        <LockKeyhole v-else class="mb-5 size-10 text-[#237b4d]" aria-hidden="true" />
         <h1 class="text-xl min-[761px]:text-2xl font-bold text-[#1e3f30]">
-          {{ state === 'request' ? 'パスワード再設定' : '新しいパスワードを設定' }}
+          {{ state === 'request' ? 'パスワードを再設定' : '新しいパスワードを設定' }}
         </h1>
         <p v-if="state === 'request'" class="mt-3 text-sm leading-7 text-[#708278]">
-          登録したメールアドレスに、パスワード再設定用のリンクを送信します。
+          登録時のメールアドレスを入力してください。
         </p>
         <p v-else id="password-guidance" class="mt-3 text-xs leading-6 text-[#708278]">
           8〜64文字で、大文字・小文字・数字・記号をそれぞれ1文字以上含めてください。
         </p>
-        <form class="mt-6 grid gap-5" novalidate @submit.prevent="submit">
+        <form class="mt-8 grid gap-4" :aria-busy="pending" novalidate @submit.prevent="submit">
           <div v-if="state === 'request'" class="grid gap-2">
-            <UiFormLabel for="reset-email">メールアドレス</UiFormLabel>
-            <UiInput
-              id="reset-email"
-              v-model="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="h-12"
-              :disabled="pending"
-              :aria-invalid="Boolean(errors.email)"
-              :aria-describedby="errors.email ? 'reset-email-error' : undefined"
-            />
+            <UiFormLabel for="reset-email" class="text-base font-bold text-[#183c2c]">
+              メールアドレス
+            </UiFormLabel>
+            <div class="relative">
+              <Mail
+                class="pointer-events-none absolute top-1/2 left-4 z-10 size-5 -translate-y-1/2 text-[#708278]"
+                aria-hidden="true"
+              />
+              <UiInput
+                id="reset-email"
+                v-model="email"
+                type="email"
+                inputmode="email"
+                placeholder="メールアドレスを入力"
+                autocomplete="email"
+                required
+                class="h-14 rounded-xl border-[#cbded2] pl-12 text-base placeholder:text-[#708278]"
+                :disabled="pending"
+                :aria-invalid="Boolean(errors.email)"
+                :aria-describedby="errors.email ? 'reset-email-error' : undefined"
+              />
+            </div>
             <UiFormMessage v-if="errors.email" id="reset-email-error" role="alert">
               {{ errors.email }}
             </UiFormMessage>
           </div>
           <template v-else>
             <div class="grid gap-2">
-              <UiFormLabel for="new-password">
+              <UiFormLabel for="new-password" class="text-base font-bold text-[#183c2c]">
                 新しいパスワード
                 <span class="text-red-600">*</span>
               </UiFormLabel>
               <div class="relative">
+                <LockKeyhole
+                  class="pointer-events-none absolute top-1/2 left-4 z-10 size-5 -translate-y-1/2 text-[#708278]"
+                  aria-hidden="true"
+                />
                 <UiInput
                   id="new-password"
                   v-model="password"
+                  placeholder="新しいパスワードを入力"
                   :type="visible ? 'text' : 'password'"
                   autocomplete="new-password"
                   required
-                  class="h-12 pr-12"
+                  class="h-14 rounded-xl border-[#cbded2] pr-12 pl-12 text-base placeholder:text-[#708278]"
                   :disabled="pending"
                   :aria-invalid="Boolean(errors.password)"
                   :aria-describedby="
@@ -279,18 +372,23 @@ onBeforeUnmount(() => {
               </UiFormMessage>
             </div>
             <div class="grid gap-2">
-              <UiFormLabel for="confirm-password">
+              <UiFormLabel for="confirm-password" class="text-base font-bold text-[#183c2c]">
                 パスワード（確認）
                 <span class="text-red-600">*</span>
               </UiFormLabel>
               <div class="relative">
+                <LockKeyhole
+                  class="pointer-events-none absolute top-1/2 left-4 z-10 size-5 -translate-y-1/2 text-[#708278]"
+                  aria-hidden="true"
+                />
                 <UiInput
                   id="confirm-password"
                   v-model="confirmation"
+                  placeholder="新しいパスワードを再入力"
                   :type="confirmationVisible ? 'text' : 'password'"
                   autocomplete="new-password"
                   required
-                  class="h-12 pr-12"
+                  class="h-14 rounded-xl border-[#cbded2] pr-12 pl-12 text-base placeholder:text-[#708278]"
                   :disabled="pending"
                   :aria-invalid="Boolean(errors.password_confirmation)"
                   :aria-describedby="
@@ -320,23 +418,36 @@ onBeforeUnmount(() => {
             </div>
           </template>
           <UiFormMessage v-if="error" role="alert">{{ error }}</UiFormMessage>
-          <UiButton type="submit" class="min-h-12 w-full bg-[#237b4d]" :disabled="pending">
+          <UiButton
+            type="submit"
+            class="min-h-14 w-full rounded-xl border-0 bg-linear-to-r from-[#2b8c57] to-[#17623e] text-base font-bold text-white shadow-lg"
+            :disabled="pending"
+          >
             {{
               pending
                 ? '処理中…'
                 : state === 'request'
-                  ? '再設定リンクを送信する'
+                  ? '再設定リンクを送信'
                   : 'パスワードを再設定する'
             }}
           </UiButton>
         </form>
+        <p
+          v-if="state === 'request'"
+          class="mt-3 rounded-xl bg-[#f6faf8] px-4 py-4 text-xs leading-5 text-[#687b70]"
+        >
+          入力内容に該当するアカウントがある場合、
+          <br />
+          再設定メールを送信します。
+        </p>
       </template>
       <RouterLink
         v-if="state !== 'success'"
         to="/login"
-        class="mt-6 block text-center text-sm font-medium text-[#368357] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+        class="mt-6 flex items-center text-sm font-bold text-[#20794d] focus-visible:outline-2 focus-visible:outline-offset-4"
       >
-        ログインに戻る
+        <ChevronLeft class="size-4 shrink-0" aria-hidden="true" />
+        生産者ログインに戻る
       </RouterLink>
     </UiCard>
   </RegistrationShell>
