@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import { Check, ChevronLeft } from 'lucide-vue-next'
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { UiButton } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-
-const route = useRoute()
-const router = useRouter()
-const referenceNumber = computed(() => String(route.query.reference ?? ''))
-const isProducerInquiry = computed(() => route.query.type === 'producer')
-
-function returnToMyPage() {
-  void router.replace({ name: 'my-page' })
-}
+import { useBuyerContactComplete } from '@/composables/useBuyerContactComplete'
+const { route, router, referenceNumber, isProducerInquiry, returnToMyPage } =
+  useBuyerContactComplete()
 </script>
 
 <template>

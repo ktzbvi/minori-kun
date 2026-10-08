@@ -1,60 +1,29 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeft, Download, Search, ShoppingCart } from 'lucide-vue-next'
-import { toast } from '@minorikun/ui'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import BuyerPageShell from '@/components/BuyerPageShell.vue'
-import { cancelBuyerOrder, downloadBuyerReceipt } from '@/services/orders/orders.api'
-import { buyerOrderKeys } from '@/services/orders/orders.key'
-import { useBuyerOrderQuery } from '@/services/orders/orders.query'
-import { orderStatusLabel, paymentStatusLabel, refundStatusLabel } from '@/services/orders/orders.status'
-
-const route = useRoute()
-const router = useRouter()
-const client = useQueryClient()
-const orderId = computed(() => String(route.params.orderId ?? ''))
-const order = useBuyerOrderQuery(orderId)
-const isCancelled = computed(() => order.data.value?.order_state === 'cancelled')
-const confirmCancel = ref(false)
-const cancellationKey = crypto.randomUUID()
-function openSearch() {
-  void router.push({ name: 'search' })
-}
-function openCart() {
-  void router.push({ name: 'cart' })
-}
-const cancelMutation = useMutation({
-  mutationFn: () => cancelBuyerOrder(orderId.value, cancellationKey),
-  onSuccess: (data) => {
-    client.setQueryData(buyerOrderKeys.detail(orderId.value), data)
-    void client.invalidateQueries({ queryKey: buyerOrderKeys.all() })
-    confirmCancel.value = false
-    toast.success('注文をキャンセルしました。返金状況は注文詳細で確認できます。')
-  },
-  onError: () => toast.error('キャンセルできませんでした。注文状態をご確認ください。'),
-})
-const receiptMutation = useMutation({
-  mutationFn: () =>
-    downloadBuyerReceipt(orderId.value, order.data.value?.order_number ?? 'receipt'),
-  onError: () => toast.error('領収書をダウンロードできませんでした。時間をおいて再度お試しください。'),
-})
-
-function yen(value: number) {
-  return `${value.toLocaleString('ja-JP')}円`
-}
-function date(value: string) {
-  return new Date(value).toLocaleString('ja-JP')
-}
-function fulfillmentLabel(value?: string) {
-  return (
-    ({ received: '受付', processing: '対応中', shipped: '発送済み' } as Record<string, string>)[
-      value ?? ''
-    ] ??
-    value ??
-    '-'
-  )
-}
+import {
+  orderStatusLabel,
+  paymentStatusLabel,
+  refundStatusLabel,
+} from '@/services/orders/orders.status'
+import { useBuyerOrderDetail } from '@/composables/useBuyerOrderDetail'
+const {
+  route,
+  router,
+  client,
+  orderId,
+  order,
+  isCancelled,
+  confirmCancel,
+  cancellationKey,
+  openSearch,
+  openCart,
+  cancelMutation,
+  receiptMutation,
+  yen,
+  date,
+  fulfillmentLabel,
+} = useBuyerOrderDetail()
 </script>
 
 <template>
@@ -105,10 +74,7 @@ function fulfillmentLabel(value?: string) {
         <span class="rounded bg-[#edf3f8] px-2 py-1 text-[10px]">
           注文：{{ orderStatusLabel(order.data.value.order_state) }}
         </span>
-        <span
-          v-if="!isCancelled"
-          class="ml-1 rounded bg-[#edf3f8] px-2 py-1 text-[10px]"
-        >
+        <span v-if="!isCancelled" class="ml-1 rounded bg-[#edf3f8] px-2 py-1 text-[10px]">
           発送：{{ fulfillmentLabel(order.data.value.producer_orders[0]?.fulfillment_state) }}
         </span>
         <div v-if="isCancelled" class="mt-2 flex flex-wrap gap-x-3 text-[10px] text-[#68786e]">
@@ -148,7 +114,9 @@ function fulfillmentLabel(value?: string) {
         <button
           class="mt-2 flex min-h-9 w-full items-center justify-between border-0 border-t border-[#e5ebe5] bg-white pt-2 text-left text-[11px] font-bold text-[#237f4b]"
           type="button"
-          @click="router.push({ name: 'producer-inquiry', params: { orderId: order.data.value.id } })"
+          @click="
+            router.push({ name: 'producer-inquiry', params: { orderId: order.data.value.id } })
+          "
         >
           生産者に問い合わせる
           <span aria-hidden="true" class="text-base text-[#68786e]">›</span>
@@ -185,11 +153,15 @@ function fulfillmentLabel(value?: string) {
         </button>
       </section>
       <section
-        v-else-if="order.data.value.order_state === '完了' && order.data.value.refund_state === 'none'"
+        v-else-if="
+          order.data.value.order_state === '完了' && order.data.value.refund_state === 'none'
+        "
         class="rounded-md border border-[#dce5dc] bg-white p-3"
       >
         <h2 class="m-0 text-xs font-bold">領収書</h2>
-        <p class="my-2 text-[10px] text-[#68786e]">注文番号が記載されたPDFをダウンロードできます。</p>
+        <p class="my-2 text-[10px] text-[#68786e]">
+          注文番号が記載されたPDFをダウンロードできます。
+        </p>
         <button
           class="flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-[#237f4b] bg-white text-xs font-bold text-[#237f4b] disabled:opacity-60"
           type="button"
@@ -200,10 +172,7 @@ function fulfillmentLabel(value?: string) {
           {{ receiptMutation.isPending.value ? 'ダウンロード中...' : '領収書をダウンロード' }}
         </button>
       </section>
-      <section
-        v-else-if="isCancelled"
-        class="rounded-md border border-[#dce5dc] bg-[#eaf5ef] p-3"
-      >
+      <section v-else-if="isCancelled" class="rounded-md border border-[#dce5dc] bg-[#eaf5ef] p-3">
         <strong class="text-xs">注文をキャンセルしました</strong>
         <p class="my-1 text-[10px]">返金額：{{ yen(order.data.value.total_yen) }}</p>
         <p
@@ -212,14 +181,22 @@ function fulfillmentLabel(value?: string) {
         >
           返金処理中です。カード明細への反映時期はカード会社により異なります。
         </p>
-        <p v-else-if="order.data.value.refund_state === 'refunded'" class="my-1 text-[10px] text-[#68786e]">
+        <p
+          v-else-if="order.data.value.refund_state === 'refunded'"
+          class="my-1 text-[10px] text-[#68786e]"
+        >
           返金処理が完了しました。カード明細への反映時期はカード会社により異なります。
         </p>
-        <p v-else-if="['failed', 'canceled'].includes(order.data.value.refund_state)" class="my-1 text-[10px] text-[#b33a2b]">
+        <p
+          v-else-if="['failed', 'canceled'].includes(order.data.value.refund_state)"
+          class="my-1 text-[10px] text-[#b33a2b]"
+        >
           返金に失敗したため、運営が確認しています。
         </p>
         <p v-else class="my-1 text-[10px] text-[#68786e]">
-          返金{{ refundStatusLabel(order.data.value.refund_state) ?? '状況確認中' }}です。カード会社により返金の反映時期が異なります。
+          返金{{
+            refundStatusLabel(order.data.value.refund_state) ?? '状況確認中'
+          }}です。カード会社により返金の反映時期が異なります。
         </p>
         <button
           class="mt-2 min-h-9 w-full rounded-md border-0 bg-[#237f4b] text-xs font-bold text-white"
@@ -248,14 +225,10 @@ function fulfillmentLabel(value?: string) {
         <h2 id="cancel-title" class="m-0 text-center text-sm font-bold">
           注文をキャンセルしますか？
         </h2>
-        <p class="my-2 text-[10px] text-[#68786e]">
-          以下の注文をキャンセルします。
-        </p>
+        <p class="my-2 text-[10px] text-[#68786e]">以下の注文をキャンセルします。</p>
         <div class="my-3 rounded-md bg-[#f3f6f3] p-3 text-[10px]">
           <strong class="block text-xs">{{ order.data.value?.shop_name }}</strong>
-          <p class="my-1 text-[#68786e]">
-            注文番号 {{ order.data.value?.order_number }}
-          </p>
+          <p class="my-1 text-[#68786e]">注文番号 {{ order.data.value?.order_number }}</p>
           <div class="mt-2 flex items-center justify-between gap-2">
             <span>返金対象額</span>
             <strong class="text-sm">
@@ -264,7 +237,8 @@ function fulfillmentLabel(value?: string) {
           </div>
         </div>
         <p class="my-3 text-[10px] leading-relaxed text-[#68786e]">
-          このショップの注文のみがキャンセルされます。<br />
+          このショップの注文のみがキャンセルされます。
+          <br />
           他のショップの注文はキャンセルされません。
         </p>
         <div class="grid grid-cols-1 gap-2">

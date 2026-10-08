@@ -1,76 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { ChevronLeft, Search, ShoppingCart } from 'lucide-vue-next'
-import { useRoute, useRouter } from 'vue-router'
-import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { useAddBuyerCartItemMutation } from '@/services/cart/cart.mutation'
-import { useBuyerCartQuery } from '@/services/cart/cart.query'
-import {
-  useBuyerCatalogueQuery,
-  type BuyerCatalogueProduct,
-} from '@/services/catalog/catalog.query'
-
-const route = useRoute()
-const router = useRouter()
-const catalogueQuery = useBuyerCatalogueQuery()
-const cartQuery = useBuyerCartQuery()
-const addCartItemMutation = useAddBuyerCartItemMutation()
-const selectedCategoryId = computed(() => String(route.params.categoryId ?? 'all'))
-const selectedCategory = computed(() =>
-  selectedCategoryId.value === 'all'
-    ? 'すべて'
-    : (catalogueQuery.data.value?.find((product) => product.category === selectedCategoryId.value)
-        ?.category ?? selectedCategoryId.value),
-)
-const cartItemCount = computed(
-  () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
-)
-const categoryProducts = computed(() =>
-  selectedCategoryId.value === 'all'
-    ? (catalogueQuery.data.value ?? [])
-    : (catalogueQuery.data.value ?? []).filter(
-        (product) => product.category === selectedCategoryId.value,
-      ),
-)
-
-function goBack() {
-  void router.push({ name: 'categories' })
-}
-
-function openSearch() {
-  void router.push({ name: 'search' })
-}
-
-function openProduct(productId: string) {
-  void router.push({ name: 'product-detail', params: { productId } })
-}
-
-function addToCart(product: BuyerCatalogueProduct) {
-  const variant = product.variants[0]
-  if (!variant || variant.stock_quantity < 1) return
-
-  addCartItemMutation.mutate(
-    { variantId: variant.id, quantity: 1 },
-    {
-      onSuccess: () => toast.success('カートに追加しました'),
-      onError: () => toast.error('カートに追加できませんでした。ログイン状態を確認してください。'),
-    },
-  )
-}
-
-function openCart() {
-  void router.push({ name: 'cart' })
-}
-
-function productPrice(product: BuyerCatalogueProduct) {
-  const variant = product.variants[0]
-  return variant ? Math.round((variant.price_yen * (10_000 - variant.discount_bps)) / 10_000) : 0
-}
-
-function formatYen(amount: number) {
-  return `税込 ${amount.toLocaleString('ja-JP')}円`
-}
+import { useBuyerCategoryProductList } from '@/composables/useBuyerCategoryProductList'
+const {
+  route,
+  router,
+  catalogueQuery,
+  cartQuery,
+  addCartItemMutation,
+  selectedCategoryId,
+  selectedCategory,
+  cartItemCount,
+  categoryProducts,
+  goBack,
+  openSearch,
+  openProduct,
+  addToCart,
+  openCart,
+  productPrice,
+  formatYen,
+} = useBuyerCategoryProductList()
 </script>
 
 <template>
@@ -89,7 +38,7 @@ function formatYen(amount: number) {
             <ChevronLeft :size="22" stroke-width="2.5" />
           </button>
           <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">
-            &#x30AB;&#x30C6;&#x30B4;&#x30EA;&#x5546;&#x54C1;&#x4E00;&#x89A7;
+            カテゴリ商品一覧
           </h1>
         </div>
         <div class="flex gap-2">
@@ -172,7 +121,7 @@ function formatYen(amount: number) {
                 "
                 @click="addToCart(product)"
               >
-                &#x30AB;&#x30FC;&#x30C8;&#x306B;&#x8FFD;&#x52A0;
+                カートに追加
               </button>
             </div>
           </article>
@@ -194,7 +143,7 @@ function formatYen(amount: number) {
           v-else-if="!categoryProducts.length"
           class="mt-10 text-center text-[12px] text-[#718075]"
         >
-          &#x3053;&#x306E;&#x30AB;&#x30C6;&#x30B4;&#x30EA;&#x306B;&#x5546;&#x54C1;&#x306F;&#x3042;&#x308A;&#x307E;&#x305B;&#x3093;
+          このカテゴリに商品はありません
         </p>
       </section>
 

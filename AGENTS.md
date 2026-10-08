@@ -35,6 +35,7 @@
 
 - Write requirements, implementation documentation, and agent handoffs in English.
 - Preserve exact Japanese UI labels where specified. When discussing a Japanese label outside the UI specification, include its English meaning.
+- In every file under `apps/buyer-web`, write Japanese text and Japanese regex characters as literal Japanese characters. Never encode Japanese characters as `\uXXXX` escapes or HTML numeric entities such as `&#xXXXX;` / `&#NNNN;`; keep escapes/entities only when required for non-Japanese syntax or data.
 - The customer-facing locale is Japanese, the currency is JPY, and the business timezone is Asia/Tokyo.
 
 ## Repository Architecture
@@ -73,6 +74,7 @@
 - Put endpoint calls directly in feature `services/<feature>/<feature>.query.ts` and `<feature>.mutation.ts` files. Keep cache keys in `<feature>.key.ts`. Do not add `<feature>.api.ts` wrappers or centralize endpoint functions in `services/api.ts`. Create only files needed by implemented behavior.
 - Import generated types from `@minorikun/api-contracts`; keep app-specific type aliases in `src/types` and error helpers in `src/lib`. Pages and components consume query/mutation services without raw endpoint calls. Preserve Sanctum cookie/CSRF authentication.
 - Keep the current implementation scope in Producer unless the user requests Buyer/Admin changes. Buyer now has its own Axios client and uses `@minorikun/api-contracts`; this does not establish that every Buyer feature follows the final service layout. Admin still references the removed `@minorikun/api-client` package and requires migration before workspace installation or its build can succeed. Do not expand a Producer task to repair Admin.
+- Keep Buyer page components focused on templates and visual imports. Move page state, validation, navigation handlers, and feature orchestration into exported `src/composables/useBuyer*.ts` composables, following the existing Producer composable naming pattern.
 - Buyer UI is mobile-first. Producer and Admin portals are desktop-oriented and must remain usable at the supported viewport sizes.
 - Implement loading, empty, validation, error, retry, disabled, and unavailable states required by the relevant screen specification.
 - Communicate status with text or icon plus text, never color alone.

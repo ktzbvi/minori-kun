@@ -1,59 +1,20 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
-import axios from 'axios'
 import { ChevronLeft, Leaf } from 'lucide-vue-next'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useForm } from 'vee-validate'
-import { z } from 'zod'
 import { UiButton, UiCard } from '@minorikun/ui'
-import { startBuyerPasswordReset } from '@/services/password-reset/password-reset.mutation'
-
-const router = useRouter()
-const requestMessage = ref('')
-const serviceError = ref('')
-
-const schema = toTypedSchema(
-  z.object({
-    email: z
-      .string()
-      .trim()
-      .min(1, 'メールアドレスを入力してください。')
-      .email('正しいメールアドレスを入力してください。')
-      .max(255, 'メールアドレスは255文字以内で入力してください。'),
-  }),
-)
-
-const { defineField, errors, handleSubmit, isSubmitting } = useForm({
-  validationSchema: schema,
-  initialValues: { email: '' },
-})
-
-const [email, emailAttrs] = defineField('email', (state) => ({
-  validateOnBlur: false,
-  validateOnChange: false,
-  validateOnInput: false,
-  validateOnModelUpdate: state.errors.length > 0,
-}))
-
-const submit = handleSubmit(
-  async (values) => {
-    requestMessage.value = ''
-    serviceError.value = ''
-
-    try {
-      const data = await startBuyerPasswordReset(values.email)
-      requestMessage.value = data.message
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 422) {
-        return
-      }
-
-      serviceError.value = '現在メールを送信できません。時間をおいてからもう一度お試しください。'
-    }
-  },
-  () => undefined,
-)
+import { useBuyerPasswordReset } from '@/composables/useBuyerPasswordReset'
+const {
+  router,
+  requestMessage,
+  serviceError,
+  schema,
+  defineField,
+  errors,
+  handleSubmit,
+  isSubmitting,
+  email,
+  emailAttrs,
+  submit,
+} = useBuyerPasswordReset()
 </script>
 
 <template>
@@ -69,7 +30,7 @@ const submit = handleSubmit(
           <ChevronLeft :size="22" :stroke-width="2.5" aria-hidden="true" />
         </button>
         <h1 class="text-[16px] font-bold text-[#227644]">
-          &#12497;&#12473;&#12527;&#12540;&#12489;&#12398;&#20877;&#35373;&#23450;
+          パスワードの再設定
         </h1>
       </header>
 
@@ -79,15 +40,17 @@ const submit = handleSubmit(
             <span class="grid size-8 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]">
               <Leaf :size="19" :stroke-width="2.5" aria-hidden="true" />
             </span>
-            <strong class="text-[16px] text-[#217848]">&#12415;&#12398;&#12426;&#12367;&#12435;</strong>
+            <strong class="text-[16px] text-[#217848]">
+              みのりくん
+            </strong>
           </div>
 
           <form class="grid gap-3" novalidate @submit.prevent="submit">
             <div class="grid gap-1.5">
               <label class="text-[11px] font-bold text-[#24372b]" for="password-reset-email">
-                &#12513;&#12540;&#12523;&#12450;&#12489;&#12524;&#12473;
+                メールアドレス
                 <span class="rounded bg-[#d84444] px-1 py-px text-[9px] text-white">
-                  &#24517;&#38920;
+                  必須
                 </span>
               </label>
               <input
@@ -98,7 +61,7 @@ const submit = handleSubmit(
                 type="email"
                 autocomplete="email"
                 inputmode="email"
-                placeholder="&#12513;&#12540;&#12523;&#12450;&#12489;&#12524;&#12473;&#12434;&#20837;&#21147;&#12375;&#12390;&#12367;&#12384;&#12373;&#12356;&#12290;"
+                placeholder="メールアドレスを入力してください。"
                 :aria-describedby="errors.email ? 'password-reset-email-error' : undefined"
                 :aria-invalid="Boolean(errors.email)"
               />
@@ -112,20 +75,34 @@ const submit = handleSubmit(
               </p>
             </div>
 
-            <UiButton class="!w-full !min-h-[35px] !rounded-[4px] !text-[12px]" type="submit" :disabled="isSubmitting">
-              <span v-if="isSubmitting">&#36865;&#20449;&#20013;...</span>
-              <span v-else>&#20877;&#35373;&#23450;&#12513;&#12540;&#12523;&#12434;&#36865;&#20449;</span>
+            <UiButton
+              class="!w-full !min-h-[35px] !rounded-[4px] !text-[12px]"
+              type="submit"
+              :disabled="isSubmitting"
+            >
+              <span v-if="isSubmitting">送信中...</span>
+              <span v-else>
+                再設定メールを送信
+              </span>
             </UiButton>
           </form>
         </UiCard>
 
-        <p v-if="requestMessage" class="mt-4 text-center text-[11px] font-medium text-[#237f4b]" role="status">
+        <p
+          v-if="requestMessage"
+          class="mt-4 text-center text-[11px] font-medium text-[#237f4b]"
+          role="status"
+        >
           {{ requestMessage }}
         </p>
         <p v-else class="mt-4 text-center text-[10px] leading-5 text-[#78867d]">
-          &#20837;&#21147;&#12375;&#12383;&#12513;&#12540;&#12523;&#12450;&#12489;&#12524;&#12473;&#12395;&#20877;&#35373;&#23450;&#29992;&#12522;&#12531;&#12463;&#12434;&#36865;&#20449;&#12375;&#12414;&#12377;&#12290;
+          入力したメールアドレスに再設定用リンクを送信します。
         </p>
-        <p v-if="serviceError" class="mt-2 text-center text-[11px] font-medium text-[#b33a2b]" role="alert">
+        <p
+          v-if="serviceError"
+          class="mt-2 text-center text-[11px] font-medium text-[#b33a2b]"
+          role="alert"
+        >
           {{ serviceError }}
         </p>
       </div>

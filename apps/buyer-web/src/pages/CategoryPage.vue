@@ -1,39 +1,17 @@
 <script setup lang="ts">
 import { ChevronLeft, Grid2X2, Search, ShoppingCart } from 'lucide-vue-next'
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { useBuyerCartQuery } from '@/services/cart/cart.query'
-import { useBuyerCatalogueQuery } from '@/services/catalog/catalog.query'
-
-const router = useRouter()
-const catalogueQuery = useBuyerCatalogueQuery()
-const cartQuery = useBuyerCartQuery()
-const cartItemCount = computed(
-  () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
-)
-const categoryCards = computed(() => [
-  { id: 'all', label: 'すべて', count: catalogueQuery.data.value?.length ?? 0 },
-  ...Array.from(
-    new Set((catalogueQuery.data.value ?? []).map((product) => product.category).filter(Boolean)),
-  ).map((category) => ({
-    id: category!,
-    label: category!,
-    count:
-      catalogueQuery.data.value?.filter((product) => product.category === category).length ?? 0,
-  })),
-])
-
-function openCategory(categoryId: string) {
-  void router.push({ name: 'category-products', params: { categoryId } })
-}
-
-function openSearch() {
-  void router.push({ name: 'search' })
-}
-function openCart() {
-  void router.push({ name: 'cart' })
-}
+import { useBuyerCategory } from '@/composables/useBuyerCategory'
+const {
+  router,
+  catalogueQuery,
+  cartQuery,
+  cartItemCount,
+  categoryCards,
+  openCategory,
+  openSearch,
+  openCart,
+} = useBuyerCategory()
 </script>
 
 <template>
@@ -51,7 +29,7 @@ function openCart() {
           >
             <ChevronLeft :size="22" stroke-width="2.5" />
           </button>
-          <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">&#x30AB;&#x30C6;&#x30B4;&#x30EA;</h1>
+          <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">カテゴリ</h1>
         </div>
         <div class="flex gap-2">
           <button
@@ -81,10 +59,10 @@ function openCart() {
 
       <section class="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-[82px]">
         <h2 class="m-0 text-[13px] font-bold text-[#237f4b]">
-          &#x30AB;&#x30C6;&#x30B4;&#x30EA;&#x30FC;&#x304B;&#x3089;&#x63A2;&#x3059;
+          カテゴリーから探す
         </h2>
         <p class="mt-1 mb-3 text-[11px] text-[#718075]">
-          &#x76EE;&#x7684;&#x306E;&#x5546;&#x54C1;&#x3092;&#x63A2;&#x3057;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;
+          目的の商品を探してください
         </p>
         <div class="grid grid-cols-2 gap-3">
           <button

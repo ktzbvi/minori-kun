@@ -9,53 +9,10 @@ import {
   ChevronRight,
   KeyRound,
 } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { toast } from '@minorikun/ui'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
-import { getBuyerAccountProfile } from '@/services/account/account.api'
-import { logoutBuyer } from '@/services/auth/auth.mutation'
-import { queryClient } from '@/lib/query'
-import type { BuyerAccountProfile } from '@/types/account'
-
-const router = useRouter()
-const profile = ref<BuyerAccountProfile | null>(null)
-const logoutOpen = ref(false)
-const loggingOut = ref(false)
-
-onMounted(async () => {
-  try {
-    profile.value = await getBuyerAccountProfile()
-  } catch {
-    await router.replace({ name: 'login', query: { redirect: '/my-page' } })
-  }
-})
-
-function openSearch() {
-  void router.push({ name: 'search' })
-}
-
-function openCart() {
-  void router.push({ name: 'cart' })
-}
-
-async function confirmLogout() {
-  loggingOut.value = true
-
-  try {
-    await logoutBuyer()
-    queryClient.removeQueries({ queryKey: ['current-session'] })
-    await router.replace({ name: 'home' })
-    toast.success('ログアウトしました。')
-  } catch {
-    toast.error('ログアウトできませんでした。時間をおいてからもう一度お試しください。')
-    return
-  } finally {
-    loggingOut.value = false
-  }
-
-  logoutOpen.value = false
-}
+import { useBuyerMyPage } from '@/composables/useBuyerMyPage'
+const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLogout } =
+  useBuyerMyPage()
 </script>
 
 <template>
@@ -67,7 +24,7 @@ async function confirmLogout() {
         class="flex h-[65px] shrink-0 items-center justify-between border-b border-[#e3e9e3] bg-white px-4"
       >
         <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">
-          &#12510;&#12452;&#12506;&#12540;&#12472;
+          マイページ
         </h1>
         <div class="flex gap-2">
           <button
@@ -92,48 +49,48 @@ async function confirmLogout() {
       <div class="min-h-0 flex-1 overflow-y-auto px-3 pt-4 pb-[76px]">
         <section class="rounded-[8px] border border-[#dce5dc] bg-white px-3 py-2.5">
           <div>
-            <p class="m-0 text-[13px] font-bold">{{ profile?.name || '&#35501;&#21517;' }}</p>
+            <p class="m-0 text-[13px] font-bold">{{ profile?.name || '読名' }}</p>
             <p class="m-0 mt-0.5 text-[9px] text-[#718075]">
-              &#20250;&#21729;&#30058;&#21495;: {{ profile?.member_id || '-' }}
+              会員番号: {{ profile?.member_id || '-' }}
             </p>
           </div>
         </section>
 
-        <p class="mb-1 mt-4 text-[10px] text-[#718075]">&#27880;&#25991;&#38306;&#36899;</p>
+        <p class="mb-1 mt-4 text-[10px] text-[#718075]">注文関連</p>
         <div class="menu-group">
           <button class="menu-row" type="button" @click="router.push({ name: 'order-history' })">
             <PackageOpen :size="15" />
-            <span>&#27880;&#25991;&#23653;&#27508;</span>
+            <span>注文履歴</span>
             <ChevronRight :size="16" />
           </button>
         </div>
 
         <p class="mb-1 mt-4 text-[10px] text-[#718075]">
-          &#12450;&#12459;&#12454;&#12531;&#12488;&#35373;&#23450;
+          アカウント設定
         </p>
         <div class="menu-group">
           <button class="menu-row" type="button" @click="router.push({ name: 'member-info' })">
             <Pencil :size="15" />
-            <span>&#20250;&#21729;&#24773;&#22577;&#12398;&#22793;&#26356;</span>
+            <span>会員情報の変更</span>
             <ChevronRight :size="16" />
           </button>
           <button class="menu-row" type="button" @click="router.push({ name: 'password-change' })">
             <KeyRound :size="15" />
-            <span>&#12497;&#12473;&#12527;&#12540;&#12489;&#12398;&#22793;&#26356;</span>
+            <span>パスワードの変更</span>
             <ChevronRight :size="16" />
           </button>
         </div>
 
-        <p class="mb-1 mt-4 text-[10px] text-[#718075]">&#12381;&#12398;&#20182;</p>
+        <p class="mb-1 mt-4 text-[10px] text-[#718075]">その他</p>
         <div class="menu-group">
           <button class="menu-row" type="button" @click="router.push({ name: 'contact' })">
             <Mail :size="15" />
-            <span>&#12362;&#21839;&#12356;&#21512;&#12431;&#12379;</span>
+            <span>お問い合わせ</span>
             <ChevronRight :size="16" />
           </button>
           <button class="menu-row" type="button" @click="logoutOpen = true">
             <LogOut :size="15" />
-            <span>&#12525;&#12464;&#12450;&#12454;&#12488;</span>
+            <span>ログアウト</span>
             <ChevronRight :size="16" />
           </button>
         </div>
@@ -153,10 +110,10 @@ async function confirmLogout() {
           aria-labelledby="logout-title"
         >
           <h2 id="logout-title" class="m-0 text-center text-[14px] font-bold">
-            &#12525;&#12464;&#12450;&#12454;&#12488;&#12375;&#12414;&#12377;&#12363;&#65311;
+            ログアウトしますか？
           </h2>
           <p class="mt-2 mb-4 text-center text-[10px] text-[#718075]">
-            &#29694;&#22312;&#12398;&#12450;&#12459;&#12454;&#12531;&#12488;&#12363;&#12425;&#12525;&#12464;&#12450;&#12454;&#12488;&#12375;&#12414;&#12377;&#12290;
+            現在のアカウントからログアウトします。
           </p>
           <div class="grid grid-cols-2 gap-2">
             <button
@@ -165,7 +122,7 @@ async function confirmLogout() {
               :disabled="loggingOut"
               @click="logoutOpen = false"
             >
-              &#12461;&#12515;&#12531;&#12475;&#12523;
+              キャンセル
             </button>
             <button
               class="modal-button border-[#d94444] bg-[#d94444] text-white"
@@ -173,7 +130,7 @@ async function confirmLogout() {
               :disabled="loggingOut"
               @click="confirmLogout"
             >
-              &#12525;&#12464;&#12450;&#12454;&#12488;
+              ログアウト
             </button>
           </div>
         </section>
