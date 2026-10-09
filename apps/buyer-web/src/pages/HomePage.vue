@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Leaf, Search, ShoppingCart } from 'lucide-vue-next'
+import { Search, ShoppingCart } from 'lucide-vue-next'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerHome } from '@/composables/useBuyerHome'
 const {
   pageSize,
@@ -37,17 +38,7 @@ const {
       <header
         class="flex h-[74px] shrink-0 items-center justify-between border-b border-[#e3e9e3] bg-white px-4"
       >
-        <div class="flex items-center gap-2">
-          <span
-            class="grid size-7 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
-            aria-hidden="true"
-          >
-            <Leaf :size="17" stroke-width="2.5" />
-          </span>
-          <strong class="text-[17px] tracking-[0.05em] text-[#237d4a]">
-            みのりくん
-          </strong>
-        </div>
+        <BuyerBrand size="header" />
         <div class="flex items-center gap-3">
           <button
             class="grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"

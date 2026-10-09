@@ -56,7 +56,7 @@ export function useBuyerProductDetail() {
       {
         onSuccess: () => toast.success('カートに追加しました'),
         onError: () =>
-          toast.error('カートに追加できませんでした。ログイン状態を確認してください。'),
+          toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
   }
@@ -74,7 +74,7 @@ export function useBuyerProductDetail() {
       {
         onSuccess: () => router.push({ name: 'cart' }),
         onError: () =>
-          toast.error('カートに追加できませんでした。在庫とログイン状態をご確認ください。'),
+          toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
   }

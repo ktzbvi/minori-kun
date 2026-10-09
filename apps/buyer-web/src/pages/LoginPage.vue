@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ChevronLeft, Leaf, LoaderCircle, ArrowRight } from 'lucide-vue-next'
+import { ChevronLeft, LoaderCircle, ArrowRight } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerLogin } from '@/composables/useBuyerLogin'
 
 const {
   errorMessage,
+  route,
   errors,
   isSubmitting,
   email,
@@ -32,10 +34,9 @@ const {
           to="/"
           class="relative z-10 flex w-fit items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
-          <span class="grid size-11 place-items-center rounded-full bg-white/10">
-            <Leaf class="size-6 text-[#c5e2a3]" aria-hidden="true" />
+          <span class="rounded-md bg-white px-3 py-2">
+            <BuyerBrand size="compact" />
           </span>
-          <span class="text-2xl font-extrabold tracking-widest">みのりくん</span>
         </RouterLink>
         <div class="relative z-10 mt-20 max-w-sm">
           <p class="mb-5 text-sm font-medium tracking-widest text-[#b9d7c0]">
@@ -96,14 +97,8 @@ const {
 
         <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
           <div class="mb-8 lg:hidden">
-            <div class="mb-7 flex items-center gap-2 lg:hidden">
-              <span
-                class="grid size-10 place-items-center rounded-full bg-[#e4f3e9] text-[#237d4a]"
-                aria-hidden="true"
-              >
-                <Leaf class="size-6" :stroke-width="2.5" />
-              </span>
-              <p class="text-xl font-extrabold tracking-[0.06em] text-[#217848]">みのりくん</p>
+            <div class="mb-7 lg:hidden">
+              <BuyerBrand size="compact" />
             </div>
 
             <h1 class="text-2xl leading-snug font-bold text-[#24372b]">おかえりなさい</h1>
@@ -207,7 +202,13 @@ const {
               <span class="text-[#78867d]">アカウントをお持ちでない方</span>
               <RouterLink
                 class="flex min-h-12 w-full items-center justify-center rounded-xl border border-[#c6d9cb] font-bold text-[#237f4b] hover:bg-[#f3f6f3] focus-visible:outline-2 focus-visible:outline-offset-4 lg:rounded-lg"
-                to="/register"
+                :to="{
+                  name: 'register',
+                  query:
+                    typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
+                      ? { redirect: route.query.redirect }
+                      : {},
+                }"
               >
                 新規会員登録
               </RouterLink>

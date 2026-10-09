@@ -21,11 +21,14 @@ export type BuyerCatalogueProduct = {
   variants: BuyerCatalogueVariant[]
 }
 
+export async function fetchBuyerCatalogueProducts() {
+  return (await api.get<{ data: BuyerCatalogueProduct[] }>('/api/v1/buyer/products')).data.data
+}
+
 export function useBuyerCatalogueQuery() {
   return useQuery({
     queryKey: buyerCatalogKeys.products(),
-    queryFn: async () =>
-      (await api.get<{ data: BuyerCatalogueProduct[] }>('/api/v1/buyer/products')).data.data,
+    queryFn: fetchBuyerCatalogueProducts,
     staleTime: 30_000,
   })
 }

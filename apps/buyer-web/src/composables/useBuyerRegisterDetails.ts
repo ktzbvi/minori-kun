@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import { queryClient } from '@/lib/query'
 import { buyerAuthKeys } from '@/services/auth/auth.key'
+import { buyerCartKeys } from '@/services/cart/cart.key'
+import { mergeGuestCartAfterAuthentication } from '@/services/cart/cart.mutation'
 import { completeBuyerRegistration } from '@/services/registration/registration.mutation'
 import { getBuyerRegistrationStatus } from '@/services/registration/registration.query'
 
@@ -174,12 +176,21 @@ export function useBuyerRegisterDetails() {
       const data = await completeBuyerRegistration(form)
 
       await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
+      let guestCartMergeFailed = false
+      try {
+        const result = await mergeGuestCartAfterAuthentication()
+        guestCartMergeFailed = result.failedCount > 0
+        queryClient.setQueryData(buyerCartKeys.current(), result.cart)
+      } catch {
+        guestCartMergeFailed = true
+      }
+      await queryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })
       await router.replace(
         typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/')
           ? route.query.redirect
           : data.redirect,
       )
-      toast.success('登録しました。')
+      toast.success(guestCartMergeFailed ? '登録しました。商品をカートでご確認ください。' : '登録しました。')
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 422) {
         const errors = error.response.data?.errors
