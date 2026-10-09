@@ -25,3 +25,11 @@ export { default as UiDropdownMenu } from './components/DropdownMenu.vue'
 export { DropdownMenuTrigger as UiDropdownMenuTrigger } from 'reka-ui'
 export { default as UiDropdownMenuContent } from './components/DropdownMenuContent.vue'
 export { default as UiDropdownMenuItem } from './components/DropdownMenuItem.vue'
+export { default as UiDrawerContent } from './components/DrawerContent.vue'
+export {
+  DrawerRoot as UiDrawer,
+  DrawerTrigger as UiDrawerTrigger,
+  DrawerClose as UiDrawerClose,
+  DrawerTitle as UiDrawerTitle,
+  DrawerDescription as UiDrawerDescription,
+} from 'reka-ui'
