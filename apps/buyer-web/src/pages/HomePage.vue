@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ImageOff, LoaderCircle, Search, ShoppingCart } from 'lucide-vue-next'
+import { ImageOff, LoaderCircle, Search } from 'lucide-vue-next'
 import { UiButton, UiCard, UiSkeleton } from '@minorikun/ui'
 import BuyerLayout from '@/components/layout/BuyerLayout.vue'
+import BuyerCartButton from '@/components/layout/BuyerCartButton.vue'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerHome } from '@/composables/useBuyerHome'
@@ -11,14 +12,12 @@ const {
   selectedCategory,
   catalogueQuery,
   addCartItemMutation,
-  cartItemCount,
   categories,
   productTotal,
   displayedProducts,
   hasMoreProducts,
   retryProducts,
   addToCart,
-  openCart,
   openProduct,
   openSearch,
   productPrice,
@@ -49,21 +48,7 @@ const {
             >
               <Search :size="21" aria-hidden="true" />
             </UiButton>
-            <UiButton
-              variant="ghost"
-              class="relative grid size-9 min-h-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
-              type="button"
-              aria-label="カート"
-              @click="openCart"
-            >
-              <ShoppingCart :size="21" aria-hidden="true" />
-              <span
-                v-if="cartItemCount"
-                class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-xs font-bold text-white"
-              >
-                {{ cartItemCount }}
-              </span>
-            </UiButton>
+            <BuyerCartButton />
           </div>
         </header>
         <div

@@ -2,7 +2,6 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from '@minorikun/ui'
 import { useAddBuyerCartItemMutation } from '@/services/cart/cart.mutation'
-import { useBuyerCartQuery } from '@/services/cart/cart.query'
 import {
   useBuyerCatalogueQuery,
   type BuyerCatalogueVariant,
@@ -12,7 +11,6 @@ export function useBuyerProductDetail() {
   const route = useRoute()
   const router = useRouter()
   const catalogueQuery = useBuyerCatalogueQuery()
-  const cartQuery = useBuyerCartQuery()
   const addCartItemMutation = useAddBuyerCartItemMutation()
   const product = computed(() =>
     catalogueQuery.data.value?.find((item) => item.id === route.params.productId),
@@ -23,9 +21,6 @@ export function useBuyerProductDetail() {
     () =>
       product.value?.variants.find((variant) => variant.id === selectedVariantId.value) ??
       product.value?.variants[0],
-  )
-  const cartItemCount = computed(
-    () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
   )
   const canPurchase = computed(() =>
     Boolean(selectedVariant.value && selectedVariant.value.stock_quantity >= quantity.value),
@@ -55,16 +50,12 @@ export function useBuyerProductDetail() {
       { variantId: selectedVariant.value.id, quantity: quantity.value },
       {
         onSuccess: () => toast.success('カートに追加しました'),
-        onError: () =>
-          toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
+        onError: () => toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
   }
   function openSearch() {
     void router.push({ name: 'search' })
-  }
-  function openCart() {
-    void router.push({ name: 'cart' })
   }
   function buyNow() {
     if (!canPurchase.value || !selectedVariant.value) return
@@ -73,8 +64,7 @@ export function useBuyerProductDetail() {
       { variantId: selectedVariant.value.id, quantity: quantity.value },
       {
         onSuccess: () => router.push({ name: 'cart' }),
-        onError: () =>
-          toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
+        onError: () => toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
   }
@@ -88,19 +78,16 @@ export function useBuyerProductDetail() {
     route,
     router,
     catalogueQuery,
-    cartQuery,
     addCartItemMutation,
     product,
     selectedVariantId,
     quantity,
     selectedVariant,
-    cartItemCount,
     canPurchase,
     decreaseQuantity,
     increaseQuantity,
     addToCart,
     openSearch,
-    openCart,
     buyNow,
     formatYen,
     discountedPrice,

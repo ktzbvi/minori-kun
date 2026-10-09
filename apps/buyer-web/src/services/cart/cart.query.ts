@@ -1,7 +1,17 @@
 import axios from 'axios'
+import { computed, type Ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import type { components } from '@minorikun/api-contracts'
+import type { CurrentSession } from '@/types/auth'
+import { queryClient } from '@/lib/query'
+import { currentSessionQuery } from '@/services/auth/auth.query'
 import api from '@/services/api'
-import { readGuestCart, removeGuestCartItem, setGuestCartMergeTarget } from '@/lib/guest-cart'
+import {
+  readGuestCart,
+  removeGuestCartItem,
+  setGuestCartMergeTarget,
+  type GuestCartLine,
+} from '@/lib/guest-cart'
 import {
   fetchBuyerCatalogueProductsByVariants,
   type BuyerCatalogueProduct,
@@ -119,24 +129,103 @@ export function projectGuestCart(
 export function useBuyerCartQuery() {
   return useQuery({
     queryKey: buyerCartKeys.current(),
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
+      let requestBuyerId: string | undefined
       try {
-        const serverCart = (await api.get<{ data: BuyerCart }>('/api/v1/buyer/cart')).data.data
+        const session = await queryClient.fetchQuery(currentSessionQuery)
+        if (signal.aborted) throw new Error('Cart request was cancelled.')
+        requestBuyerId = session?.id
+        if (!session) {
+          const products = await fetchBuyerCatalogueProductsByVariants(
+            readGuestCart().map((item) => item.variant_id),
+            signal,
+          )
+          return projectGuestCart(products)
+        }
+        const serverCart = (await api.get<{ data: BuyerCart }>('/api/v1/buyer/cart', { signal }))
+          .data.data
         const guestItems = readGuestCart()
         if (!guestItems.length) return serverCart
 
         const products = await fetchBuyerCatalogueProductsByVariants(
           readGuestCart().map((item) => item.variant_id),
+          signal,
         )
         return projectGuestCart(products, { serverCart, pendingMerge: true })
       } catch (error) {
-        if (!axios.isAxiosError(error) || error.response?.status !== 401) throw error
+        if (signal.aborted) throw error
+        if (!axios.isAxiosError(error) || ![401, 403].includes(error.response?.status ?? 0))
+          throw error
+        const session = queryClient.getQueryData<CurrentSession | null>(
+          currentSessionQuery.queryKey,
+        )
+        if (session?.id === requestBuyerId)
+          queryClient.setQueryData(currentSessionQuery.queryKey, null)
 
         const products = await fetchBuyerCatalogueProductsByVariants(
           readGuestCart().map((item) => item.variant_id),
+          signal,
         )
         return projectGuestCart(products)
       }
     },
   })
+}
+
+type BuyerCartCount = components['schemas']['BuyerCartCountResource']
+
+export function useBuyerCartCountQuery(
+  buyerId: Ref<string | undefined>,
+  guestItems: Ref<GuestCartLine[]>,
+) {
+  return useQuery({
+    queryKey: computed(() => buyerCartKeys.count(buyerId.value ?? 'guest', guestItems.value)),
+    enabled: computed(() => Boolean(buyerId.value)),
+    queryFn: async ({ queryKey, signal }) => {
+      try {
+        return (
+          await api.get<{ data: BuyerCartCount }>('/api/v1/buyer/cart/count', {
+            params: queryKey[4].length ? { guest_items: queryKey[4] } : undefined,
+            signal,
+          })
+        ).data.data
+      } catch (error) {
+        if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+          const session = queryClient.getQueryData<CurrentSession | null>(
+            currentSessionQuery.queryKey,
+          )
+          if (session?.id === queryKey[3]) {
+            queryClient.setQueryData(currentSessionQuery.queryKey, null)
+            queryClient.removeQueries({ queryKey: buyerCartKeys.all() })
+          }
+        }
+        throw error
+      }
+    },
+  })
+}
+
+export function cacheBuyerCart(cart: BuyerCart) {
+  queryClient.setQueryData(buyerCartKeys.current(), cart)
+  const session = queryClient.getQueryData<CurrentSession | null>(currentSessionQuery.queryKey)
+  if (!session || cart.id === 'guest') return
+
+  const serverItems = cart.items.filter((item) => !item.id.startsWith('guest:'))
+  const guestItems = readGuestCart()
+  const serverCount = serverItems.reduce((total, item) => total + item.quantity, 0)
+  const count =
+    serverCount +
+    guestItems.reduce((total, item) => {
+      const serverQuantity =
+        serverItems.find((serverItem) => serverItem.variant_id === item.variant_id)?.quantity ?? 0
+      return (
+        total +
+        (item.merge_target === undefined
+          ? item.quantity
+          : Math.max(0, item.merge_target - serverQuantity))
+      )
+    }, 0)
+  const countKey = buyerCartKeys.count(session.id, guestItems)
+  void queryClient.cancelQueries({ queryKey: countKey, exact: true })
+  queryClient.setQueryData(countKey, { count })
 }

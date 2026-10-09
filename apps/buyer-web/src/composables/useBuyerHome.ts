@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia'
 import { usePresentationStore } from '@/stores/presentation'
 import { toast } from '@minorikun/ui'
 import { useAddBuyerCartItemMutation } from '@/services/cart/cart.mutation'
-import { useBuyerCartQuery } from '@/services/cart/cart.query'
 import {
   useBuyerProductFeedQuery,
   type BuyerCatalogueProduct,
@@ -17,11 +16,7 @@ export function useBuyerHome() {
   let productObserver: IntersectionObserver | undefined
   const router = useRouter()
   const catalogueQuery = useBuyerProductFeedQuery(selectedCategory)
-  const cartQuery = useBuyerCartQuery()
   const addCartItemMutation = useAddBuyerCartItemMutation()
-  const cartItemCount = computed(
-    () => cartQuery.data.value?.items.reduce((total, item) => total + item.quantity, 0) ?? 0,
-  )
   const availableCategories = ref<string[]>([])
   watch(
     catalogueQuery.data,
@@ -54,9 +49,6 @@ export function useBuyerHome() {
         onError: () => toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
-  }
-  function openCart() {
-    void router.push({ name: 'cart' })
   }
   function openProduct(productId: string) {
     void router.push({ name: 'product-detail', params: { productId } })
@@ -122,15 +114,12 @@ export function useBuyerHome() {
     loadMoreTrigger,
     router,
     catalogueQuery,
-    cartQuery,
     addCartItemMutation,
-    cartItemCount,
     categories,
     productTotal,
     displayedProducts,
     hasMoreProducts,
     addToCart,
-    openCart,
     openProduct,
     openSearch,
     loadMoreProducts,

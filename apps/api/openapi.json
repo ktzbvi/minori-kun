@@ -2673,6 +2673,70 @@
                     }
                 }
             }
+        },
+        "/v1/buyer/cart/count": {
+            "get": {
+                "operationId": "buyerCart.count",
+                "tags": [
+                    "BuyerCart"
+                ],
+                "parameters": [
+                    {
+                        "name": "guest_items",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "variant_id": {
+                                        "type": "string"
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "merge_target": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    }
+                                },
+                                "required": [
+                                    "variant_id",
+                                    "quantity"
+                                ]
+                            }
+                        },
+                        "x-deepObject-style": "qs"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`BuyerCartCountResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/BuyerCartCountResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -4133,6 +4197,18 @@
                     "next_cursor"
                 ],
                 "title": "BuyerProductFeedResource"
+            },
+            "BuyerCartCountResource": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "count"
+                ],
+                "title": "BuyerCartCountResource"
             }
         },
         "responses": {

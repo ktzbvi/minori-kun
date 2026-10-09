@@ -1,22 +1,17 @@
 <script setup lang="ts">
 import { ChevronLeft, Search, ShoppingCart } from 'lucide-vue-next'
+import BuyerCartButton from '@/components/layout/BuyerCartButton.vue'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import { useBuyerSearch } from '@/composables/useBuyerSearch'
 const {
-  route,
   router,
-  catalogueQuery,
-  cartQuery,
   addCartItemMutation,
-  cartItemCount,
   searchInput,
   query,
   results,
-  readQuery,
   searchProducts,
   openProduct,
   addToCart,
-  openCart,
   formatYen,
   productPrice,
 } = useBuyerSearch()
@@ -49,20 +44,7 @@ const {
           >
             <Search :size="21" />
           </button>
-          <button
-            class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="Cart"
-            @click="openCart"
-          >
-            <ShoppingCart :size="21" />
-            <span
-              v-if="cartItemCount"
-              class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-            >
-              {{ cartItemCount }}
-            </span>
-          </button>
+          <BuyerCartButton />
         </div>
       </header>
 
@@ -87,12 +69,8 @@ const {
 
       <section class="flex-1 overflow-y-auto px-3 pt-2 pb-[82px]">
         <p class="m-0 text-[11px] text-[#718075]">
-          <template v-if="query">
-            「{{ query }}」の検索結果 {{ results.length }}件
-          </template>
-          <template v-else>
-            キーワードを入力してください
-          </template>
+          <template v-if="query">「{{ query }}」の検索結果 {{ results.length }}件</template>
+          <template v-else>キーワードを入力してください</template>
         </p>
 
         <div v-if="results.length" class="mt-2 grid grid-cols-2 gap-3">
@@ -156,12 +134,8 @@ const {
             >
               <ShoppingCart :size="54" stroke-width="1.25" />
             </span>
-            <h2 class="m-0 text-[15px] font-bold text-[#37483d]">
-              該当する商品がありません
-            </h2>
-            <p class="mt-1 mb-0 text-[11px]">
-              キーワードを変更して再検索してください
-            </p>
+            <h2 class="m-0 text-[15px] font-bold text-[#37483d]">該当する商品がありません</h2>
+            <p class="mt-1 mb-0 text-[11px]">キーワードを変更して再検索してください</p>
           </div>
         </div>
       </section>

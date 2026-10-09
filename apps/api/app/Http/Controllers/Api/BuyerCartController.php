@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domain\Orders\ReadBuyerCartCount;
 use App\Enums\ProductPublicationState;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BuyerCartCountRequest;
+use App\Http\Resources\BuyerCartCountResource;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\ProductVariant;
@@ -18,6 +21,14 @@ class BuyerCartController extends Controller
     public function index(Request $request): JsonResponse
     {
         return response()->json(['data' => $this->payload($this->cartFor($request))]);
+    }
+
+    public function count(BuyerCartCountRequest $request, ReadBuyerCartCount $count): BuyerCartCountResource
+    {
+        return new BuyerCartCountResource($count->execute(
+            $request->user(),
+            $request->validated('guest_items', []),
+        ));
     }
 
     public function store(Request $request): JsonResponse

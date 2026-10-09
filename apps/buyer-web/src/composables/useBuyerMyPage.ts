@@ -4,6 +4,8 @@ import { toast } from '@minorikun/ui'
 import { getBuyerAccountProfile } from '@/services/account/account.api'
 import { logoutBuyer } from '@/services/auth/auth.mutation'
 import { queryClient } from '@/lib/query'
+import { buyerAuthKeys } from '@/services/auth/auth.key'
+import { buyerCartKeys } from '@/services/cart/cart.key'
 import type { BuyerAccountProfile } from '@/types/account'
 
 export function useBuyerMyPage() {
@@ -29,7 +31,9 @@ export function useBuyerMyPage() {
 
     try {
       await logoutBuyer()
-      queryClient.removeQueries({ queryKey: ['current-session'] })
+      await queryClient.cancelQueries({ queryKey: buyerCartKeys.all() })
+      queryClient.removeQueries({ queryKey: buyerCartKeys.all() })
+      queryClient.setQueryData(buyerAuthKeys.currentSession(), null)
       await router.replace({ name: 'home' })
       toast.success('ログアウトしました。')
     } catch {

@@ -12,12 +12,16 @@ export async function fetchBuyerCatalogueProducts() {
   return (await api.get<{ data: BuyerCatalogueProduct[] }>('/api/v1/buyer/products')).data.data
 }
 
-export async function fetchBuyerCatalogueProductsByVariants(variantIds: string[]) {
+export async function fetchBuyerCatalogueProductsByVariants(
+  variantIds: string[],
+  signal?: AbortSignal,
+) {
   if (!variantIds.length) return []
 
   return (
     await api.get<{ data: BuyerCatalogueProduct[] }>('/api/v1/buyer/products', {
       params: { variant_ids: [...new Set(variantIds)] },
+      signal,
     })
   ).data.data
 }

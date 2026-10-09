@@ -6,6 +6,7 @@ import { useForm } from 'vee-validate'
 import { z } from 'zod'
 import { toast } from '@minorikun/ui'
 import { queryClient } from '@/lib/query'
+import { cacheBuyerCart } from '@/services/cart/cart.query'
 import { buyerCartKeys } from '@/services/cart/cart.key'
 import { mergeGuestCartAfterAuthentication } from '@/services/cart/cart.mutation'
 import { loginBuyer } from '@/services/auth/auth.mutation'
@@ -52,13 +53,15 @@ export function useBuyerLogin() {
     async (values) => {
       errorMessage.value = ''
       try {
-        await loginBuyer(values)
-        await queryClient.invalidateQueries({ queryKey: buyerAuthKeys.currentSession() })
+        const session = await loginBuyer(values)
+        await queryClient.cancelQueries({ queryKey: buyerCartKeys.all() })
+        queryClient.removeQueries({ queryKey: buyerCartKeys.all() })
+        queryClient.setQueryData(buyerAuthKeys.currentSession(), session)
         let guestCartMergeFailed = false
         try {
           const result = await mergeGuestCartAfterAuthentication()
           guestCartMergeFailed = result.failedCount > 0
-          queryClient.setQueryData(buyerCartKeys.current(), result.cart)
+          if (result.cart) cacheBuyerCart(result.cart)
         } catch {
           guestCartMergeFailed = true
         }

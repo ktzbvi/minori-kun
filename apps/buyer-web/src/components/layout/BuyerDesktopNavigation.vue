@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Leaf, Grid2X2, Search, ShoppingCart, UserRound } from 'lucide-vue-next'
+import { Leaf, Grid2X2, Search, UserRound } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton } from '@minorikun/ui'
+import BuyerCartButton from './BuyerCartButton.vue'
 defineProps<{ active?: 'category' | 'search' | 'cart' | 'profile' }>()
 </script>
 <template>
@@ -53,21 +54,7 @@ defineProps<{ active?: 'category' | 'search' | 'cart' | 'profile' }>()
             検索
           </RouterLink>
         </UiButton>
-        <UiButton
-          as-child
-          variant="ghost"
-          class="min-h-12 gap-2.5 rounded-xl px-4 text-base"
-          :class="
-            active === 'cart'
-              ? 'bg-[#edf4ef] font-bold text-[#237f4b] hover:bg-[#e3efe6]'
-              : 'font-medium text-[#52675a] hover:bg-[#edf4ef] hover:text-[#237f4b]'
-          "
-        >
-          <RouterLink :to="{ name: 'cart' }" :aria-current="active === 'cart' ? 'page' : undefined">
-            <ShoppingCart class="size-5" aria-hidden="true" />
-            カート
-          </RouterLink>
-        </UiButton>
+        <BuyerCartButton appearance="navigation" :active="active === 'cart'" />
         <span class="mx-1 h-6 w-px bg-[#dce5dc] xl:mx-2" aria-hidden="true"></span>
         <UiButton
           as-child

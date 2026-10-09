@@ -740,6 +740,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/buyer/cart/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerCart.count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1110,6 +1126,10 @@ export interface components {
             total: number | null;
             categories: string[] | null;
             next_cursor: string | null;
+        };
+        /** BuyerCartCountResource */
+        BuyerCartCountResource: {
+            count: number;
         };
     };
     responses: {
@@ -2595,6 +2615,36 @@ export interface operations {
                     };
                 };
             };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerCart.count": {
+        parameters: {
+            query?: {
+                guest_items?: {
+                    variant_id: string;
+                    quantity: number;
+                    merge_target?: number;
+                }[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `BuyerCartCountResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BuyerCartCountResource"];
+                    };
+                };
+            };
+            401: components["responses"]["AuthenticationException"];
             422: components["responses"]["ValidationException"];
         };
     };
