@@ -1,16 +1,23 @@
+import { ref } from 'vue'
+
 export type GuestCartLine = {
   variant_id: string
   quantity: number
   merge_target?: number
 }
 
-const storageKey = 'minorikun.buyer.guest-cart.v1'
+export const guestCartStorageKey = 'minorikun.buyer.guest-cart.v1'
+export const guestCartRevision = ref(0)
+
+export function refreshGuestCart() {
+  guestCartRevision.value += 1
+}
 
 export function readGuestCart(): GuestCartLine[] {
   if (typeof window === 'undefined') return []
 
   try {
-    const value: unknown = JSON.parse(window.localStorage.getItem(storageKey) ?? '[]')
+    const value: unknown = JSON.parse(window.localStorage.getItem(guestCartStorageKey) ?? '[]')
 
     if (!Array.isArray(value)) return []
 
@@ -33,10 +40,11 @@ function writeGuestCart(items: GuestCartLine[]) {
   if (typeof window === 'undefined') return
 
   if (items.length) {
-    window.localStorage.setItem(storageKey, JSON.stringify(items))
+    window.localStorage.setItem(guestCartStorageKey, JSON.stringify(items))
   } else {
-    window.localStorage.removeItem(storageKey)
+    window.localStorage.removeItem(guestCartStorageKey)
   }
+  refreshGuestCart()
 }
 
 export function addGuestCartItem(variantId: string, quantity: number, stockQuantity: number) {

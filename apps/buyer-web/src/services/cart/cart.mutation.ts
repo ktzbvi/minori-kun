@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation } from '@tanstack/vue-query'
+import { currentSessionQuery } from '@/services/auth/auth.query'
 import api from '@/services/api'
 import { queryClient as appQueryClient } from '@/lib/query'
 import {
@@ -9,9 +10,8 @@ import {
   setGuestCartMergeTarget,
   updateGuestCartItem,
 } from '@/lib/guest-cart'
-import { buyerCatalogKeys } from '@/services/catalog/catalog.key'
-import { fetchBuyerCatalogueProducts } from '@/services/catalog/catalog.query'
-import { projectGuestCart, type BuyerCart } from './cart.query'
+import { fetchBuyerCatalogueProductsByVariants } from '@/services/catalog/catalog.query'
+import { cacheBuyerCart, projectGuestCart, type BuyerCart } from './cart.query'
 import { buyerCartKeys } from './cart.key'
 
 type AddBuyerCartItemInput = {
@@ -24,12 +24,46 @@ type UpdateBuyerCartItemInput = {
   quantity: number
 }
 
-export function useAddBuyerCartItemMutation() {
-  const queryClient = useQueryClient()
+async function addGuestCartVariant(variantId: string, quantity: number) {
+  const products = await fetchBuyerCatalogueProductsByVariants([
+    variantId,
+    ...readGuestCart().map((item) => item.variant_id),
+  ])
+  const variant = products
+    .flatMap((product) => product.variants)
+    .find((item) => item.id === variantId)
+  if (!variant) throw new Error('This product is unavailable.')
 
+  addGuestCartItem(variantId, quantity, variant.stock_quantity)
+  return projectGuestCart(products)
+}
+
+async function prepareCartMutation() {
+  await appQueryClient.cancelQueries({ queryKey: buyerCartKeys.all() })
+  const session = await appQueryClient.fetchQuery(currentSessionQuery)
+  return { buyerId: session?.id ?? null }
+}
+
+function cacheCartMutation(
+  cart: BuyerCart,
+  _variables: unknown,
+  context?: { buyerId: string | null },
+) {
+  const session = appQueryClient.getQueryData<{ id: string } | null>(currentSessionQuery.queryKey)
+  if (cart.id === 'guest' ? !session : context?.buyerId === session?.id) cacheBuyerCart(cart)
+}
+
+function recoverCartMutation() {
+  return appQueryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })
+}
+
+export function useAddBuyerCartItemMutation() {
   return useMutation({
+    onMutate: prepareCartMutation,
     mutationFn: async ({ variantId, quantity }: AddBuyerCartItemInput) => {
       try {
+        const session = await appQueryClient.fetchQuery(currentSessionQuery)
+        if (!session) return addGuestCartVariant(variantId, quantity)
         return (
           await api.post<{ data: BuyerCart }>('/api/v1/buyer/cart/items', {
             variant_id: variantId,
@@ -39,32 +73,24 @@ export function useAddBuyerCartItemMutation() {
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) throw error
 
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
-        const variant = products.flatMap((product) => product.variants).find((item) => item.id === variantId)
-        if (!variant) throw error
-
-        addGuestCartItem(variantId, quantity, variant.stock_quantity)
-        return projectGuestCart(products)
+        appQueryClient.setQueryData(currentSessionQuery.queryKey, null)
+        return addGuestCartVariant(variantId, quantity)
       }
     },
-    onSuccess: (cart) => queryClient.setQueryData(buyerCartKeys.current(), cart),
+    onSuccess: cacheCartMutation,
+    onError: recoverCartMutation,
   })
 }
 
 export function useUpdateBuyerCartItemMutation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
+    onMutate: prepareCartMutation,
     mutationFn: async ({ itemId, quantity }: UpdateBuyerCartItemInput) => {
       if (itemId.startsWith('guest:')) {
         updateGuestCartItem(itemId.slice('guest:'.length), quantity)
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         const cachedCart = appQueryClient.getQueryData<BuyerCart>(buyerCartKeys.current())
         const cart = cachedCart && {
           ...cachedCart,
@@ -80,21 +106,20 @@ export function useUpdateBuyerCartItemMutation() {
         await api.patch<{ data: BuyerCart }>(`/api/v1/buyer/cart/items/${itemId}`, { quantity })
       ).data.data
     },
-    onSuccess: (cart) => queryClient.setQueryData(buyerCartKeys.current(), cart),
+    onSuccess: cacheCartMutation,
+    onError: recoverCartMutation,
   })
 }
 
 export function useRemoveBuyerCartItemMutation() {
-  const queryClient = useQueryClient()
-
   return useMutation({
+    onMutate: prepareCartMutation,
     mutationFn: async (itemId: string) => {
       if (itemId.startsWith('guest:')) {
         removeGuestCartItem(itemId.slice('guest:'.length))
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         const cachedCart = appQueryClient.getQueryData<BuyerCart>(buyerCartKeys.current())
         const cart = cachedCart && {
           ...cachedCart,
@@ -108,11 +133,13 @@ export function useRemoveBuyerCartItemMutation() {
 
       return (await api.delete<{ data: BuyerCart }>(`/api/v1/buyer/cart/items/${itemId}`)).data.data
     },
-    onSuccess: (cart) => queryClient.setQueryData(buyerCartKeys.current(), cart),
+    onSuccess: cacheCartMutation,
+    onError: recoverCartMutation,
   })
 }
 
 export async function mergeGuestCartAfterAuthentication() {
+  if (!readGuestCart().length) return { cart: undefined, failedCount: 0 }
   let cart = (await api.get<{ data: BuyerCart }>('/api/v1/buyer/cart')).data.data
   let failedCount = 0
 

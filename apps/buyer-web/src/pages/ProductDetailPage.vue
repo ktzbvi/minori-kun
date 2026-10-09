@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { ChevronLeft, Leaf, Search, ShoppingCart } from 'lucide-vue-next'
+import { ChevronLeft, Leaf, Search } from 'lucide-vue-next'
+import BuyerCartButton from '@/components/layout/BuyerCartButton.vue'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import { useBuyerProductDetail } from '@/composables/useBuyerProductDetail'
 const {
-  route,
   router,
   catalogueQuery,
-  cartQuery,
   addCartItemMutation,
   product,
   selectedVariantId,
   quantity,
   selectedVariant,
-  cartItemCount,
   canPurchase,
   decreaseQuantity,
   increaseQuantity,
   addToCart,
   openSearch,
-  openCart,
   buyNow,
   formatYen,
   discountedPrice,
@@ -53,20 +50,7 @@ const {
           >
             <Search :size="21" />
           </button>
-          <button
-            class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="Cart"
-            @click="openCart"
-          >
-            <ShoppingCart :size="21" />
-            <span
-              class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-              v-if="cartItemCount"
-            >
-              {{ cartItemCount }}
-            </span>
-          </button>
+          <BuyerCartButton />
         </div>
       </header>
       <template v-if="product && selectedVariant">
@@ -96,12 +80,8 @@ const {
             {{ product.shop_name }}
           </p>
           <section class="border-t border-[#e1e8e2] pt-4">
-            <h3 class="m-0 text-[14px] font-bold">
-              商品オプション
-            </h3>
-            <p class="mt-1 mb-2 text-[12px] text-[#617269]">
-              セットタイプ
-            </p>
+            <h3 class="m-0 text-[14px] font-bold">商品オプション</h3>
+            <p class="mt-1 mb-2 text-[12px] text-[#617269]">セットタイプ</p>
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="variant in product.variants"
@@ -171,12 +151,8 @@ const {
         v-else
         class="grid min-h-[360px] place-items-center px-6 text-center text-[14px] text-[#63746a]"
       >
-        <p v-if="catalogueQuery.isPending.value">
-          商品を読み込んでいます。
-        </p>
-        <p v-else>
-          商品を表示できません。
-        </p>
+        <p v-if="catalogueQuery.isPending.value">商品を読み込んでいます。</p>
+        <p v-else>商品を表示できません。</p>
       </div>
       <BuyerBottomNavigation />
     </section>

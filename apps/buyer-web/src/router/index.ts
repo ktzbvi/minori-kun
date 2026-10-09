@@ -125,7 +125,8 @@ export const router = createRouter({
 router.beforeEach(async (to) => {
   if (to.meta.public) return true
   try {
-    await queryClient.ensureQueryData(currentSessionQuery)
+    const session = await queryClient.fetchQuery(currentSessionQuery)
+    if (!session) return { name: 'login', query: { redirect: to.fullPath } }
     return true
   } catch {
     return { name: 'login', query: { redirect: to.fullPath } }

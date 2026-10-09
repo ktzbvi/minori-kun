@@ -2,6 +2,7 @@
 import { ChevronLeft, ChevronRight, Leaf, LoaderCircle, ArrowRight, Check } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerRegisterOtp } from '@/composables/useBuyerRegisterOtp'
 
 const {
@@ -22,10 +23,10 @@ const {
 
 <template>
   <main
-    class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
+    class="min-h-dvh bg-[#fbfcfa] text-[#26362c] lg:grid lg:place-items-center lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-dvh w-full bg-[#fbfcfa] lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -98,11 +99,8 @@ const {
         </header>
         <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
           <div class="mb-7 lg:hidden">
-            <div class="mb-7 flex items-center gap-2">
-              <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
-                <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
-              </span>
-              <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+            <div class="mb-7">
+              <BuyerBrand size="large" />
             </div>
             <h1 class="text-2xl leading-snug font-bold text-[#24372b]">メールをご確認ください</h1>
             <p class="mt-3 text-sm leading-7 text-[#687a70]">

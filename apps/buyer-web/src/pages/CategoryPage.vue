@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import { ChevronLeft, Grid2X2, Search, ShoppingCart } from 'lucide-vue-next'
+import { ChevronLeft, Grid2X2, Search } from 'lucide-vue-next'
+import BuyerCartButton from '@/components/layout/BuyerCartButton.vue'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import { useBuyerCategory } from '@/composables/useBuyerCategory'
-const {
-  router,
-  catalogueQuery,
-  cartQuery,
-  cartItemCount,
-  categoryCards,
-  openCategory,
-  openSearch,
-  openCart,
-} = useBuyerCategory()
+const { router, catalogueQuery, categoryCards, openCategory, openSearch } = useBuyerCategory()
 </script>
 
 <template>
@@ -40,30 +32,13 @@ const {
           >
             <Search :size="21" />
           </button>
-          <button
-            class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="Cart"
-            @click="openCart"
-          >
-            <ShoppingCart :size="21" />
-            <span
-              v-if="cartItemCount"
-              class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-            >
-              {{ cartItemCount }}
-            </span>
-          </button>
+          <BuyerCartButton />
         </div>
       </header>
 
       <section class="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-[82px]">
-        <h2 class="m-0 text-[13px] font-bold text-[#237f4b]">
-          カテゴリーから探す
-        </h2>
-        <p class="mt-1 mb-3 text-[11px] text-[#718075]">
-          目的の商品を探してください
-        </p>
+        <h2 class="m-0 text-[13px] font-bold text-[#237f4b]">カテゴリーから探す</h2>
+        <p class="mt-1 mb-3 text-[11px] text-[#718075]">目的の商品を探してください</p>
         <div class="grid grid-cols-2 gap-3">
           <button
             v-for="category in categoryCards"

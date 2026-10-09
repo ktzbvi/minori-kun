@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { ChevronLeft, Search, ShoppingCart } from 'lucide-vue-next'
+import { ChevronLeft, Search } from 'lucide-vue-next'
+import BuyerCartButton from '@/components/layout/BuyerCartButton.vue'
 import BuyerBottomNavigation from '@/components/BuyerBottomNavigation.vue'
 import { useBuyerCategoryProductList } from '@/composables/useBuyerCategoryProductList'
 const {
-  route,
-  router,
   catalogueQuery,
-  cartQuery,
   addCartItemMutation,
-  selectedCategoryId,
   selectedCategory,
-  cartItemCount,
   categoryProducts,
   goBack,
   openSearch,
   openProduct,
   addToCart,
-  openCart,
   productPrice,
   formatYen,
 } = useBuyerCategoryProductList()
@@ -37,9 +32,7 @@ const {
           >
             <ChevronLeft :size="22" stroke-width="2.5" />
           </button>
-          <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">
-            カテゴリ商品一覧
-          </h1>
+          <h1 class="m-0 text-[16px] font-bold text-[#237d4a]">カテゴリ商品一覧</h1>
         </div>
         <div class="flex gap-2">
           <button
@@ -50,20 +43,7 @@ const {
           >
             <Search :size="21" />
           </button>
-          <button
-            class="relative grid size-9 place-items-center rounded-full border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="Cart"
-            @click="openCart"
-          >
-            <ShoppingCart :size="21" />
-            <span
-              v-if="cartItemCount"
-              class="absolute top-0 right-0 grid size-4 place-items-center rounded-full bg-[#e25a3d] text-[9px] font-bold text-white"
-            >
-              {{ cartItemCount }}
-            </span>
-          </button>
+          <BuyerCartButton />
         </div>
       </header>
 

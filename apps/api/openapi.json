@@ -2563,6 +2563,180 @@
                     }
                 }
             }
+        },
+        "/v1/buyer/products": {
+            "get": {
+                "operationId": "buyerCatalog.index",
+                "tags": [
+                    "BuyerCatalog"
+                ],
+                "parameters": [
+                    {
+                        "name": "variant_ids[]",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `BuyerCatalogueProductResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/BuyerCatalogueProductResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/products/feed": {
+            "get": {
+                "operationId": "buyerCatalog.feed",
+                "tags": [
+                    "BuyerCatalog"
+                ],
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 40
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "schema": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "maxLength": 1024
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`BuyerProductFeedResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/BuyerProductFeedResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/v1/buyer/cart/count": {
+            "get": {
+                "operationId": "buyerCart.count",
+                "tags": [
+                    "BuyerCart"
+                ],
+                "parameters": [
+                    {
+                        "name": "guest_items",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "variant_id": {
+                                        "type": "string"
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "merge_target": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    }
+                                },
+                                "required": [
+                                    "variant_id",
+                                    "quantity"
+                                ]
+                            }
+                        },
+                        "x-deepObject-style": "qs"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`BuyerCartCountResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/BuyerCartCountResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -3908,6 +4082,133 @@
                     "expected_photo_id"
                 ],
                 "title": "UpdateProducerShopPhotoRequest"
+            },
+            "BuyerCatalogueProductResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "producer_id": {
+                        "type": "string"
+                    },
+                    "shop_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "image_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "variants": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "price_yen": {
+                                    "type": "integer"
+                                },
+                                "stock_quantity": {
+                                    "type": "integer"
+                                },
+                                "discount_bps": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "label",
+                                "price_yen",
+                                "stock_quantity",
+                                "discount_bps"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "category",
+                    "producer_id",
+                    "shop_name",
+                    "image_url",
+                    "variants"
+                ],
+                "title": "BuyerCatalogueProductResource"
+            },
+            "BuyerProductFeedResource": {
+                "type": "object",
+                "properties": {
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BuyerCatalogueProductResource"
+                        }
+                    },
+                    "total": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "categories": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "next_cursor": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "products",
+                    "total",
+                    "categories",
+                    "next_cursor"
+                ],
+                "title": "BuyerProductFeedResource"
+            },
+            "BuyerCartCountResource": {
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "count"
+                ],
+                "title": "BuyerCartCountResource"
             }
         },
         "responses": {

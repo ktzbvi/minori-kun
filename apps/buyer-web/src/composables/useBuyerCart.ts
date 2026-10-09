@@ -6,7 +6,7 @@ import {
   useRemoveBuyerCartItemMutation,
   useUpdateBuyerCartItemMutation,
 } from '@/services/cart/cart.mutation'
-import { useBuyerCartQuery, type BuyerCartItem } from '@/services/cart/cart.query'
+import { cacheBuyerCart, useBuyerCartQuery, type BuyerCartItem } from '@/services/cart/cart.query'
 import { mergeGuestCartAfterAuthentication } from '@/services/cart/cart.mutation'
 import { buyerCartKeys } from '@/services/cart/cart.key'
 import { getBuyerAccountProfile } from '@/services/account/account.api'
@@ -26,7 +26,7 @@ export function useBuyerCart() {
       deliveryPrefecture.value = (await getBuyerAccountProfile()).prefecture
       if (readGuestCart().length) {
         const result = await mergeGuestCartAfterAuthentication()
-        queryClient.setQueryData(buyerCartKeys.current(), result.cart)
+        if (result.cart) cacheBuyerCart(result.cart)
         await queryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })
         if (result.failedCount) {
           toast.warning('一部の商品をカートに反映できませんでした。商品と在庫をご確認ください。')
@@ -101,7 +101,7 @@ export function useBuyerCart() {
   async function retryGuestCartMerge() {
     try {
       const result = await mergeGuestCartAfterAuthentication()
-      queryClient.setQueryData(buyerCartKeys.current(), result.cart)
+      if (result.cart) cacheBuyerCart(result.cart)
       await queryClient.invalidateQueries({ queryKey: buyerCartKeys.all() })
       if (result.failedCount) {
         toast.warning('一部の商品をカートに反映できませんでした。商品と在庫をご確認ください。')

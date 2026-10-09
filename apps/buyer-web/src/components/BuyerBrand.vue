@@ -1,7 +1,7 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    size?: 'header' | 'form' | 'compact'
+    size?: 'header' | 'form' | 'compact' | 'large'
   }>(),
   { size: 'form' },
 )
@@ -18,6 +18,7 @@ withDefaults(
       :class="{
         'w-[87px]': size === 'header' || size === 'compact',
         'w-[109px]': size === 'form',
+        'w-40': size === 'large',
       }"
     />
   </div>
