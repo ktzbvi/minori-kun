@@ -8,6 +8,8 @@ const {
   updateCartItemMutation,
   removeCartItemMutation,
   cartItems,
+  isDeliveryFeeKnown,
+  hasPendingGuestItems,
   deliveryPrefecture,
   producerGroups,
   decreaseQuantity,
@@ -16,6 +18,7 @@ const {
   openSearch,
   goHome,
   proceedToOrderConfirmation,
+  retryGuestCartMerge,
   formatYen,
   unitPrice,
   lineTotal,
@@ -66,9 +69,27 @@ const {
           <p class="mb-2 text-[10px] text-[#708076]">
             ショップごとにお支払い手続きを行います。
           </p>
+          <p v-if="!isDeliveryFeeKnown" class="mb-2 text-[10px] text-[#708076]">
+            送料込みの金額は、お届け先入力後に確定します。
+          </p>
+          <div v-if="hasPendingGuestItems" class="mb-3 rounded-md border border-[#e7d8a2] bg-[#fffdf4] p-3">
+            <p class="m-0 text-xs font-bold text-[#765b13]">
+              一部の商品を会員カートに反映できませんでした。
+            </p>
+            <p class="mt-1 mb-2 text-[11px] text-[#665b38]">
+              商品の在庫を確認するか、不要な商品を削除してください。
+            </p>
+            <button
+              class="min-h-8 rounded border border-[#237f4b] bg-white px-3 text-[11px] font-bold text-[#237f4b]"
+              type="button"
+              @click="retryGuestCartMerge"
+            >
+              カートへ反映する
+            </button>
+          </div>
           <section
             v-for="group in producerGroups"
-            :key="group.shopName"
+            :key="group.producerId"
             class="mb-2.5 rounded-[7px] border border-[#dce5dc] bg-white p-2"
             :aria-label="group.shopName"
           >
@@ -92,6 +113,12 @@ const {
               <div class="min-w-0 flex-1">
                 <h2 class="m-0 truncate text-[12px] font-bold">{{ item.product_name }}</h2>
                 <p class="mt-0.5 mb-0 text-[10px] text-[#66776c]">{{ item.variant_label }}</p>
+                <p v-if="item.pending_merge" class="mt-0.5 mb-0 text-[10px] text-[#9b6713]">
+                  会員カートへの反映待ち
+                </p>
+                <p v-else-if="item.unavailable" class="mt-0.5 mb-0 text-[10px] text-[#b33a2b]">
+                  この商品は現在購入できません
+                </p>
                 <p class="mt-1 mb-0 text-[12px]">
                   <span v-if="item.discount_bps" class="mr-1 text-[#89968e] line-through">
                     {{ formatYen(regularLineAmount(item, group.items)) }}
@@ -140,12 +167,22 @@ const {
               </button>
             </article>
             <div class="mt-1 flex items-center justify-between text-[11px] text-[#53645a]">
-              <span>ショップ小計（{{ group.itemCount }}点・税込・送料込み）</span>
-              <strong class="text-[#33443a]">{{ formatYen(group.subtotal) }}</strong>
+              <span>
+                {{
+                  isDeliveryFeeKnown
+                    ? `ショップ小計（${group.itemCount}点・税込・送料込み）`
+                    : `商品小計（${group.itemCount}点・税込）`
+                }}
+              </span>
+              <strong class="text-[#33443a]">
+                {{ isDeliveryFeeKnown ? formatYen(group.subtotal) : formatYen(group.subtotal - discountedDeliveryFee(group.items)) }}
+              </strong>
             </div>
             <button
               class="mt-2 min-h-8 w-full rounded-[4px] border-0 bg-[#237f4b] text-[11px] font-bold text-white"
               type="button"
+              :disabled="group.hasUnavailableItem"
+              :class="{ 'cursor-not-allowed opacity-50': group.hasUnavailableItem }"
               @click="proceedToOrderConfirmation(group.producerId)"
             >
               このショップの商品を購入する
@@ -153,6 +190,28 @@ const {
           </section>
         </section>
       </template>
+
+      <section
+        v-else-if="cartQuery.isPending.value"
+        class="grid min-h-0 flex-1 place-items-center px-6 pb-[82px] text-center text-xs text-[#718075]"
+      >
+        カートを読み込んでいます。
+      </section>
+      <section
+        v-else-if="cartQuery.isError.value"
+        class="grid min-h-0 flex-1 place-items-center px-6 pb-[82px] text-center"
+      >
+        <div>
+          <p class="text-xs text-[#b33a2b]">カートを読み込めませんでした。</p>
+          <button
+            class="min-h-9 rounded border border-[#237f4b] bg-white px-4 text-xs font-bold text-[#237f4b]"
+            type="button"
+            @click="cartQuery.refetch()"
+          >
+            再読み込み
+          </button>
+        </div>
+      </section>
 
       <section v-else class="grid min-h-0 flex-1 place-items-center px-6 pb-[82px] text-center">
         <div>

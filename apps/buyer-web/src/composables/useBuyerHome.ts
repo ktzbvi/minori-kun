@@ -49,7 +49,7 @@ export function useBuyerHome() {
       {
         onSuccess: () => toast.success('カートに追加しました'),
         onError: () =>
-          toast.error('カートに追加できませんでした。ログイン状態を確認してください。'),
+          toast.error('カートに追加できませんでした。商品と在庫をご確認ください。'),
       },
     )
   }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight, Leaf, LoaderCircle, Check, CircleCheck } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, LoaderCircle, Check, CircleCheck } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage, UiCheckbox } from '@minorikun/ui'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerRegisterDetails } from '@/composables/useBuyerRegisterDetails'
 const {
   router,
@@ -31,10 +32,7 @@ const {
             to="/"
             class="mr-auto hidden items-center gap-2 rounded-lg text-[#237f4b] focus-visible:outline-2 focus-visible:outline-offset-4 lg:flex"
           >
-            <span class="grid size-9 place-items-center rounded-full bg-[#e8f2eb]">
-              <Leaf class="size-5" aria-hidden="true" />
-            </span>
-            <span class="text-xl font-extrabold tracking-widest">みのりくん</span>
+            <BuyerBrand size="compact" />
           </RouterLink>
           <UiButton
             variant="ghost"
@@ -104,6 +102,9 @@ const {
           class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5 scroll-pb-5 lg:overflow-visible lg:px-8 lg:pt-6 lg:pb-0"
         >
           <div class="mb-6">
+            <div class="mb-5 lg:hidden">
+              <BuyerBrand size="compact" />
+            </div>
             <p class="hidden text-sm font-medium text-[#237f4b] lg:block">STEP 3 / 3</p>
             <h1 class="mt-2 text-2xl font-bold text-[#1f2a24]">お客様情報の入力</h1>
             <p class="mt-3 text-sm leading-6 text-[#687a70]">

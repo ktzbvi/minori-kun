@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight, Leaf, LoaderCircle, ArrowRight, Mail } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, LoaderCircle, ArrowRight, Mail } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerRegisterEmail } from '@/composables/useBuyerRegisterEmail'
 
 const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegisterEmail()
@@ -22,10 +23,9 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
           to="/"
           class="relative z-10 flex w-fit items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
-          <span class="grid size-11 place-items-center rounded-full bg-white/10">
-            <Leaf class="size-6 text-[#c5e2a3]" aria-hidden="true" />
+          <span class="rounded-md bg-white px-3 py-2">
+            <BuyerBrand size="compact" />
           </span>
-          <span class="text-2xl font-extrabold tracking-widest">みのりくん</span>
         </RouterLink>
         <div class="relative z-10 mt-20 max-w-sm">
           <p class="mb-5 text-sm font-medium tracking-widest text-[#b9d7c0]">
@@ -85,11 +85,8 @@ const { errors, isSubmitting, email, emailAttrs, submit, goBack } = useBuyerRegi
         </header>
         <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
           <div class="mb-7 lg:hidden">
-            <div class="mb-7 flex items-center gap-2">
-              <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
-                <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
-              </span>
-              <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+            <div class="mb-7">
+              <BuyerBrand size="compact" />
             </div>
             <h1 class="text-2xl leading-snug font-bold text-[#24372b]">新規会員登録</h1>
             <p class="mt-3 text-sm leading-7 text-[#687a70]">
