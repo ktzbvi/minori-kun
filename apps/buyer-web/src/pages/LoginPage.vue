@@ -21,10 +21,10 @@ const {
 
 <template>
   <main
-    class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
+    class="min-h-dvh bg-[#fbfcfa] text-[#26362c] lg:grid lg:place-items-center lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-dvh w-full bg-[#fbfcfa] lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -98,7 +98,7 @@ const {
         <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
           <div class="mb-8 lg:hidden">
             <div class="mb-7 lg:hidden">
-              <BuyerBrand size="compact" />
+              <BuyerBrand size="large" />
             </div>
 
             <h1 class="text-2xl leading-snug font-bold text-[#24372b]">おかえりなさい</h1>

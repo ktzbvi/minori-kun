@@ -2,6 +2,7 @@
 import { ChevronLeft, Leaf, LoaderCircle, ArrowRight } from 'lucide-vue-next'
 import { RouterLink } from 'vue-router'
 import { UiButton, UiCard, UiInput, UiFormLabel, UiFormMessage } from '@minorikun/ui'
+import BuyerBrand from '@/components/BuyerBrand.vue'
 import { useBuyerPasswordResetConfirm } from '@/composables/useBuyerPasswordResetConfirm'
 const {
   router,
@@ -19,10 +20,10 @@ const {
 </script>
 <template>
   <main
-    class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
+    class="min-h-dvh bg-[#fbfcfa] text-[#26362c] lg:grid lg:place-items-center lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="min-h-screen w-full max-w-md bg-[#fbfcfa] sm:min-h-[728px] sm:shadow-sm lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="min-h-dvh w-full bg-[#fbfcfa] lg:grid lg:min-h-[680px] lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <aside
         class="relative hidden overflow-hidden bg-[#173e2c] p-12 text-white lg:flex lg:flex-col"
@@ -94,11 +95,8 @@ const {
           <span class="text-sm font-semibold text-[#227644] lg:hidden">パスワードの再設定</span>
         </header>
         <div class="px-6 pt-8 pb-12 lg:mx-auto lg:w-full lg:max-w-md lg:px-8 lg:pt-10 lg:pb-10">
-          <div class="mb-7 flex items-center gap-2 lg:hidden">
-            <span class="grid size-10 place-items-center rounded-full bg-[#e4f3e9]">
-              <Leaf class="size-6 text-[#237f4b]" aria-hidden="true" />
-            </span>
-            <span class="text-xl font-extrabold tracking-widest text-[#217848]">みのりくん</span>
+          <div class="mb-7 lg:hidden">
+            <BuyerBrand size="large" />
           </div>
           <template v-if="!linkIsComplete">
             <h1 class="text-2xl font-bold text-[#1f2a24]">リンクをご確認ください</h1>

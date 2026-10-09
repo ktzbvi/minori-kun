@@ -19,10 +19,10 @@ const {
 
 <template>
   <main
-    class="min-h-screen bg-[#e4ebe6] text-[#26362c] sm:grid sm:place-items-center sm:p-6 lg:bg-[#f3f6f3] lg:p-10"
+    class="min-h-dvh bg-[#fbfcfa] text-[#26362c] lg:grid lg:place-items-center lg:bg-[#f3f6f3] lg:p-10"
   >
     <section
-      class="flex h-dvh w-full max-w-md flex-col overflow-hidden bg-[#fbfcfa] sm:h-[728px] sm:shadow-sm lg:h-auto lg:max-w-5xl lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
+      class="flex h-dvh w-full flex-col overflow-hidden bg-[#fbfcfa] lg:h-auto lg:max-w-5xl lg:rounded-3xl lg:border lg:border-[#d7e3da] lg:bg-white lg:shadow-xl lg:shadow-[#14382a]/5"
     >
       <div class="flex min-h-0 min-w-0 flex-1 flex-col lg:block">
         <header
@@ -103,7 +103,7 @@ const {
         >
           <div class="mb-6">
             <div class="mb-5 lg:hidden">
-              <BuyerBrand size="compact" />
+              <BuyerBrand size="large" />
             </div>
             <p class="hidden text-sm font-medium text-[#237f4b] lg:block">STEP 3 / 3</p>
             <h1 class="mt-2 text-2xl font-bold text-[#1f2a24]">お客様情報の入力</h1>
