@@ -46,6 +46,7 @@ Route::prefix('api/v1')->group(function (): void {
             ->where('token', '[A-Za-z0-9]+');
 
         Route::get('/products', [BuyerCatalogController::class, 'index']);
+        Route::get('/products/feed', [BuyerCatalogController::class, 'feed']);
 
         Route::middleware(['auth:sanctum', 'portal.role:buyer'])->group(function (): void {
             Route::prefix('account')->group(function (): void {

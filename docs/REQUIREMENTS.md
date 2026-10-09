@@ -5,9 +5,9 @@
 | Field | Value |
 |---|---|
 | Project | `みのりくん` (Minori-kun) agricultural and food EC marketplace |
-| Document version | 0.3.62 |
+| Document version | 0.3.64 |
 | Status | Latest workbook-aligned implementation baseline |
-| Last updated | 2026-10-05 (Asia/Tokyo) |
+| Last updated | 2026-10-09 (Asia/Tokyo) |
 | Target launch | First week of November 2026 |
 | Development completion target | 2026-10-16 |
 | Development estimate | 280 hours / 35 working days |
@@ -23,6 +23,8 @@ This baseline was rebuilt from `C:\EC\docs\みのりくん_EC画面要件定義�
 
 | Version | Date | Summary |
 |---|---|---|
+| 0.3.64 | 2026-10-09 | Refined B01 feed performance: retain inactive TanStack infinite-query data for five minutes, preserve the selected Home category during navigation, trim only the newly selected category to its first cached batch without changing freshness, return total/category metadata only on the first cursor batch, and index the publication/category filters plus stable cursor ordering. Four products per batch and explicit later-batch retry are unchanged. |
+| 0.3.63 | 2026-10-09 | User-confirmed B01 infinite scroll replaces the More button on desktop and mobile. Reveal successive product batches when the end of the visible list enters view, fill short viewports automatically, reset the visible batch on category changes, and stop at the end. B01 uses a server-paginated cursor feed, requesting four products per batch; it does not fetch the full catalogue on entry. Guest-cart lookups are limited to the locally stored variant IDs. |
 | 0.3.62 | 2026-10-08 | Confirmed Buyer guest-cart behavior: guests can add, edit, and remove cart lines stored locally; selected-shop checkout routes through login/registration back to Cart; successful authentication merges guest quantities into the Buyer cart idempotently, with unavailable/over-stock lines retained for correction. |
 | 0.3.61 | 2026-10-05 | Added the two-stage Buyer cancellation/refund email flow: cancellation plus refund-pending notice after accepted cancellation, then one refund-completed notice only after authoritative provider success. Refund failure remains cancelled, displays `返金：失敗`, and requires operational follow-up; provider-specific webhook mapping remains pending confirmation of the staging Marketplace API contract. |
 | 0.3.60 | 2026-10-05 | Standardized B11/B12 Japanese status labels and made both screens render order, payment, and refund from the same API state fields. Cancelled orders show `キャンセル済み`; B12 suppresses fulfillment; payment/refund remain independent and must match B11. |
@@ -325,7 +327,7 @@ These decisions supersede conflicting Producer-specific numeric-policy and deliv
 - **Actor:** Guest / Buyer
 - **Purpose:** Entry point for discovering published products and opening Product Detail or Cart.
 - **Main entry:** App launch / Home navigation
-- **Summary:** Home / Product List is the Buyer entry page for discovering published products. Buyers can browse product cards, use category quick filters, open the Search page, open Cart, or move to Product Detail. The approved B01 UI does not show a campaign banner; category filters and the product grid begin directly below the header. A purchasable in-stock product can be added directly from the list. Producer/Farm name is not shown on list cards in V1.
+- **Summary:** Home / Product List is the Buyer entry page for discovering published products. Buyers can browse product cards, use category quick filters, open the Search page, open Cart, or move to Product Detail. The approved B01 UI does not show a campaign banner; category filters and the product grid begin directly below the header. A purchasable in-stock product can be added directly from the list. Producer/Farm name is not shown on list cards in V1. Product batches are requested from the server in groups of four and appended automatically as the end of the visible list enters view on desktop or mobile; no More button is shown. A short viewport is filled automatically while products remain. Inactive feed data is retained for five minutes and the selected Home category is preserved during navigation. Category changes reset the selected feed to its first cached batch (preserving the original freshness timestamp) or request its first batch when uncached, and cancel obsolete requests; the list stops requesting when the server returns no next cursor. The category filters and total count come from first-batch server metadata, including categories whose products are outside the loaded batches. Later cursor batches return null for total/category metadata and do not repeat those catalogue-wide queries; the UI continues using first-batch metadata. Composite indexes cover the publication/category filters and created-at/ID cursor ordering. A later-batch failure preserves loaded cards and provides explicit retry without automatically repeating the failed request. Existing loading, empty, error, and retry states remain required.
 
 | Element ID | Element (EN / JP) | Display or input | Japanese display/input | User action | Processing / destination |
 |---|---|---|---|---|---|
@@ -1284,7 +1286,7 @@ The approved workbook contains no cells marked TBD, requiring review, or pending
 
 ### 18.1 Buyer screens
 
-- **AT-B-001:** Verify `B01` satisfies every `B01-*` element row, its stated entry and navigation, the authenticated actor scope, and its safe error/retry behavior.
+- **AT-B-001:** Verify `B01` satisfies every `B01-*` element row, its stated entry and navigation, the authenticated actor scope, and its safe error/retry behavior. On desktop and mobile, verify automatic successive API batches of at most four products at the visible list end without a More button or full-catalogue request, automatic filling of short viewports after asynchronous catalogue arrival, category-reset behavior, no duplicate cards, stopping at the final product, viewport resizing, later-batch failure with cards retained and explicit retry, category metadata beyond the first batch, targeted guest-cart variant lookups, request cancellation, observer cleanup when leaving Home, retained cached pages/category after navigation, resetting only the selected filter without marking stale data fresh, first-batch-only metadata queries, and the feed indexes.
 - **AT-B-002:** Verify `B02` satisfies every `B02-*` element row, its stated entry and navigation, the authenticated actor scope, and its safe error/retry behavior.
 - **AT-B-003:** Verify `B03` satisfies every `B03-*` element row, its stated entry and navigation, the authenticated actor scope, and its safe error/retry behavior.
 - **AT-B-004:** Verify `B04` satisfies every `B04-*` element row, its stated entry and navigation, the authenticated actor scope, and its safe error/retry behavior.

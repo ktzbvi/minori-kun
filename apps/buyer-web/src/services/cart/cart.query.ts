@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { useQuery } from '@tanstack/vue-query'
 import api from '@/services/api'
-import { queryClient } from '@/lib/query'
 import { readGuestCart, removeGuestCartItem, setGuestCartMergeTarget } from '@/lib/guest-cart'
-import { buyerCatalogKeys } from '@/services/catalog/catalog.key'
-import { fetchBuyerCatalogueProducts, type BuyerCatalogueProduct } from '@/services/catalog/catalog.query'
+import {
+  fetchBuyerCatalogueProductsByVariants,
+  type BuyerCatalogueProduct,
+} from '@/services/catalog/catalog.query'
 import { buyerCartKeys } from './cart.key'
 
 export type BuyerCartItem = {
@@ -124,18 +125,16 @@ export function useBuyerCartQuery() {
         const guestItems = readGuestCart()
         if (!guestItems.length) return serverCart
 
-        const products = await queryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         return projectGuestCart(products, { serverCart, pendingMerge: true })
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) throw error
 
-        const products = await queryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         return projectGuestCart(products)
       }
     },

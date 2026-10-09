@@ -676,7 +676,6 @@ export interface paths {
         patch: operations["producerOrder.updateFulfillment"];
         trace?: never;
     };
-
     "/v1/producer/account": {
         parameters: {
             query?: never;
@@ -703,6 +702,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["producerAccount.updatePhoto"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerCatalog.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/buyer/products/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["buyerCatalog.feed"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1055,6 +1086,30 @@ export interface components {
              */
             photo: string;
             expected_photo_id: string | null;
+        };
+        /** BuyerCatalogueProductResource */
+        BuyerCatalogueProductResource: {
+            id: string;
+            name: string;
+            description: string;
+            category: string | null;
+            producer_id: string;
+            shop_name: string | null;
+            image_url: string | null;
+            variants: {
+                id: string;
+                label: string;
+                price_yen: number;
+                stock_quantity: number;
+                discount_bps: number;
+            }[];
+        };
+        /** BuyerProductFeedResource */
+        BuyerProductFeedResource: {
+            products: components["schemas"]["BuyerCatalogueProductResource"][];
+            total: number | null;
+            categories: string[] | null;
+            next_cursor: string | null;
         };
     };
     responses: {
@@ -2426,7 +2481,6 @@ export interface operations {
             422: components["responses"]["ValidationException"];
         };
     };
-
     "producerAccount.show": {
         parameters: {
             query?: never;
@@ -2486,6 +2540,58 @@ export interface operations {
                     "application/json": {
                         /** @description Error overview. */
                         message: string;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerCatalog.index": {
+        parameters: {
+            query?: {
+                "variant_ids[]"?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of `BuyerCatalogueProductResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BuyerCatalogueProductResource"][];
+                    };
+                };
+            };
+            422: components["responses"]["ValidationException"];
+        };
+    };
+    "buyerCatalog.feed": {
+        parameters: {
+            query?: {
+                category?: string | null;
+                per_page?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description `BuyerProductFeedResource` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BuyerProductFeedResource"];
                     };
                 };
             };

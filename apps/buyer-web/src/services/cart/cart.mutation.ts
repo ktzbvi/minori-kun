@@ -9,8 +9,7 @@ import {
   setGuestCartMergeTarget,
   updateGuestCartItem,
 } from '@/lib/guest-cart'
-import { buyerCatalogKeys } from '@/services/catalog/catalog.key'
-import { fetchBuyerCatalogueProducts } from '@/services/catalog/catalog.query'
+import { fetchBuyerCatalogueProductsByVariants } from '@/services/catalog/catalog.query'
 import { projectGuestCart, type BuyerCart } from './cart.query'
 import { buyerCartKeys } from './cart.key'
 
@@ -39,11 +38,13 @@ export function useAddBuyerCartItemMutation() {
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) throw error
 
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
-        const variant = products.flatMap((product) => product.variants).find((item) => item.id === variantId)
+        const products = await fetchBuyerCatalogueProductsByVariants([
+          variantId,
+          ...readGuestCart().map((item) => item.variant_id),
+        ])
+        const variant = products
+          .flatMap((product) => product.variants)
+          .find((item) => item.id === variantId)
         if (!variant) throw error
 
         addGuestCartItem(variantId, quantity, variant.stock_quantity)
@@ -61,10 +62,9 @@ export function useUpdateBuyerCartItemMutation() {
     mutationFn: async ({ itemId, quantity }: UpdateBuyerCartItemInput) => {
       if (itemId.startsWith('guest:')) {
         updateGuestCartItem(itemId.slice('guest:'.length), quantity)
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         const cachedCart = appQueryClient.getQueryData<BuyerCart>(buyerCartKeys.current())
         const cart = cachedCart && {
           ...cachedCart,
@@ -91,10 +91,9 @@ export function useRemoveBuyerCartItemMutation() {
     mutationFn: async (itemId: string) => {
       if (itemId.startsWith('guest:')) {
         removeGuestCartItem(itemId.slice('guest:'.length))
-        const products = await appQueryClient.ensureQueryData({
-          queryKey: buyerCatalogKeys.products(),
-          queryFn: fetchBuyerCatalogueProducts,
-        })
+        const products = await fetchBuyerCatalogueProductsByVariants(
+          readGuestCart().map((item) => item.variant_id),
+        )
         const cachedCart = appQueryClient.getQueryData<BuyerCart>(buyerCartKeys.current())
         const cart = cachedCart && {
           ...cachedCart,
