@@ -20,37 +20,22 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
 <template>
   <BuyerLayout active="profile">
     <template #mobile-header>
-      <header
-        class="flex h-[65px] items-center justify-between border-b border-[#e3e9e3] bg-white px-4"
-      >
+      <header class="flex h-[65px] items-center justify-between border-b border-[#e3e9e3] bg-white px-4">
         <h1 class="text-base font-bold text-[#237d4a]">マイページ</h1>
         <div class="flex gap-2">
-          <UiButton
-            variant="ghost"
-            class="size-9 min-h-9 p-0 text-[#627469]"
-            aria-label="検索"
-            @click="openSearch"
-          >
+          <UiButton variant="ghost" class="size-9 min-h-9 p-0 text-[#627469]" aria-label="検索" @click="openSearch">
             <Search class="size-5" aria-hidden="true" />
           </UiButton>
-          <UiButton
-            variant="ghost"
-            class="size-9 min-h-9 p-0 text-[#627469]"
-            aria-label="カート"
-            @click="openCart"
-          >
+          <UiButton variant="ghost" class="size-9 min-h-9 p-0 text-[#627469]" aria-label="カート" @click="openCart">
             <ShoppingCart class="size-5" aria-hidden="true" />
           </UiButton>
         </div>
       </header>
     </template>
     <div
-      class="flex-1 px-3 pt-4 pb-[calc(88px+env(safe-area-inset-bottom))] lg:mx-auto lg:w-full lg:max-w-2xl lg:overflow-visible lg:px-6 lg:pt-6 lg:pb-10"
-    >
+      class="flex-1 px-3 pt-4 pb-[calc(88px+env(safe-area-inset-bottom))] lg:mx-auto lg:w-full lg:max-w-2xl lg:overflow-visible lg:px-6 lg:pt-6 lg:pb-10">
       <div class="w-full">
-        <UiCard
-          class="rounded-lg border-[#dce5dc] bg-white px-3 py-2.5 shadow-none lg:rounded-lg lg:px-4 lg:py-4"
-        >
+        <UiCard class="rounded-lg border-[#dce5dc] bg-white px-3 py-2.5 shadow-none lg:rounded-lg lg:px-4 lg:py-4">
           <template v-if="profile">
             <p class="break-words text-sm font-bold lg:text-xl">{{ profile.name }}</p>
             <p class="mt-1 break-all text-xs text-[#718075] lg:mt-3">
@@ -67,14 +52,10 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
             <h2 class="mb-2 mt-4 text-xs font-medium text-[#718075] lg:mt-6 lg:mb-2 lg:text-sm">
               注文関連
             </h2>
-            <UiCard
-              class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl"
-            >
-              <UiButton
-                variant="ghost"
+            <UiCard class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl">
+              <UiButton variant="ghost"
                 class="min-h-11 w-full justify-start gap-2 whitespace-normal rounded-none border-0 border-b border-[#dce5dc] bg-white px-3 py-3 text-left text-xs font-medium text-[#33443a] last:border-b-0 lg:min-h-14 lg:gap-3 lg:px-4 lg:py-3 lg:text-sm"
-                @click="router.push({ name: 'order-history' })"
-              >
+                @click="router.push({ name: 'order-history' })">
                 <span class="text-[#237f4b] lg:shrink-0">
                   <PackageOpen class="size-4 lg:size-5" aria-hidden="true" />
                 </span>
@@ -90,14 +71,10 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
             <h2 class="mb-2 mt-4 text-xs font-medium text-[#718075] lg:mt-6 lg:mb-2 lg:text-sm">
               アカウント設定
             </h2>
-            <UiCard
-              class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl"
-            >
-              <UiButton
-                variant="ghost"
+            <UiCard class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl">
+              <UiButton variant="ghost"
                 class="min-h-11 w-full justify-start gap-2 whitespace-normal rounded-none border-0 border-b border-[#dce5dc] bg-white px-3 py-3 text-left text-xs font-medium text-[#33443a] last:border-b-0 lg:min-h-14 lg:gap-3 lg:px-4 lg:py-3 lg:text-sm"
-                @click="router.push({ name: 'member-info' })"
-              >
+                @click="router.push({ name: 'member-info' })">
                 <span class="text-[#237f4b] lg:shrink-0">
                   <Pencil class="size-4 lg:size-5" aria-hidden="true" />
                 </span>
@@ -107,11 +84,9 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
                 </span>
                 <ChevronRight class="size-4 shrink-0 text-[#718075]" aria-hidden="true" />
               </UiButton>
-              <UiButton
-                variant="ghost"
+              <UiButton variant="ghost"
                 class="min-h-11 w-full justify-start gap-2 whitespace-normal rounded-none border-0 border-b border-[#dce5dc] bg-white px-3 py-3 text-left text-xs font-medium text-[#33443a] last:border-b-0 lg:min-h-14 lg:gap-3 lg:px-4 lg:py-3 lg:text-sm"
-                @click="router.push({ name: 'password-change' })"
-              >
+                @click="router.push({ name: 'password-change' })">
                 <span class="text-[#237f4b] lg:shrink-0">
                   <KeyRound class="size-4 lg:size-5" aria-hidden="true" />
                 </span>
@@ -127,14 +102,10 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
             <h2 class="mb-2 mt-4 text-xs font-medium text-[#718075] lg:mt-6 lg:mb-2 lg:text-sm">
               その他
             </h2>
-            <UiCard
-              class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl"
-            >
-              <UiButton
-                variant="ghost"
+            <UiCard class="overflow-hidden rounded-lg border-[#dce5dc] bg-white p-0 shadow-none lg:rounded-xl">
+              <UiButton variant="ghost"
                 class="min-h-11 w-full justify-start gap-2 whitespace-normal rounded-none border-0 border-b border-[#dce5dc] bg-white px-3 py-3 text-left text-xs font-medium text-[#33443a] last:border-b-0 lg:min-h-14 lg:gap-3 lg:px-4 lg:py-3 lg:text-sm"
-                @click="router.push({ name: 'contact' })"
-              >
+                @click="router.push({ name: 'contact' })">
                 <span class="text-[#237f4b] lg:shrink-0">
                   <Mail class="size-4 lg:size-5" aria-hidden="true" />
                 </span>
@@ -144,11 +115,9 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
                 </span>
                 <ChevronRight class="size-4 shrink-0 text-[#718075]" aria-hidden="true" />
               </UiButton>
-              <UiButton
-                variant="ghost"
+              <UiButton variant="ghost"
                 class="min-h-11 w-full justify-start gap-2 whitespace-normal rounded-none border-0 border-b border-[#dce5dc] bg-white px-3 py-3 text-left text-xs font-medium text-[#33443a] last:border-b-0 lg:min-h-14 lg:gap-3 lg:px-4 lg:py-3 lg:text-sm"
-                @click="logoutOpen = true"
-              >
+                @click="logoutOpen = true">
                 <span class="text-[#237f4b] lg:shrink-0">
                   <LogOut class="size-4 lg:size-5" aria-hidden="true" />
                 </span>
@@ -163,31 +132,20 @@ const { router, profile, logoutOpen, loggingOut, openSearch, openCart, confirmLo
         </div>
       </div>
     </div>
-<template #mobile-navigation>    <div
-      class="fixed inset-x-0 bottom-0 z-40 h-[calc(64px+env(safe-area-inset-bottom))] bg-white lg:hidden"
-    >
-      <div class="relative h-16">
-        <BuyerBottomNavigation active="profile" />
+    <template #mobile-navigation>
+      <div class="fixed inset-x-0 bottom-0 z-40 h-[calc(64px+env(safe-area-inset-bottom))] bg-white lg:hidden">
+        <div class="relative h-16">
+          <BuyerBottomNavigation active="profile" />
+        </div>
       </div>
-    </div>
-</template>
-    <UiDialog
-      :open="logoutOpen"
-      title="ログアウトしますか？"
-      description="現在のアカウントからログアウトします。"
-      :show-close="!loggingOut"
-      content-class="max-w-sm"
-      @update:open="!loggingOut && (logoutOpen = $event)"
-    >
+    </template>
+    <UiDialog :open="logoutOpen" title="ログアウトしますか？" description="現在のアカウントからログアウトします。" :show-close="!loggingOut"
+      content-class="max-w-sm" @update:open="!loggingOut && (logoutOpen = $event)">
       <template #footer>
         <UiButton variant="outline" :disabled="loggingOut" @click="logoutOpen = false">
           キャンセル
         </UiButton>
-        <UiButton
-          class="border-red-600 bg-red-600 hover:bg-red-700"
-          :disabled="loggingOut"
-          @click="confirmLogout"
-        >
+        <UiButton class="border-red-600 bg-red-600 hover:bg-red-700" :disabled="loggingOut" @click="confirmLogout">
           <LoaderCircle v-if="loggingOut" class="size-4 animate-spin" aria-hidden="true" />
           {{ loggingOut ? 'ログアウト中...' : 'ログアウト' }}
         </UiButton>

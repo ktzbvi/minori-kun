@@ -15,6 +15,12 @@ import {
   UiCard,
   UiBadge,
   UiDialog,
+  UiDrawer,
+  UiDrawerContent,
+  UiDrawerTrigger,
+  UiDrawerClose,
+  UiDrawerTitle,
+  UiDrawerDescription,
   UiRadioGroup,
   UiInput,
   UiFormLabel,
@@ -328,144 +334,143 @@ const {
     </BuyerLayout>
   </div>
   <div class="lg:hidden">
-    <BuyerPageShell active="profile" full-width>
-      <header
-        class="flex h-[60px] shrink-0 items-center justify-between border-b border-[#e3e9e3] bg-white px-3"
-      >
-        <div class="flex items-center gap-2">
-          <button
-            class="grid size-9 place-items-center border-0 bg-transparent text-[#237d4a]"
-            type="button"
-            aria-label="戻る"
-            @click="router.push({ name: 'my-page' })"
-          >
-            <ChevronLeft :size="22" />
-          </button>
-          <h1 class="m-0 text-base font-bold text-[#237d4a]">注文履歴</h1>
-        </div>
-        <div class="flex gap-2">
-          <button
-            class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="検索"
-            @click="openSearch"
-          >
-            <Search :size="21" />
-          </button>
-          <button
-            class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
-            type="button"
-            aria-label="カート"
-            @click="openCart"
-          >
-            <ShoppingCart :size="21" />
-          </button>
-        </div>
-      </header>
-      <section class="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 pb-[78px]">
-        <button
-          class="flex min-h-9 w-full items-center justify-between rounded-lg border border-[#dce5dc] bg-white px-3 text-left text-xs text-[#526258]"
-          type="button"
-          aria-haspopup="dialog"
-          :aria-expanded="filterOpen"
-          @click="openFilters"
+    <UiDrawer
+      :open="filterOpen && !desktopFilters"
+      swipe-direction="down"
+      @update:open="!$event && closeFilters()"
+    >
+      <BuyerPageShell active="profile" full-width>
+        <header
+          class="flex h-[60px] shrink-0 items-center justify-between border-b border-[#e3e9e3] bg-white px-3"
         >
-          <span>絞り込み</span>
-          <ChevronDown :size="15" />
-        </button>
-        <p v-if="orders.isLoading.value" class="py-8 text-center text-xs text-[#68786e]">
-          注文履歴を読み込んでいます...
-        </p>
-        <p v-else-if="orders.isError.value" class="py-8 text-center text-xs text-[#b33a2b]">
-          注文履歴を読み込めませんでした。
-        </p>
-        <p v-else-if="!orders.data.value?.length" class="py-8 text-center text-xs text-[#68786e]">
-          該当する注文はありません。
-        </p>
-        <button
-          v-for="order in orders.data.value"
-          :key="order.id"
-          class="block w-full rounded-md border border-[#dce5dc] bg-white p-3 text-left"
-          type="button"
-          @click="router.push({ name: 'order-detail', params: { orderId: order.id } })"
-        >
-          <span class="flex items-start justify-between gap-2">
-            <span>
-              <strong class="block text-xs">{{ order.shop_name }}</strong>
-              <span class="mt-1 block text-[10px] text-[#68786e]">
-                注文番号 {{ order.order_number }}
-              </span>
-              <span class="block text-[10px] text-[#849188]">{{ date(order.placed_at) }}</span>
-            </span>
-            <ChevronRight :size="18" class="shrink-0" />
-          </span>
-          <span
-            v-for="item in order.items.slice(0, 2)"
-            :key="item.product_name"
-            class="mt-2 flex items-center gap-2 border-t border-[#e5ebe5] pt-2"
-          >
-            <img
-              v-if="item.image_url"
-              :src="item.image_url"
-              class="size-9 rounded object-cover"
-              alt=""
-            />
-            <span v-else class="size-9 rounded bg-[#edf2ed]" />
-            <span class="min-w-0 flex-1 truncate text-[10px]">
-              {{ item.product_name }} × {{ item.quantity }}
-            </span>
-          </span>
-          <span
-            v-if="order.items.length > 2"
-            class="mt-1 block text-right text-[10px] text-[#68786e]"
-          >
-            ほか{{ order.items.length - 2 }}点
-          </span>
-          <span
-            class="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#e5ebe5] pt-2 text-xs"
-          >
-            <strong>合計 {{ yen(order.total_yen) }}</strong>
-            <span class="flex flex-wrap justify-end gap-1">
-              <span class="rounded bg-[#edf3f8] px-2 py-1 text-[10px]">
-                注文：{{ orderStatusLabel(order.order_state) }}
-              </span>
-              <span class="rounded bg-[#e9f5ee] px-2 py-1 text-[10px]">
-                支払：{{ paymentStatusLabel(order.payment_state) }}
-              </span>
-              <span
-                v-if="refundStatusLabel(order.refund_state)"
-                class="rounded bg-[#fff4e5] px-2 py-1 text-[10px]"
-              >
-                返金：{{ refundStatusLabel(order.refund_state) }}
-              </span>
-            </span>
-          </span>
-        </button>
-      </section>
-      <div
-        v-if="filterOpen"
-        class="absolute inset-0 z-20 flex items-end justify-center bg-black/35"
-        role="presentation"
-        @click.self="closeFilters"
-      >
-        <section
-          class="flex max-h-[82%] w-full flex-col rounded-t-[20px] bg-white px-4 pb-4 pt-2 shadow-xl"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="order-filter-title"
-        >
-          <div class="mx-auto mb-3 h-1 w-11 rounded-full bg-[#d2d9d4]" />
-          <div class="mb-4 flex items-center justify-between">
-            <h2 id="order-filter-title" class="m-0 text-base font-bold">絞り込み</h2>
+          <div class="flex items-center gap-2">
             <button
-              class="grid size-8 place-items-center border-0 bg-transparent text-[#66766d]"
+              class="grid size-9 place-items-center border-0 bg-transparent text-[#237d4a]"
               type="button"
-              aria-label="閉じる"
-              @click="closeFilters"
+              aria-label="戻る"
+              @click="router.push({ name: 'my-page' })"
             >
-              <X :size="21" />
+              <ChevronLeft :size="22" />
+            </button>
+            <h1 class="m-0 text-base font-bold text-[#237d4a]">注文履歴</h1>
+          </div>
+          <div class="flex gap-2">
+            <button
+              class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
+              type="button"
+              aria-label="検索"
+              @click="openSearch"
+            >
+              <Search :size="21" />
+            </button>
+            <button
+              class="grid size-9 place-items-center border-0 bg-transparent text-[#627469]"
+              type="button"
+              aria-label="カート"
+              @click="openCart"
+            >
+              <ShoppingCart :size="21" />
             </button>
           </div>
+        </header>
+        <section class="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3 pb-[78px]">
+          <UiDrawerTrigger as-child>
+            <button
+              class="flex min-h-9 w-full items-center justify-between rounded-lg border border-[#dce5dc] bg-white px-3 text-left text-xs text-[#526258]"
+              type="button"
+              aria-haspopup="dialog"
+              :aria-expanded="filterOpen"
+              @click="openFilters"
+            >
+              <span>絞り込み</span>
+              <ChevronDown :size="15" />
+            </button>
+          </UiDrawerTrigger>
+          <p v-if="orders.isLoading.value" class="py-8 text-center text-xs text-[#68786e]">
+            注文履歴を読み込んでいます...
+          </p>
+          <p v-else-if="orders.isError.value" class="py-8 text-center text-xs text-[#b33a2b]">
+            注文履歴を読み込めませんでした。
+          </p>
+          <p v-else-if="!orders.data.value?.length" class="py-8 text-center text-xs text-[#68786e]">
+            該当する注文はありません。
+          </p>
+          <button
+            v-for="order in orders.data.value"
+            :key="order.id"
+            class="block w-full rounded-md border border-[#dce5dc] bg-white p-3 text-left"
+            type="button"
+            @click="router.push({ name: 'order-detail', params: { orderId: order.id } })"
+          >
+            <span class="flex items-start justify-between gap-2">
+              <span>
+                <strong class="block text-xs">{{ order.shop_name }}</strong>
+                <span class="mt-1 block text-[10px] text-[#68786e]">
+                  注文番号 {{ order.order_number }}
+                </span>
+                <span class="block text-[10px] text-[#849188]">{{ date(order.placed_at) }}</span>
+              </span>
+              <ChevronRight :size="18" class="shrink-0" />
+            </span>
+            <span
+              v-for="item in order.items.slice(0, 2)"
+              :key="item.product_name"
+              class="mt-2 flex items-center gap-2 border-t border-[#e5ebe5] pt-2"
+            >
+              <img
+                v-if="item.image_url"
+                :src="item.image_url"
+                class="size-9 rounded object-cover"
+                alt=""
+              />
+              <span v-else class="size-9 rounded bg-[#edf2ed]" />
+              <span class="min-w-0 flex-1 truncate text-[10px]">
+                {{ item.product_name }} × {{ item.quantity }}
+              </span>
+            </span>
+            <span
+              v-if="order.items.length > 2"
+              class="mt-1 block text-right text-[10px] text-[#68786e]"
+            >
+              ほか{{ order.items.length - 2 }}点
+            </span>
+            <span
+              class="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#e5ebe5] pt-2 text-xs"
+            >
+              <strong>合計 {{ yen(order.total_yen) }}</strong>
+              <span class="flex flex-wrap justify-end gap-1">
+                <span class="rounded bg-[#edf3f8] px-2 py-1 text-[10px]">
+                  注文：{{ orderStatusLabel(order.order_state) }}
+                </span>
+                <span class="rounded bg-[#e9f5ee] px-2 py-1 text-[10px]">
+                  支払：{{ paymentStatusLabel(order.payment_state) }}
+                </span>
+                <span
+                  v-if="refundStatusLabel(order.refund_state)"
+                  class="rounded bg-[#fff4e5] px-2 py-1 text-[10px]"
+                >
+                  返金：{{ refundStatusLabel(order.refund_state) }}
+                </span>
+              </span>
+            </span>
+          </button>
+        </section>
+        <UiDrawerContent>
+          <div class="mb-4 flex items-center justify-between">
+            <UiDrawerTitle class="text-base font-bold">絞り込み</UiDrawerTitle>
+            <UiDrawerClose as-child>
+              <button
+                class="grid size-8 place-items-center border-0 bg-transparent text-[#66766d]"
+                type="button"
+                aria-label="閉じる"
+              >
+                <X :size="21" aria-hidden="true" />
+              </button>
+            </UiDrawerClose>
+          </div>
+          <UiDrawerDescription class="sr-only">
+            注文期間を選択して、適用してください。
+          </UiDrawerDescription>
           <form class="flex min-h-0 flex-1 flex-col" @submit.prevent="applyFilters">
             <fieldset class="m-0 min-h-0 flex-1 overflow-y-auto border-0 p-0">
               <legend class="mb-2 text-xs font-bold">注文期間</legend>
@@ -546,8 +551,8 @@ const {
               </button>
             </div>
           </form>
-        </section>
-      </div>
-    </BuyerPageShell>
+        </UiDrawerContent>
+      </BuyerPageShell>
+    </UiDrawer>
   </div>
 </template>
